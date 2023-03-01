@@ -9,9 +9,9 @@ import { GetUser } from 'src/auth/decorator';
 export class UserController {
     @UseGuards(JwtModule)
     @Get('me')
-    getMe(@GetUser() user: User) {
+    getMe( @GetUser() user: User, @GetUser('email') email: string ) {
         return user;
     }
     
-}
+} 
 
