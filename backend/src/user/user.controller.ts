@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { Request } from 'express';
-import { GetUser } from 'src/auth/decorator';
+import { GetUser } from '../auth/decorator';
 
 @Controller('users')
 export class UserController {
