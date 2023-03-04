@@ -1,3 +1,29 @@
 NestJs Course for Beginners - Create a REST API
 	https://www.youtube.com/watch?v=GHTA143_b-s
 
+**********************************************
+|	======================================== |
+|		USEFULL COMMAND	AND INFORMATIONS	 |
+|	======================================== |
+**********************************************
+
+ON UTILISE YARN POUR COMPILER LE PROJET.
+SI VOUS GIT PULL = npm i ou yarn je crois que ca marche aussi // pour installer les dépendances qui vous manque
+
+Installer Insomnia pour tester les routes et les inputs / output.
+
+yarn start:dev : Lance le serveur en mode DEV.
+yarn db:restart : Redemarre le container de la DATABASE PRINCIPAL.
+yarn test:restart: Redemarre le container de la DATABASE DE TEST avec le .env.test.
+yarn test:e2e : Lance les tests e2e. DU FICHIER src/test/app.e2e-spec.ts (PAS BESOIN DE RELANCER LA COMMANDE UN "ENTER" SUFFIT)
+
+npx prisma studio : Lance la database sur l'adresse http://localhost:5555
+
+LORSQUE VOUS FAITES UNE MISE A JOUR DE LA DATABASE
+npx prisma migrate dev 
+
++ PENSEZ A REDEMARRER LE CONTAINER DE TEST LORSQUE VOUS FAITES VOS TESTS DE yarn test:e2e
++ ASSUREZ VOUS QUE TOUT LES TESTS DU FICHIER src/test/app.e2e-spec.ts PASSENT AVANT DE PUSH SUR LE REPO.
+
+Bon code les gamers.
+

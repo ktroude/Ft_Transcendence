@@ -18,6 +18,7 @@ model User {
   email String @unique
   hash String
 
+  nickname String?
   firstname String?
   lastname String?
 

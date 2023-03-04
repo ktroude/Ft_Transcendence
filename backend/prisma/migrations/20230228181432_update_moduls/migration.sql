@@ -18,6 +18,7 @@ CREATE TABLE "users" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "email" TEXT NOT NULL,
     "hash" TEXT NOT NULL,
+    "nickname" TEXT,
     "firstname" TEXT,
     "lastname" TEXT,
 

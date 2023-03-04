@@ -62,8 +62,8 @@ describe('App test', () => {
 
   describe('Bookmarks', () => {
     describe('Create bookmarks', () => {});
-    describe('Get bookmarks', () => {});
     describe('Get bookmarks by id', () => {});
-    describe('Delete bookmarks', () => {});
+    describe('Get bookmarks by id', () => {});
+    describe('Delete bookmarks by id', () => {});
   });
 });
