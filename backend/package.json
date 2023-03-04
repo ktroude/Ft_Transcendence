@@ -6,7 +6,10 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "db:stop": "docker compose rm backend -sfv && sleep 1 && docker compose rm test-backend -sfv",
+    "db:start": "docker compose up backend -d && sleep 3 && prisma migrate deploy",
     "db:restart": "docker compose rm backend -sfv && sleep 1 && docker compose up backend -d && sleep 3 && prisma migrate deploy",
+    "test:start": "docker compose up test-backend -d && sleep 3 && dotenv -e ./.env.test -- prisma migrate deploy",
     "test:restart": "docker compose rm test-backend -sfv && sleep 1 && docker compose up test-backend -d && sleep 3 && dotenv -e ./.env.test -- prisma migrate deploy",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
