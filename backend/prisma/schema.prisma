@@ -17,5 +17,6 @@ model User {
 
   firstname String
   lastname String
-  pseudo String
+  pseudo String @unique
+  @@map("user") // indique que le nom de la table est "user" plutôt que "User"
 }
