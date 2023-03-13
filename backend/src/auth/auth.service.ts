@@ -92,5 +92,7 @@ export class AuthService {
 };
 
 // maintenant il faut convertir les data du user qu'on recupere en un jwt token --> done
+
+// a faire :
 // et renvoyer l'utilisateur vers une page du fronte avec une variable code dans l'url
 // ce code sera le jwt token et permettra d'afficher les infos dont on a besoin pour le front.
