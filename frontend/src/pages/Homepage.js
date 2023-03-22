@@ -1,13 +1,20 @@
 import React from 'react';
-import MonComposant from '../components/Cookie';
+import Header from '../components/Header/Header';
+import Info from '../components/Info/Info';
+import Logo from '../components/Logo/Logo';
+import '../styles/Homepage.css'
 
 const Homepage = () => {
-    const Log = false;
+    const Log = true;
     if (!Log)
     {
         return (
-            <div>    
-                <h1>Connecte toi pour avoir acces a cette page</h1>
+            <div>
+                <Header />
+                <Logo />
+                <div className="LogFalse">
+                    <h1>Vous devez être connecté pour avoir accès au site</h1>
+                </div>
             </div>
         );
     } 
@@ -15,8 +22,12 @@ const Homepage = () => {
     {
         return (
             <div>
-                <h1>Welcome to Ft_transcendence</h1>
-                <MonComposant />
+                <nav>
+                    <link rel="stylesheet" href="/fonts.css" />
+                    <h1 className='Welcome'>
+                        Welcome to Ft_Transcendence
+                    </h1>
+                </nav>
             </div>
         );
     } 

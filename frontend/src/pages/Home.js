@@ -1,11 +1,12 @@
 import React from 'react';
-import Logo from '../components/Logo.js';
-import Navigation from '../components/Navigation.js';
+import Header from '../components/Header/Header.js';
+import Logo from '../components/Logo/Logo.js';
+import Navigation from '../components/Navigation/Navigation.js';
 
 const Home = () => {
     return (
         <div>
-            <h1>Ft_transcendence</h1>
+            <Header />
             <Logo />
             <Navigation />
         </div>

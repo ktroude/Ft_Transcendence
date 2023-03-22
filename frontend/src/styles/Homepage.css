@@ -1,0 +1,34 @@
+*{
+    margin:0;
+    padding: 0;
+    background-image: url('../../public/Bontavsbrak.jpg');
+    height: 100%;
+    width: 100%;
+}
+
+.LogFalse{
+    text-align: center;
+    font-size: 80px;
+    background-color: DarkSeaGreen;
+}
+
+.Welcome{
+    background-color: transparent;
+    margin: 0 auto;
+    width: 1920px;
+    height: 98px;
+    font-family: Lobster, cursive;
+    text-align: center;
+    color: orange;
+    text-shadow: 2px 4px brown;
+    font-size: 75px;
+    animation: colors 3s infinite;
+}
+/* 
+div{
+
+} */
+
+.dofus{
+    text-align: center;
+}
