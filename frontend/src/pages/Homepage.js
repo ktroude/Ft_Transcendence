@@ -1,6 +1,5 @@
 import React from 'react';
 import Header from '../components/Header/Header';
-import Info from '../components/Info/Info';
 import Logo from '../components/Logo/Logo';
 import '../styles/Homepage.css'
 
@@ -21,14 +20,14 @@ const Homepage = () => {
     else
     {
         return (
-            <div>
+            <main>
                 <nav>
                     <link rel="stylesheet" href="/fonts.css" />
                     <h1 className='Welcome'>
                         Welcome to Ft_Transcendence
                     </h1>
                 </nav>
-            </div>
+            </main>
         );
     } 
 };

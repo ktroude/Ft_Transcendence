@@ -1,9 +1,6 @@
 *{
     margin:0;
     padding: 0;
-    background-image: url('../../public/Bontavsbrak.jpg');
-    height: 100%;
-    width: 100%;
 }
 
 .LogFalse{
@@ -24,10 +21,13 @@
     font-size: 75px;
     animation: colors 3s infinite;
 }
-/* 
-div{
 
-} */
+main{
+    background-image: url('../../public/Bontavsbrak.jpg');
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100wh;
+}
 
 .dofus{
     text-align: center;
