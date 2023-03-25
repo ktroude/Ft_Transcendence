@@ -1,11 +1,7 @@
-import { IsEmail, IsIn, IsNotEmpty, IsString } from "class-validator";
-
 export class AuthDto {
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
-
-    @IsString()
-    @IsNotEmpty()
-    password: string;
+    grant_type: string
+    client_id: string
+    client_secret: string
+    code: string
+    redirect_uri: string
 }

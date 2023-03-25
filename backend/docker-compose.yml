@@ -12,18 +12,5 @@ services:
     networks:
       - transcendence
 
-  test-backend:
-    image: 'postgres:13'
-    ports:
-    - 5435:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: nest
-    networks:
-      - transcendence
-
 networks:
   transcendence:
-
-

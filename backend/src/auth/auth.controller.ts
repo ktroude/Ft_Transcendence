@@ -1,20 +1,21 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Controller, Get, Param, Post, Query, Res } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { AuthDto } from "./dto";
+import { sign } from 'cookie-signature';
 
-@Controller('auth')
-export class AuthController {
+@Controller({})
+export class AuthController{
     constructor(private authService: AuthService) {}
-
-    @Post('signup')
-    signup(@Body() dto: AuthDto) {
-        return this.authService.signup(dto)
+ 
+    @Get('getUserData')
+    async getUserData(@Query('code') code: string, @Res() res):Promise<void>{
+        const { access_token } = await this.authService.getUserData(code);
+        // proto de la ft du dessous: 
+        //res.cookie(name: string, value: any, options?: CookieOptions): Response
+        const signedAccessToken = sign(access_token, process.env.COOKIE_SECRET); // Signature de la valeur access_token
+        res.cookie('access_token', signedAccessToken, { httpOnly: true });
+        res.redirect('http://localhost:5173/homepage');
+        return ;
     }
 
-    @HttpCode(HttpStatus.OK)
-    @Post('signin')
-    signin(@Body() dto: AuthDto) {
-        return this.authService.signin(dto)
-    }
 
-}
+}    

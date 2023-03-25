@@ -1,79 +1,98 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
-import { AuthDto } from "./dto";
-import * as argon from "argon2"
-import { PrismaClientInitializationError, PrismaClientKnownRequestError } from "@prisma/client/runtime";
-import { JwtSecretRequestType, JwtService } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
-import { isEAN } from "class-validator";
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
+import axios from 'axios';
+import * as dotenv from 'dotenv';
+import { userInfo } from "os";
+import { User } from "@prisma/client";
+import { JwtService } from "@nestjs/jwt";
 
-@Injectable()
+// permet de charger des variables depuis le fichier .env a la racine de backend
+// c'est une question de secu pour ne pas laisser le client secret et autre variable sensible dans le code
+dotenv.config();
+
+@Injectable({})
 export class AuthService {
-    constructor(
-        private prisma: PrismaService,
-        private jwt: JwtService,
-        private config: ConfigService,
-        ) {}
+    constructor(private prisma:PrismaService, private jwt: JwtService) {}
+    
+    // cette fonction permet de recuperer toutes les info d'un pelo qui se connecte a notre site via ce lien:
+    // https://api.intra.42.fr/oauth/authorize
+    async getUserData(code: string): Promise<{access_token: string}> {
+        // url pour avoir le token genere par l'api 42
+        const token_url = process.env.TOKEN_URL;
+        // les infos a envoyer a cette api
+        const data = {
+          grant_type: process.env.GRANT_TYPE ,
+          client_id: process.env.CLIENT_ID ,
+          client_secret: process.env.CLIENT_SECRET,
+          code: code,
+          redirect_uri: process.env.REDIRECT_URI ,
+        };
+        // la requete a l'api de 42
+        const response = await axios.post(token_url, data);
+        // url pour echanger le token (qu'on vient de generer dans la variable response) contre les data du user
+        const data_url = process.env.DATA_URL;
+        // le token en question
+        const access_token = response.data.access_token;
+        const headers = {
+        'Authorization': 'Bearer ' + access_token
+        };
+        // la requete pour faire l'echange
+        const userResponse = await axios.get(data_url, { headers: headers });
+        // toute les infos sont donc contenue dans userResponse.data 
+        // on creer le user, ou on recupere son id si il existe
+        const user = await this.check_db(userResponse.data);
+        // on convertie l'id du user et ses infos en un token qu'on reutilisera plus tard
+        const signedToken = this.getJwtToken(user);
 
-    async signup(dto: AuthDto) {
-        // generate the password hash
-        const hash = await argon.hash(dto.password);
+        return signedToken;
+      }
+    
 
-        try {
-            // save new user in the db
-            const user = await this.prisma.user.create({
-                data: {
-                    email: dto.email,
-                    hash,
-                }})
-
-            delete user.hash // delete hashed PW from the return for safety
-
-            // return the saved user
-            return this.signToken(user.id, user.email);
-        }
-        catch(error) {
-            if (error) {
-                if (error.code === 'P2002') // num de ce code --> cette variable unique existe deja
-                    throw new ForbiddenException('This email is already taken');
-                throw error;
-            }
-        }
-    }
-
-    async signin(dto: AuthDto) {
-        // find the user by email
+      // parcour la db et check si le user existe dans la db
+      // si il existe on le renvoie sinon on le creer et le renvoie.
+      async check_db(user_data: any): Promise <User> {
+        // check si il existe dans la db
         const user = await this.prisma.user.findUnique({
-            where: {
-                email: dto.email,
+          where: {
+            pseudo: user_data.login,
+          }
+        });
+        // prisma.findUnique() renvoie (null) si il existe pas dans la db
+        if (!user) {
+          // sinon on le creer
+          const new_user = await this.prisma.user.create({
+            data:{
+              firstname: user_data.first_name,
+              lastname: user_data.last_name,
+              pseudo: user_data.login,
             }
-        });
-        console.log(user);
-        // if user does not exist throw exeption
-        if (!user)
-            throw new ForbiddenException('Incorect email');
-        // compare PW
-        const pwMatches = await argon.verify(user.hash, dto.password);
-        // if PW incorect throw exeption
-        if (!pwMatches)
-            throw new ForbiddenException('Incorect password')
-        // send back the user
-        delete user.hash
-        return this.signToken(user.id, user.email);
-    }
-
-    async signToken(userId: number, email: string): Promise<{ access_token: string }> {
-        const payload = {
-            sub: userId,
-            email,
+          });
+          return new_user;
         }
-        const secret = this.config.get('JWT_SECRET');
-        
-        const token = await this.jwt.signAsync(payload, {
-            expiresIn: '60m',
-            secret: secret,
-        });
+        return user;
+      }
 
-        return { access_token : token };
-    }
-}
+      // transforme les datas du user (name, id, ect..) en un token signé par la variable process.env.JWT_SECRET 
+      // (on peut trouver cette variable dans le .env, comme les autres process.env....)
+      // on fait ca pour s'assurer que c'est bien nous qui avons cree ce token et que c'est pas une magouille d'un utilisateur
+      async getJwtToken(user:User): Promise<{access_token: string}> {
+        const data = {
+          sub: user.id,
+          pseudo: user.pseudo,
+          firstname: user.firstname,
+          lastname: user.lastname,
+        }
+        const token = await this.jwt.signAsync(data, {
+          expiresIn: '15m',
+          secret: process.env.JWT_SECRET,
+        })
+        return {access_token: token};
+      }
+
+};
+
+// maintenant il faut convertir les data du user qu'on recupere en un jwt token --> done
+
+// a faire :
+// et renvoyer l'utilisateur vers une page du fronte avec une variable code dans l'url
+// ce code sera le jwt token et permettra d'afficher les infos dont on a besoin pour le front.
