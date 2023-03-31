@@ -28,8 +28,6 @@ export class AuthService {
           redirect_uri: process.env.REDIRECT_URI ,
         };
         // la requete a l'api de 42
-        console.log("post vers 42/token");
-        
         const response = await axios.post(token_url, data);
         // url pour echanger le token (qu'on vient de generer dans la variable response) contre les data du user
         const data_url = process.env.DATA_URL;
@@ -43,8 +41,6 @@ export class AuthService {
         // toute les infos sont donc contenue dans userResponse.data 
         // on creer le user, ou on recupere son id si il existe
         const user = await this.check_db(userResponse.data);
-        console.log(userResponse.data);
-        
         // on convertie l'id du user et ses infos en un token qu'on reutilisera plus tard
         const signedToken = this.getJwtToken(user);
 
