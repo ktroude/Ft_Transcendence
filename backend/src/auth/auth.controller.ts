@@ -6,7 +6,7 @@ import { sign } from 'cookie-signature';
 export class AuthController{
     constructor(private authService: AuthService) {}
  
-    @Get('getUserData')
+    @Get('token')
     async getUserData(@Query('code') code: string, @Res() res):Promise<void>{
         const { access_token } = await this.authService.getUserData(code);
         // proto de la ft du dessous: 
