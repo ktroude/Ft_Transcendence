@@ -1,6 +1,12 @@
-Dans ce dossier mettez toute la doc dont vous avez besoin
+Pour lancer le Projet:
 
-Pas dans le redme hein
-On se fait un nouveau dossier par sujet ca sera plus propre.
-GL les BG
+dans le back:
+
+    docker compose up -d
+    npm run go
+
+dans le front:
+
+    npm run dev
+
 
