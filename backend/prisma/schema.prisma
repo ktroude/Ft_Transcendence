@@ -11,12 +11,62 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int @id   @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  firstname String
-  lastname String
-  pseudo String @unique
+  firstname   String
+  lastname    String
+  pseudo      String @unique
+
+
+// mettres toutes ces variables dans la table intermediaire ChatRoomMembers? A voir JSP
+  memberOf  ChatRoom[]   @relation("ChatRoomMembers")
+  mutedOf   ChatRoom[]   @relation("ChatRoomMuted")
+  bannedOf  ChatRoom[]   @relation("ChatRoomBanned")
+  adminOf   ChatRoom[]   @relation("ChatRoomAdmin")
+  ownerOf   ChatRoom[]   @relation("ChatRoomOwned")
   @@map("user") // indique que le nom de la table est "user" plutôt que "User"
+}
+
+model ChatRoom {
+  id        Int @id   @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  name    String ?
+  ownerId Int
+  owner   User    @relation("ChatRoomOwned", fields: [ownerId], references: [id])
+
+  members   User[]    @relation("ChatRoomMembers")
+  admin     User[]    @relation("ChatRoomAdmin")
+  muted     User[]    @relation("ChatRoomMuted")
+  banned    User[]    @relation("ChatRoomBanned")
+  messages  Message[] @relation("ChatRoomMessages")
+
+  @@map("chat_room")
+}
+
+// table intermediaire, permettra de checker qu'un user est dans une room qu'une seule fois 
+// (qu'il ne se co pas 50 fois a la meme room, ca peut etre chiant)
+model ChatRoomMembers {
+  chatRoomId  Int
+  userId      Int
+  createdAt   DateTime @default(now())
+
+  @@id([chatRoomId, userId])
+  @@map("chat_room_members")
+}
+
+model Message {
+  id        Int @id   @default(autoincrement()) //mandatory but useless (on va pas modifier ou supp des messages ds ce projet, c'est pas discord ici)
+  createdAt DateTime  @default(now())
+
+  content       String
+  senderId      Int
+  senderPseudo  String
+  chatRoomId    Int
+  chatRoom ChatRoom @relation("ChatRoomMessages", fields: [chatRoomId], references: [id])
+
+  @@map("message")
 }
