@@ -9,4 +9,4 @@ dans le front:
 
     npm run dev
 
-
+npx prisma studio
