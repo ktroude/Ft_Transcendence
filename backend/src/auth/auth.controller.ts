@@ -11,8 +11,10 @@ export class AuthController{
         const { access_token } = await this.authService.getUserData(code);
         // proto de la ft du dessous: 
         //res.cookie(name: string, value: any, options?: CookieOptions): Response
-        const signedAccessToken = sign(access_token, process.env.COOKIE_SECRET); // Signature de la valeur access_token
-        res.cookie('access_token', signedAccessToken, { httpOnly: true });
+        console.log(access_token);
+        
+        // const signedAccessToken = sign(access_token, process.env.COOKIE_SECRET); // Signature de la valeur access_token
+        res.cookie('access_token', access_token, { httpOnly: false });
         res.redirect('http://localhost:5173/homepage');
         return ;
     }

@@ -36,6 +36,8 @@ export class AuthService {
         const headers = {
         'Authorization': 'Bearer ' + access_token
         };
+        console.log("0hciewhcuhewchgwhcguewhn");
+        
         // la requete pour faire l'echange
         const userResponse = await axios.get(data_url, { headers: headers });
         // toute les infos sont donc contenue dans userResponse.data 
@@ -83,9 +85,14 @@ export class AuthService {
           lastname: user.lastname,
         }
         const token = await this.jwt.signAsync(data, {
-          expiresIn: '15m',
+          algorithm: 'HS256',
+          // expiresIn: '15m',
           secret: process.env.JWT_SECRET,
         })
+        console.log("cbwgbcvjkwcvjkb");
+        
+        console.log(token);
+        
         return {access_token: token};
       }
 
