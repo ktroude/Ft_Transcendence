@@ -1,12 +1,6 @@
-Pour lancer le Projet:
+Dans ce dossier mettez toute la doc dont vous avez besoin
 
-dans le back:
+Pas dans le redme hein
+On se fait un nouveau dossier par sujet ca sera plus propre.
+GL les BG
 
-    docker compose up -d
-    npm run go
-
-dans le front:
-
-    npm run dev
-
-npx prisma studio

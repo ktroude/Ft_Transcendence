@@ -13,6 +13,8 @@ const MyCookie = () => {
     setCookieValue(value);
   }, []);
 
+    console.log(`http://localhost:3000/users/userInfo?code=${code}`);
+    
   useEffect(() => {
     fetch(`http://localhost:3000/users/userInfo?code=${code}`,{
         method: 'POST',
