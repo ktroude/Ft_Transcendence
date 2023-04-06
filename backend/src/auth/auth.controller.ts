@@ -12,9 +12,11 @@ export class AuthController {
     const { access_token } = await this.authService.getUserData(code);
     // proto de la ft du dessous:
     //res.cookie(name: string, value: any, options?: CookieOptions): Response
-    const signedAccessToken = sign(access_token, process.env.COOKIE_SECRET); // Signature de la valeur access_token
-    res.cookie('access_token', signedAccessToken, { httpOnly: false });
-    res.redirect('http://localhost:5173/homepage');
+    // const signedAccessToken = sign(access_token, process.env.COOKIE_SECRET); // Signature de la valeur access_token
+    console.log("ACCESS TOKEN A LA CREATION == ", access_token);
+    
+    res.cookie('access_token', access_token, { httpOnly: false });
+    res.redirect('http://localhost:5173/Cookie');
     return;
   }
 }

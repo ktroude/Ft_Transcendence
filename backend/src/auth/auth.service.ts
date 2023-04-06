@@ -83,9 +83,9 @@ export class AuthService {
       lastname: user.lastname,
     };
     const token = await this.jwt.signAsync(data, {
-      expiresIn: '15m',
       secret: process.env.JWT_SECRET,
     });
+    
     return { access_token: token };
   }
 }

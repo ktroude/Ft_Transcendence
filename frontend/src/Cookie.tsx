@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 const MyCookie = () => {
   const [cookieValue, setCookieValue] = useState('');
   const [code, setCode] = useState('');
+  const [user, setUser] = useState('');
 
   useEffect(() => {
     const value = document.cookie
@@ -13,18 +14,19 @@ const MyCookie = () => {
     setCookieValue(value);
   }, []);
 
-    console.log(`http://localhost:3000/users/userInfo?code=${code}`);
-    
+  console.log('http://localhost:3000/users/userInfo?code=${code}', "\n\ncode ===", cookieValue);
+  
+
   useEffect(() => {
-    fetch(`http://localhost:3000/users/userInfo?code=${code}`,{
-        method: 'POST',
-        body: JSON.stringify(code),
-    })
+    fetch(`http://localhost:3000/users/userInfo?code=${cookieValue}`)
     .then((response) => {
-        response.json();
+        return response.json();
     })
-    .then((data) => console.log(data))
-  }, [code]);
+    .then((data) => {
+        setUser(data);
+    })
+    .catch((error) => console.log(error));
+  }, [cookieValue]);
 
   useEffect(() => {
     setCode(cookieValue);
@@ -33,6 +35,8 @@ const MyCookie = () => {
   return (
     <div>
       La valeur du cookie "access_token" est : {cookieValue}
+      <p> </p>
+      Les informations de l'utilisateur sont : {JSON.stringify(user.pseudo)}
     </div>
   );
 };
