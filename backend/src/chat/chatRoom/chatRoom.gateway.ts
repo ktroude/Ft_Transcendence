@@ -1,7 +1,9 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Message } from "@prisma/client";
 import { Server } from "socket.io";
+import { UserService } from "src/user/user.service";
 import { MessageService } from "../message/message.service";
+import { ChatRoomService } from "./chatRoom.service";
 
 
 @WebSocketGateway({
@@ -10,17 +12,23 @@ import { MessageService } from "../message/message.service";
     }
 })
 export class ChatRoomGateway {
-//   constructor(private messageService: MessageService) {}
+   constructor( private messageService:   MessageService,
+                private chatRoomService:  ChatRoomService,
+                private userService:      UserService
+              ) {}
 
   @WebSocketServer()
   server: Server;
 
-//   @SubscribeMessage('newMessage')
-//   handleEvent(client: any, newMessage: Message) {
-//     const message = this.messageService.createMessage(newMessage.content, newMessage.senderId, newMessage.senderPseudo, newMessage.chatRoomId);
-//     // Enregistrement du message en base de données avec Prisma
+  @SubscribeMessage('newMessage')
+  async handleEvent(client: any, newMessage: Message, ) {
 
-//     this.server.to(newMessage.chatRoomId).emit('newMessage', message);
-//     // Diffusion du message à tous les utilisateurs de la chatroom
-//   }
+    const chatRoom = await this.chatRoomService.getUniqueChatRoom(newMessage.chatRoomId);
+    const sender = await this.userService.findUserById(newMessage.senderId);
+    const message = this.messageService.createMessage(newMessage.content, sender, chatRoom);
+    // Enregistrement du message en base de données avec Prisma
+
+    this.server.to(newMessage.chatRoomId.toString()).emit('newMessage', message);
+    // Diffusion du message à tous les utilisateurs de la chatroom
+  }
 }

@@ -36,7 +36,6 @@ export class AuthService {
         const headers = {
         'Authorization': 'Bearer ' + access_token
         };
-        console.log("0hciewhcuhewchgwhcguewhn");
         
         // la requete pour faire l'echange
         const userResponse = await axios.get(data_url, { headers: headers });
@@ -89,9 +88,6 @@ export class AuthService {
           // expiresIn: '15m',
           secret: process.env.JWT_SECRET,
         })
-        console.log("cbwgbcvjkwcvjkb");
-        
-        console.log(token);
         
         return {access_token: token};
       }

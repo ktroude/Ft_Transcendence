@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
-import { setDefaultResultOrder } from 'dns';
+import {  User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-// import * as jwt from 'jsonwebtoken';
-import { allowedNodeEnvironmentFlags } from 'process';
+
 const jwt = require('jsonwebtoken');
 @Injectable()
 export class UserService {
