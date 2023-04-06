@@ -1,6 +1,5 @@
 import { Controller, Post } from "@nestjs/common";
 import { ChatRoomService } from "./chatRoom.service";
-import { User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Controller({})

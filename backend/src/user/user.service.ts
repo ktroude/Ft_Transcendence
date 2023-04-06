@@ -56,15 +56,11 @@ export class UserService {
             {
                 console.log("FAUX");
                 console.log(err);
-                
-                return false
+                return false;
             }
             
             else
             {
-                console.log('decoded');
-                console.log(decoded);
-                
                 return decoded;
             }
           });

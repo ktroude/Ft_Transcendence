@@ -1,44 +1,22 @@
 import React, { useEffect, useState } from 'react';
 
 const MyCookie = () => {
-  const [cookieValue, setCookieValue] = useState('');
-  const [code, setCode] = useState('');
-  const [user, setUser] = useState('');
-
+  const [user, setUser] = useState({});
   useEffect(() => {
-    const value = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('access_token='))
-      ?.split('=')[1] ?? '';
-
-    setCookieValue(value);
+    const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1] ?? '';
+    fetch('http://localhost:3000/users/userInfo', {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(response => response.json()).then(data => { setUser(data); })
+    .catch(error => console.log(error));
   }, []);
 
-  console.log('http://localhost:3000/users/userInfo?code=${code}', "\n\ncode ===", cookieValue);
-  
-
   useEffect(() => {
-    fetch(`http://localhost:3000/users/userInfo?code=${cookieValue}`)
-    .then((response) => {
-        return response.json();
-    })
-    .then((data) => {
-        setUser(data);
-    })
-    .catch((error) => console.log(error));
-  }, [cookieValue]);
+    if (Object.keys(user).length !== 0) {
+      console.log(user);
+    }
+  }, [user]);
 
-  useEffect(() => {
-    setCode(cookieValue);
-  }, [cookieValue]);
-
-  return (
-    <div>
-      La valeur du cookie "access_token" est : {cookieValue}
-      <p> </p>
-      Les informations de l'utilisateur sont : {JSON.stringify(user.pseudo)}
-    </div>
-  );
+  return null;
 };
 
 export default MyCookie;
