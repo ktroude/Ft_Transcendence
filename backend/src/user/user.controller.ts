@@ -13,12 +13,6 @@ export class UserController {
         return user;
     }
 
-    @Post('salut')
-    sayHey(){
-        console.log("HEYYO");
-        
-    }
-
     @Post('userInfo')
     async SendUserData(@Query('code') code: string) {
         const user = this.userService.decodeToken(code);
