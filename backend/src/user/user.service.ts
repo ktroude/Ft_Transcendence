@@ -65,6 +65,8 @@ export class UserService {
             }
           });
         if (ret != false)
-        return await this.findUserByPseudo(ret.pseudo)
+            return await this.findUserByPseudo(ret.pseudo);
+        else
+          return undefined;
     }
 }

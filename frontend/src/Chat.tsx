@@ -2,7 +2,10 @@ import { useEffect } from "react";
 import io from "socket.io-client";
 
 const socket = io("http://localhost:3000", {
-  // transports: ["websocket"],
+  transports: ["websocket"],
+  // extraHeaders: {
+  //   Authorization: `Bearer ${getAccessToken()}`,
+  // },
 });
 
 function Chat() {
@@ -24,5 +27,15 @@ function Chat() {
 
 export default Chat;
 
+
+function getAccessToken() {
+  const name = "access_token";
+  const cookieValue = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${name}=`))
+    ?.split("=")[1];
+
+  return cookieValue || "";
+}
 
 

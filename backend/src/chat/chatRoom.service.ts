@@ -8,6 +8,47 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class ChatRoomService {
     constructor(private prisma:PrismaService) {}
 
+  async isAdmin(user:User, chatRoom: ChatRoom):Promise<Boolean> {
+    const isAdmin = await this.prisma.chatRoom
+      .findUnique({where: { id: chatRoom.id },})
+      .admin({ where: { id: user.id },})
+      .then((user) => !!user);
+    return isAdmin
+  }
+
+  async isOwner(user: User, chatRoom: ChatRoom): Promise<boolean> {
+    const isOwner = await this.prisma.chatRoom.findUnique({
+      where: { id: chatRoom.id },
+      select: { owner: { select: { id: true }}},
+    });
+    if (!isOwner)
+      return false; // supprimer la room en plus ici
+    return isOwner.owner.id === user.id;
+  }
+
+  async isMuted(user:User, chatRoom: ChatRoom): Promise<boolean> {
+    const isMuted = await this.prisma.chatRoom
+      .findUnique({where: {id: chatRoom.id}})
+      .muted({ where: {id: user.id }})
+      .then((user) => !!user);
+    return isMuted;
+  }
+
+  async isBanned(user:User, chatRoom:ChatRoom): Promise<boolean> {
+    const isBanned = await this.prisma.chatRoom
+      .findUnique({where : {id: chatRoom.id}})
+      .banned({where: {id: user.id}})
+      .then((user) => !!user);
+    return isBanned;
+  }
+
+  async isMember(user:User, chatRoom:ChatRoom): Promise<boolean> {
+    const isMember = await this.prisma.chatRoom
+      .findUnique({where: {id: chatRoom.id}})
+      .members({where: {id: user.id}})
+      .then((user)=> !!user);
+    return isMember;
+  }
 
     async createChatRoom(user:User) {
       const chatRoomData: Prisma.ChatRoomCreateInput = {
