@@ -1,8 +1,7 @@
-import React from "react";
-import Login from "./Login";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Cookie from "./Cookie";
 import HomePage from "./Homepage";
+import Chat from "./Chat";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +15,10 @@ const router = createBrowserRouter([
   {
     path: "/cookie",
     element: <Cookie />,
+  },
+  {
+    path: "/chat",
+    element: <Chat />,
   },
 ]);
 

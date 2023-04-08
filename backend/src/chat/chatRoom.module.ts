@@ -8,9 +8,8 @@ import { ChatRoomGateway } from "./chatRoom.gateway";
 import { ChatRoomService } from "./chatRoom.service";
 
 @Module({
-    imports: [PrismaModule, UserModule, JwtModule],
+    imports: [PrismaModule, JwtModule],
     controllers: [ChatRoomController],
-    providers: [ChatRoomService, ChatRoomGateway, UserService],
+    providers: [ChatRoomService, ChatRoomGateway],
 })
-
 export class ChatRoomModule {}

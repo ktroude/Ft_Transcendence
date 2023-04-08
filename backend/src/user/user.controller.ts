@@ -13,12 +13,11 @@ export class UserController {
     @Get('userInfo')
     async SendUserData(@Headers('Authorization') cookie: string) {
       const token = cookie.split(' ')[1];
-      if (!token) {
-        console.log('No token found');
-        // throw error
+      if (!token || cookie.split(' ')[0] != 'Bearer' || cookie.split(' ').length > 2) {
+        console.log('No token found or wrong');
+        // throw error --> redirect to login page
       }
       const user = await this.userService.decodeToken(token);
       return user;
     }
-
 }
