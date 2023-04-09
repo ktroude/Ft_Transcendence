@@ -38,7 +38,9 @@ export class ChatRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   async handleConnection(client : Socket) {
     const tokenCookie = client?.handshake?.headers?.cookie;
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+    console.log("Token ==",token);
     const user = await this.userService.decodeToken(token);
+    console.log("User == ", user);
     // associer le user et sa socket-client associe
     if (user)
       this.clients.push([user, client]);
@@ -60,9 +62,8 @@ export class ChatRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     @SubscribeMessage('createRoom')
     async handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
       const user = this.clients.find(([user, socket]) => socket === client)?.[0];
-      if (!data.name)
-        data.name = '';
-      // on creer la room
+      console.log(user);
+      
       let newChatRoom = await this.prismaService.chatRoom.create({
         data: {
                 name : data.name,
@@ -226,7 +227,33 @@ export class ChatRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       });
     }
 
+    @SubscribeMessage('joinRoom')
+    async handleJoinRoom(client: Socket, data: any) {
+      const user = this.clients.find(([, socket]) => socket === client)?.[0];
+      const chatRoom = await this.prismaService.chatRoom.findUnique(data.chatRoomId);
+      if (await this.chatRoomService.isBanned(user, chatRoom) === true){
+        // peut pas rejoindre la room
+        // handle error
+      }
+      await this.prismaService.chatRoom.update({
+        where: {id: chatRoom.id},
+        data: {members: {connect : {id: user.id}}},
+      });
+    }
+
+    @SubscribeMessage('leaveRoom')
+    async handleLeaveRoom(client: Socket, data: any) {
+      const user = this.clients.find(([, socket]) => socket === client)?.[0];
+      const chatRoom = await this.prismaService.chatRoom.findUnique(data.chatRoomId);
+      // condition erreur? je vois pas pour ce cas
+      await this.prismaService.chatRoom.update({
+        where: {id: chatRoom.id},
+        data: { members: {disconnect: {id: user.id}}}
+      });
+    }    
 
 
 }
+
+
 

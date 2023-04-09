@@ -50,6 +50,18 @@ export class ChatRoomService {
     return isMember;
   }
 
+
+  async getAllChatRoom() {
+    const rooms = await this.prisma.chatRoom.findMany({
+      select: {
+        id: true,
+        name: true,
+        owner: true,
+      }
+    })
+    return rooms;
+  }
+
     async createChatRoom(user:User) {
       const chatRoomData: Prisma.ChatRoomCreateInput = {
         owner: { connect: { id: user.id } },
@@ -83,10 +95,6 @@ export class ChatRoomService {
       });
       return createdMessage;
   } 
-
-    async getAllChatRoom() {
-      return this.prisma.chatRoom.findMany()
-    }
 
     async getUniqueChatRoom(idChatRoom: number) {
       return this.prisma.chatRoom.findUnique({

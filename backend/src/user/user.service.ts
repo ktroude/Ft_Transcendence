@@ -64,8 +64,13 @@ export class UserService {
                 return decoded;
             }
           });
-        if (ret != false)
-            return await this.findUserByPseudo(ret.pseudo);
+        console.log("ret == ", ret.pseudo);
+        
+        if (ret != false){
+            const user = await this.findUserByPseudo(ret.pseudo);
+            console.log(user);
+            return user;
+        }
         else
           return undefined;
     }

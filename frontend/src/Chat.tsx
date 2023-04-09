@@ -3,9 +3,7 @@ import io from "socket.io-client";
 
 const socket = io("http://localhost:3000", {
   transports: ["websocket"],
-  // extraHeaders: {
-  //   Authorization: `Bearer ${getAccessToken()}`,
-  // },
+  extraHeaders: { Authorization: `Bearer ${getAccessToken()}`},
 });
 
 function Chat() {
