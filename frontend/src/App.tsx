@@ -1,5 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import HomePage from "./Homepage";
+import HomePage from "./Homepage/Homepage";
 import Chat from "./Chat";
 import ChatRoomSelection from "./ChatRoomSlection";
 import Login from "./Login/Login";

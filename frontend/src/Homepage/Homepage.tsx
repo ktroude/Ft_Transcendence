@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import backgroundImage from '../../public/bvb.jpg';
+import Header from '../Login/Component'
+import HeaderLeft from './HeaderLeft';
 
 const HomePage = () => {
   const [user, setUser] = useState({});
@@ -16,8 +19,22 @@ const HomePage = () => {
     }
   }, [user]);
 
+  const background ={
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    height: '100vh',
+  }
+  interface HeaderLeftProps {
+    user: {
+    }
+  }
+
   return (
-    <div>Bonjour bienvenue sur la Homepage tu es {user.pseudo}</div>
+    <div style={background}>
+      <Header title="Ft_transcendence" />
+      <HeaderLeft user={user}/>
+    </div>
   );
 };
 

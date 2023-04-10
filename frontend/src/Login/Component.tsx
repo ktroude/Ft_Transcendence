@@ -1,6 +1,5 @@
 import React from 'react';
 import backgroundImage from '../../public/bvb.jpg';
-//import { textAlign } from 'csstype';
 
 interface HeaderProps {
   title: string;
@@ -16,7 +15,6 @@ const Header: React.FC<HeaderProps> = ({ title }: HeaderProps) => {
     color: 'orange',
     textShadow: '2px 4px brown',
     fontSize: '50px',
-    animation: 'colors 3s infinite',
   };
 
   return (
