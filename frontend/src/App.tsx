@@ -1,21 +1,18 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import Cookie from "./Cookie";
 import HomePage from "./Homepage";
 import Chat from "./Chat";
 import ChatRoomSelection from "./ChatRoomSlection";
+import Login from "./Login/Login";
+import "./Global.css"
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
+    element: <Login />,
   },
   {
     path: "/Homepage",
     element: <HomePage />,
-  },
-  {
-    path: "/cookie",
-    element: <Cookie />,
   },
   {
     path: "/chat",

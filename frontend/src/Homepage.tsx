@@ -1,15 +1,24 @@
-import React, { useEffect, useState } from "react";
-import Login from "./Login";
-import { unstable_createChainedFunction } from "@mui/utils";
+import React, { useEffect, useState } from 'react';
 
 const HomePage = () => {
-    const [userInfo] = useState(null);
-    return (
-        <div>
-          <h1>Page d'accueil</h1>
-          <Login />
-        </div>
-      );
+  const [user, setUser] = useState({});
+  useEffect(() => {
+    const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1] ?? '';
+    fetch('http://localhost:3000/users/userInfo', {
+      headers: { Authorization: `Bearer ${token}` }})
+      .then(response => response.json()).then(data => { setUser(data); })
+      .catch(error => console.log(error));
+  }, []);
+
+  useEffect(() => {
+    if (Object.keys(user).length !== 0) {
+      console.log(user);
+    }
+  }, [user]);
+
+  return (
+    <div>Bonjour bienvenue sur la Homepage tu es {user.pseudo}</div>
+  );
 };
 
 export default HomePage;
