@@ -53,8 +53,6 @@ export class UserService {
         const ret = jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
             if (err)
             {
-                console.log("FAUX");
-                console.log(err);
                 return false;
             }
             
@@ -63,8 +61,6 @@ export class UserService {
                 return decoded;
             }
           });
-        console.log("ret == ", ret.pseudo);
-        
         if (ret != false){
             const user = await this.findUserByPseudo(ret.pseudo);
             console.log(user);

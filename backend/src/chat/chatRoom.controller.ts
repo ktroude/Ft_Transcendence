@@ -6,16 +6,16 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class ChatRoomController {
     constructor(private prisma:PrismaService ,private chatRoomService: ChatRoomService) {}
 
-    @Post('newChatRoom')
-    async createChatRoom(userId: number) {
-        const user = await this.prisma.user.findUnique({
-            where: {
-                id: userId,
-            }
-        });
+    // @Post('newChatRoom')
+    // async createChatRoom(userId: number) {
+    //     const user = await this.prisma.user.findUnique({
+    //         where: {
+    //             id: userId,
+    //         }
+    //     });
 
-        return this.chatRoomService.createChatRoom(user);
-    }
+    //     return this.chatRoomService.createChatRoom(user);
+    // }
 
     @Get('getAll')
     async getAllChatRoom() {

@@ -43,13 +43,18 @@ export class ChatRoomGateway
   }
 
   async handleConnection(client: Socket) {
-    const tokenCookie = client?.handshake?.headers?.cookie;
-    const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+    const tokenCookie = client?.handshake?.headers?.authorization;
+    const token = tokenCookie ? tokenCookie.split(' ')[1] : '';
     const user = await this.userService.decodeToken(token);
     // associer le user et sa socket-client associe
-    if (user) this.clients.push([user, client]);
+    if (user){
+      this.clients.push([user, client]);
+    }
+    
     // sinon on le deco c'est une fraude
-    else this.handleDisconnect(client);
+    else {
+      this.handleDisconnect(client);
+    }
   }
 
   handleDisconnect(client: Socket) {
@@ -68,11 +73,13 @@ export class ChatRoomGateway
     @MessageBody() data: any,
   ) {
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
-    console.log(user);
-
+    console.log("data ===", data);
+    
     let newChatRoom = await this.prismaService.chatRoom.create({
       data: {
         name: data.name,
+        password: data.password,
+        private: data.private,
         ownerId: user.id,
       },
     });
@@ -85,6 +92,7 @@ export class ChatRoomGateway
         admin: { connect: { id: user.id } },
       },
     });
+    console.log(this.clients);
   }
 
   @SubscribeMessage('sendMessage')

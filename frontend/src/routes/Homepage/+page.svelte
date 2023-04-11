@@ -18,10 +18,8 @@
         if (accessToken) {
             const headers = new Headers();
             headers.append('Authorization', `Bearer ${accessToken}`);
-
             const response = await fetch('http://localhost:3000/users/userInfo', { headers });
             const data = await response.json();
-
             user = {
                 pseudo: data.pseudo,
                 firstName: data.firstname,

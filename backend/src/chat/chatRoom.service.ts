@@ -59,20 +59,20 @@ export class ChatRoomService {
     return rooms;
   }
 
-  async createChatRoom(user: User) {
-    const chatRoomData: Prisma.ChatRoomCreateInput = {
-      owner: { connect: { id: user.id } },
-      members: { connect: [{ id: user.id }] },
-      admin: { connect: [{ id: user.id }] },
-      muted: { connect: [] },
-      banned: { connect: [] },
-      messages: { connect: [] },
-    };
-
-    return await this.prisma.chatRoom.create({
-      data: chatRoomData,
-    });
-  }
+  // async createChatRoom(user: User) {
+  //   const chatRoomData: Prisma.ChatRoomCreateInput = {
+  //     owner: { connect: { id: user.id } },
+  //     members: { connect: [{ id: user.id }] },
+  //     admin: { connect: [{ id: user.id }] },
+  //     muted: { connect: [] },
+  //     banned: { connect: [] },
+  //     messages: { connect: [] },
+  //   };
+  // 
+  //   return await this.prisma.chatRoom.create({
+  //     data: chatRoomData,
+  //   });
+  // }
 
   async createMessage(text: string, user: User, chatRoom: ChatRoom) {
     const messageData: Prisma.MessageCreateInput = {

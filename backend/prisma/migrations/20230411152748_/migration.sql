@@ -16,7 +16,9 @@ CREATE TABLE "chat_room" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "name" TEXT,
+    "name" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "private" BOOLEAN NOT NULL,
     "ownerId" INTEGER NOT NULL,
 
     CONSTRAINT "chat_room_pkey" PRIMARY KEY ("id")
