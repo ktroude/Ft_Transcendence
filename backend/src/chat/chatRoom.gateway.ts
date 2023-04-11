@@ -45,9 +45,7 @@ export class ChatRoomGateway
   async handleConnection(client: Socket) {
     const tokenCookie = client?.handshake?.headers?.cookie;
     const token = tokenCookie ? tokenCookie.split('=')[1] : '';
-    console.log('Token ==', token);
     const user = await this.userService.decodeToken(token);
-    console.log('User == ', user);
     // associer le user et sa socket-client associe
     if (user) this.clients.push([user, client]);
     // sinon on le deco c'est une fraude

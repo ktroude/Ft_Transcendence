@@ -1,4 +1,17 @@
 -- CreateTable
+CREATE TABLE "user" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "firstname" TEXT NOT NULL,
+    "lastname" TEXT NOT NULL,
+    "pseudo" TEXT NOT NULL,
+    "picture" TEXT NOT NULL,
+
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "chat_room" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -24,6 +37,7 @@ CREATE TABLE "message" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "content" TEXT NOT NULL,
     "senderId" INTEGER NOT NULL,
+    "senderPseudo" TEXT NOT NULL,
     "chatRoomId" INTEGER NOT NULL,
 
     CONSTRAINT "message_pkey" PRIMARY KEY ("id")
@@ -54,6 +68,9 @@ CREATE TABLE "_ChatRoomBanned" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "user_pseudo_key" ON "user"("pseudo");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_ChatRoomMembers_AB_unique" ON "_ChatRoomMembers"("A", "B");
 
 -- CreateIndex
@@ -76,6 +93,9 @@ CREATE UNIQUE INDEX "_ChatRoomBanned_AB_unique" ON "_ChatRoomBanned"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_ChatRoomBanned_B_index" ON "_ChatRoomBanned"("B");
+
+-- AddForeignKey
+ALTER TABLE "chat_room" ADD CONSTRAINT "chat_room_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "message" ADD CONSTRAINT "message_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "chat_room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
