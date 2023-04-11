@@ -33,7 +33,7 @@
     }
 
     const gotoRoute = (route: string) => {
-        goto(route);
+        goto("http://localhost:5173" + route);
     }
 
     onMount(() => {
@@ -43,6 +43,6 @@
 
 <h1>Ceci est la homepage et tu es {user?.firstName}</h1>
 
-<button on:click={() => gotoRoute('/profil')}> Profil </button>
-<button on:click={() => gotoRoute('/game')}> Game </button>
-<button on:click={() => gotoRoute('/chat')}> Chat </button>
+<button on:click={() => gotoRoute('/Profile')}> Profil </button>
+<button on:click={() => gotoRoute('/Game')}> Game </button>
+<button on:click={() => gotoRoute('/Chat')}> Chat </button>
