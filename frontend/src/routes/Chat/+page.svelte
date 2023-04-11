@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { io, Socket } from 'socket.io-client';
-	import { dataset_dev } from 'svelte/internal';
+	import { bind, dataset_dev } from 'svelte/internal';
     
 // VARIABLES
 
@@ -9,6 +9,7 @@
     let isFormValid = false;
     let chatRooms:ChatRoom[] = [];
     let loading = false;
+    let form: HTMLFormElement;
     let formData: RoomFormData = {
         roomName: '',
         private: false
@@ -52,7 +53,7 @@
   
     async function handleSubmit(event: Event, socket:Socket) {
         event.preventDefault();
-        if (isFormValid) {
+        if (isFormValid && formData.roomName.length) {
             let data = {
                 name: formData.roomName,
                 password: formData.password,
@@ -62,6 +63,7 @@
                 data.password = '';
             socket.emit("createRoom", data);
             formData.roomName = '';
+            form.reset();
       }
     }
 
@@ -122,7 +124,7 @@
 {/if}
 
  <h2>Creer une room: </h2>
-  <form on:submit={(event) => handleSubmit(event, socket)}>
+  <form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
     <label for="roomName">Nom de la salle *</label>
     <input type="text" id="roomName" name="roomName" on:input={handleNameInput} required>
   
