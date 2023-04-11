@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@mui/material';
 import Header from './Component';
 import backgroundImage from '../../public/bvb.jpg';
+import { useResolvedPath } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const handleLoginButtonClick = () => {
@@ -20,7 +21,7 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div style={background}>
+    <div style={{...background, userSelect: 'none'}}>
       <Header title="Ft_transcendence" />
         <Button
           variant="contained"

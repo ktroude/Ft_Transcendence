@@ -53,6 +53,7 @@ const HeaderLeft = ({ user }: { user: any }) => {
         color: 'white',
         cursor: 'pointer',
     };
+    
     return (
         <header style={HeaderStyle}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
