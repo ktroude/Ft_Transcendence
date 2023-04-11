@@ -3,10 +3,19 @@
     import { io, Socket } from 'socket.io-client';
 	import { dataset_dev } from 'svelte/internal';
     
+// VARIABLES
+
     let socket: Socket;
     let isFormValid = false;
     let chatRooms:ChatRoom[] = [];
     let loading = false;
+    let formData: RoomFormData = {
+        roomName: '',
+        private: false
+    };
+
+
+// INTERFACES
 
     interface ChatRoom {
         name: string;
@@ -21,10 +30,7 @@
         private: boolean;
     }
 
-    let formData: RoomFormData = {
-        roomName: '',
-        private: false
-    };
+// FUNCTIONS
 
     function handleNameInput(event:any) {
         formData.roomName = (event.target as HTMLInputElement).value;
@@ -44,7 +50,7 @@
         isFormValid = formData.roomName.length > 0 && formData.private !== undefined;
     }
   
-    function handleSubmit(event: Event, socket:Socket) {
+    async function handleSubmit(event: Event, socket:Socket) {
         event.preventDefault();
         if (isFormValid) {
             let data = {
@@ -55,7 +61,15 @@
             if (data.password===undefined)
                 data.password = '';
             socket.emit("createRoom", data);
+            formData.roomName = '';
       }
+    }
+
+    function updateChatRooms(newRoom: ChatRoom) {
+        const isRoomExist = chatRooms.some((room) => room.id === newRoom.id);
+        if (!isRoomExist) {
+            chatRooms = [...chatRooms, newRoom];
+        }
     }
 
     const fletchChatRoomsData = async(): Promise<ChatRoom[]> => {
@@ -85,12 +99,17 @@
         socket.on("connect", () => {
         console.log("Connected to server");
         });
+        socket.on("roomCreated", (newRoom: ChatRoom) => {
+            updateChatRooms(newRoom);
+        });
         chatRooms = await fletchChatRoomsData();
         loading = true;
         checkFormValidity();
     });
 
   </script>
+
+<!-- HTML CODE -->
 
 <h1>Chat</h1>
 <h2>Liste des rooms:</h2>

@@ -23,14 +23,12 @@ export class ChatRoomController {
             if (elem.private == true && await this.chatRoomService.isMember(user, elem) === true)
             array.push(elem);
         });
-        console.log(array);
         const ret = array.map(elem => ({
             name: elem.name,
             private: elem.private,
             id: elem.id,
             ownerId: elem.ownerId,
         }));
-        console.log(ret);
         return ret;
     }
 }
