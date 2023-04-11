@@ -18,6 +18,7 @@ model User {
   firstname   String
   lastname    String
   pseudo      String @unique
+  picture     String
 
 
 // mettres toutes ces variables dans la table intermediaire ChatRoomMembers? A voir JSP

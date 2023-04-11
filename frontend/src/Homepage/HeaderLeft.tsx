@@ -28,7 +28,7 @@ const HeaderLeft = ({ user }: { user: any }) => {
     
     const HeaderStyle={
         backgroundColor: 'black',
-        height: '100%',
+        height: '96.8%',
         width: 'auto',
         padding: '1rem',
         margin: 0,

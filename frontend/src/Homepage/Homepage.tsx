@@ -31,7 +31,7 @@ const HomePage = () => {
   }
 
   return (
-    <div style={background}>
+    <div style={{...background, userSelect: 'none'}}>
       <Header title="Ft_transcendence" />
       <HeaderLeft user={user}/>
     </div>

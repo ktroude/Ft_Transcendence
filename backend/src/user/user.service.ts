@@ -2,14 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 const jwt = require('jsonwebtoken');
-
-
-
-
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) {}
+    
     async findUserById(id: number): Promise<User> {
         const user = await this.prisma.user.findUnique({
             where: {

@@ -65,6 +65,7 @@ export class AuthService {
           firstname: user_data.first_name,
           lastname: user_data.last_name,
           pseudo: user_data.login,
+          picture: user_data.image.link,
         },
       });
       return new_user;
