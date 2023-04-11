@@ -18,6 +18,7 @@ CREATE TABLE "chat_room" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "passworded" BOOLEAN NOT NULL,
     "private" BOOLEAN NOT NULL,
     "ownerId" INTEGER NOT NULL,
 

@@ -72,9 +72,8 @@ export class ChatRoomGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    const user = this.clients.find(([user, socket]) => socket === client)?.[0];
-    console.log("data ===", data);
     
+    const user = this.clients.find(([user, socket]) => socket === client)?.[0];
     let newChatRoom = await this.prismaService.chatRoom.create({
       data: {
         name: data.name,
@@ -92,7 +91,6 @@ export class ChatRoomGateway
         admin: { connect: { id: user.id } },
       },
     });
-    console.log(this.clients);
   }
 
   @SubscribeMessage('sendMessage')

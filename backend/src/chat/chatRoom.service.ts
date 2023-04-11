@@ -49,13 +49,7 @@ export class ChatRoomService {
   }
 
   async getAllChatRoom() {
-    const rooms = await this.prisma.chatRoom.findMany({
-      select: {
-        id: true,
-        name: true,
-        owner: true,
-      },
-    });
+    const rooms = await this.prisma.chatRoom.findMany({ });
     return rooms;
   }
 

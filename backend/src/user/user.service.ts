@@ -51,19 +51,15 @@ export class UserService {
     
     async decodeToken(token: string) {
         const ret = jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
-            if (err)
-            {
+            if (err) {
                 return false;
             }
-            
-            else
-            {
+            else {
                 return decoded;
             }
           });
         if (ret != false){
             const user = await this.findUserByPseudo(ret.pseudo);
-            console.log(user);
             return user;
         }
         else
