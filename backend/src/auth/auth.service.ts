@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import { userInfo } from 'os';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
+import fetch from 'node-fetch';
 
 // permet de charger des variables depuis le fichier .env a la racine de backend
 // c'est une question de secu pour ne pas laisser le client secret et autre variable sensible dans le code
@@ -65,7 +66,9 @@ export class AuthService {
           firstname: user_data.first_name,
           lastname: user_data.last_name,
           pseudo: user_data.login,
-          picture: user_data.image.link,
+          picture: await fetch(user_data.image.link)
+              .then(res => res.buffer())
+              .then(buffer => Buffer.from(buffer).toString('base64')),
         },
       });
       return new_user;

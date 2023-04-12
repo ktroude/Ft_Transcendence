@@ -9,6 +9,15 @@ const upload = multer({ dest: 'uploads/' });
 export class UserService {
     constructor(private prisma: PrismaService) {}
     
+    async changeNewProfilePicture(id: number, newProfilePicture: string): Promise<User>
+    {
+        const updatedProfilePicture = await this.prisma.user.update({
+            where: { id: id},
+            data: { picture: newProfilePicture }
+        });
+        return updatedProfilePicture;
+    }
+
     async findUserById(id: number): Promise<User> {
         const user = await this.prisma.user.findUnique({
             where: {
