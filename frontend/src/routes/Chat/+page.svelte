@@ -16,6 +16,8 @@
     };
     let messages:any[];
     let currentRoom:any = null;
+    let currentUser:User;
+    let selectedUser:User;
 
 // INTERFACES
 
@@ -29,6 +31,11 @@
         private: boolean;
         id: number;
         ownerId: number;
+    }
+
+    interface User {
+        pseudo: string;
+        status: number; // 0 = owner, 1 = admin, 2 = member, -1 = muted, -2 banned
     }
 
     interface RoomFormData {
@@ -83,6 +90,7 @@
     function handleRoomButton(room:ChatRoom) {
         currentRoom = room;
         socket.emit('getMessage', room);
+        socket.emit('getUser', room);
     }
     
     function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:ChatRoom) {
@@ -113,6 +121,11 @@
         return [];
     }
 
+
+    function displayDropdownMenu(currentUser:User, userClicked:User) {
+        if (currentUser )
+    }
+
     onMount(async () => {
         const cookies = document.cookie.split(';');
         const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
@@ -134,6 +147,9 @@
         socket.on('newMessage', (msg:any) => {
             messages = [...messages, msg];
         } );
+        socket.on('returnUser', (user:User) => {
+            currentUser = user;
+        });
         chatRooms = await fletchChatRoomsData();
         loading = true;
         checkFormValidity();
@@ -186,4 +202,5 @@
             sendMessage(event, messageInput, currentRoom);
         }
     }}>Envoyer</button>
+    
 

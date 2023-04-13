@@ -102,7 +102,6 @@ export class ChatRoomGateway
   @SubscribeMessage('sendMessage')
   async handleSendMessage(@ConnectedSocket() client, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-    console.log("newMessage send", data);
     const chatRoom = await this.prismaService.chatRoom.findUnique({
       where: {id: data.roomId}});
     if ((await this.chatRoomService.isMuted(user, chatRoom)) === true) {
@@ -113,6 +112,33 @@ export class ChatRoomGateway
       console.log("n message =====", newMessage);
       this.server.emit('newMessage', newMessage);
     }
+  }
+
+  @SubscribeMessage('getUser')
+  async handleGetUser(@ConnectedSocket() client:Socket, @MessageBody() data: any) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.roomId}});
+    let toSend = {
+      pseudo: user.pseudo,
+      status: 2,
+    };
+    if (await this.chatRoomService.isAdmin(user, chatRoom) === true) {
+      toSend.status = 1;
+    }
+    else if (await this.chatRoomService.isOwner(user, chatRoom) === true) {
+      toSend.status = 2;
+    }
+    else if (await this.chatRoomService.isMuted(user, chatRoom) === true) {
+      toSend.status = -1
+    }
+    else if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
+      toSend.status = -2
+    }
+    else if (await this.chatRoomService.isMember(user, chatRoom) === true) {
+      toSend.status = 0;
+    }
+    this.server.emit('returnUser', toSend);
   }
 
   // @SubscribeMessage('newAdmin')
