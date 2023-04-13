@@ -140,6 +140,11 @@
 
   </script>
 
+<svelte:head>
+  <link rel="stylesheet" href="/style.css">
+</svelte:head>
+
+
 <!-- HTML CODE -->
 
 <h1>Chat</h1>
@@ -148,26 +153,26 @@
   <p>Chargement...</p>
 {:else}
   {#each chatRooms as chatRoom}
-    <button on:click={() => handleRoomButton(chatRoom)}>{chatRoom.name}</button>
+    <button class='chatroom-button' on:click={() => handleRoomButton(chatRoom)}>{chatRoom.name}</button>
   {/each}
 {/if}
 
  <h2>Creer une room: </h2>
   <form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
     <label for="roomName">Nom de la salle *</label>
-    <input type="text" id="roomName" name="roomName" on:input={handleNameInput} required>
+    <input class='form-input' type="text" id="roomName" name="roomName" on:input={handleNameInput} required>
   
     <label for="password">Mot de passe</label>
-    <input type="password" id="password" name="password" on:input={handlePasswordInput}>
+    <input class='form-input' type="password" id="password" name="password" on:input={handlePasswordInput}>
   
     <label>
-      <input type="checkbox" id="private" name="private" on:change={handlePrivateOption}>
+      <input class = 'form-input' type="checkbox" id="private" name="private" on:change={handlePrivateOption}>
       Salle privée
     </label>
 
-    <button type="submit" disabled={!isFormValid}>Créer la salle</button>
+    <button class='form-button' type="submit" disabled={!isFormValid}>Créer la salle</button>
   </form>
-
+  <div class="chat-messages"></div>  
   <input type="text" id="message" name="message">
   <button type="submit" on:click={(event) => {
         const messageInput = document.getElementById('message');
