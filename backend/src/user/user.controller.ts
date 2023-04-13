@@ -1,4 +1,5 @@
 import { Controller, Get, Header, Headers, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Param, Body, Put } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { User } from '@prisma/client';
 import { GetUser } from '../auth/decorator';
@@ -19,5 +20,10 @@ export class UserController {
       }
       const user = await this.userService.decodeToken(token);
       return user;
+    }
+    @UseGuards(JwtGuard)
+    @Put(':pseudo/newPseudo')
+    async updatePseudo(@Param('pseudo') pseudo: string, @Body() body: { user: User, newPseudo: string }): Promise<User> {
+        return this.userService.updatePseudo(body.user, body.newPseudo);
     }
 }

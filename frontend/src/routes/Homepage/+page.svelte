@@ -23,7 +23,7 @@
             user = {
                 pseudo: data.pseudo,
                 firstName: data.firstname,
-                lastName: data.lastname
+                lastName: data.lastname,
             };
         } else {
             console.log('Access token not found');
