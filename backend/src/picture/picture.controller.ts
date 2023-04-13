@@ -2,6 +2,7 @@ import { Controller, Get, UseGuards, Request, Put, Param, Body } from '@nestjs/c
 import { UserService } from 'src/user/user.service';
 import { JwtGuard } from 'src/auth/guard';
 import { User } from '@prisma/client';
+
 @UseGuards(JwtGuard)
 @Controller()
 export class PictureController {
@@ -16,8 +17,8 @@ export class PictureController {
     }
 
     @UseGuards(JwtGuard)
-    @Put('/users/:id/picture')
-    async updateProfilePicture(@Param('id') id: number,@Body('picture') picture: string): Promise<User> {
-        return this.userService.changeNewProfilePicture(id, picture);
+    @Put('users/:pseudo/picture')
+    async updateProfilePicture(@Param('pseudo') pseudo: string,@Body('picture') picture: string): Promise<User> {
+        return this.userService.changeNewProfilePicture(pseudo, picture);
     }
 }

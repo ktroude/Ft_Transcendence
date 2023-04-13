@@ -9,10 +9,10 @@ const upload = multer({ dest: 'uploads/' });
 export class UserService {
     constructor(private prisma: PrismaService) {}
     
-    async changeNewProfilePicture(id: number, newProfilePicture: string): Promise<User>
+    async changeNewProfilePicture(pseudo: string, newProfilePicture: string): Promise<User>
     {
         const updatedProfilePicture = await this.prisma.user.update({
-            where: { id: id},
+            where: { pseudo: pseudo},
             data: { picture: newProfilePicture }
         });
         return updatedProfilePicture;
