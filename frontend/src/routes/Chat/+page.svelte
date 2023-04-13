@@ -84,7 +84,7 @@
         currentRoom = room;
         socket.emit('getMessage', room);
     }
-
+    
     function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:ChatRoom) {
         event.preventDefault();
         if (messageInput && messageInput.value && messageInput.value.length && currentRoom && currentRoom.id) {
@@ -94,6 +94,7 @@
                 content: messageValue,
             }
             socket.emit("sendMessage", data);
+            console.log(messages);
             messageInput.value = "";
         }
 }
@@ -131,14 +132,14 @@
             messages = msg;
         } )
         socket.on('newMessage', (msg:any) => {
-            messages.push(msg);
+            messages = [...messages, msg];
         } );
         chatRooms = await fletchChatRoomsData();
         loading = true;
         checkFormValidity();
     });
 
-  </script>
+    </script>
 
 <svelte:head>
   <link rel="stylesheet" href="/style.css">
@@ -169,10 +170,15 @@
       <input class = 'form-input' type="checkbox" id="private" name="private" on:change={handlePrivateOption}>
       Salle privée
     </label>
-
     <button class='form-button' type="submit" disabled={!isFormValid}>Créer la salle</button>
   </form>
-  <div class="chat-messages"></div>  
+  <div class="chat-messages">
+    {#if messages && messages.length}
+    {#each messages as msg}
+        <p> {msg.senderPseudo} : {msg.content} </p>
+    {/each}
+    {/if}
+  </div>  
   <input type="text" id="message" name="message">
   <button type="submit" on:click={(event) => {
         const messageInput = document.getElementById('message');
