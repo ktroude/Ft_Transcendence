@@ -14,6 +14,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { runInThisContext } from 'vm';
 import { ChatRoomService } from './chatRoom.service';
+import { log } from 'console';
 
 @WebSocketGateway({
   cors: {
@@ -23,13 +24,12 @@ import { ChatRoomService } from './chatRoom.service';
   },
 })
 export class ChatRoomGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private userService: UserService,
     private prismaService: PrismaService,
     private chatRoomService: ChatRoomService,
-  ) {}
+  ) { }
 
   @WebSocketServer()
   server: Server;
@@ -47,7 +47,7 @@ export class ChatRoomGateway
     const token = tokenCookie ? tokenCookie.split(' ')[1] : '';
     const user = await this.userService.decodeToken(token);
     // associer le user et sa socket-client associe
-    if (user){
+    if (user) {
       this.clients.push([user, client]);
     }
     else {
@@ -67,7 +67,7 @@ export class ChatRoomGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    
+
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
     let newChatRoom = await this.prismaService.chatRoom.create({
       data: {
@@ -87,17 +87,32 @@ export class ChatRoomGateway
     this.server.emit('roomCreated', newChatRoom);
   }
 
+  @SubscribeMessage('getMessage')
+  async handleGetMessage(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: { id: data.id},
+      select: {messages: true},
+    });
+    const messages = chatRoom.messages;
+    this.server.emit('returnMessage', messages)
+  }
+
+
   @SubscribeMessage('sendMessage')
   async handleSendMessage(@ConnectedSocket() client, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-    const chatRoom = await this.prismaService.chatRoom.findUnique(
-      data.chatRoomId,
-    );
+    console.log("newMessage send", data);
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.roomId}});
     if ((await this.chatRoomService.isMuted(user, chatRoom)) === true) {
       // handle error
     }
-    await this.chatRoomService.createMessage(data.message, user, chatRoom);
-    // need display message
+    else {
+      const newMessage = await this.chatRoomService.createMessage(data.content, user, chatRoom);
+      console.log("n message =====", newMessage);
+      this.server.emit('newMessage', newMessage);
+    }
   }
 
   // @SubscribeMessage('newAdmin')

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { io, Socket } from 'socket.io-client';
-	import { bind, dataset_dev } from 'svelte/internal';
+	import { null_to_empty } from 'svelte/internal';
     
 // VARIABLES
 
@@ -14,9 +14,15 @@
         roomName: '',
         private: false
     };
-
+    let messages:any[];
+    let currentRoom:any = null;
 
 // INTERFACES
+
+    interface Message {
+        content: string;
+        sender: string;
+    }
 
     interface ChatRoom {
         name: string;
@@ -74,6 +80,23 @@
         }
     }
 
+    function handleRoomButton(room:ChatRoom) {
+        currentRoom = room;
+        socket.emit('getMessage', room);
+    }
+
+    function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:ChatRoom) {
+        event.preventDefault();
+        if (messageInput && messageInput.value && messageInput.value.length && currentRoom && currentRoom.id) {
+            const messageValue = messageInput.value;
+            const data = {
+                roomId: currentRoom.id,
+                content: messageValue,
+            }
+            socket.emit("sendMessage", data);
+            messageInput.value = "";
+        }
+}
     const fletchChatRoomsData = async(): Promise<ChatRoom[]> => {
         const cookies = document.cookie.split(';');
         const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
@@ -104,6 +127,12 @@
         socket.on("roomCreated", (newRoom: ChatRoom) => {
             updateChatRooms(newRoom);
         });
+        socket.on('returnMessage', (msg:any[]) => {
+            messages = msg;
+        } )
+        socket.on('newMessage', (msg:any) => {
+            messages.push(msg);
+        } );
         chatRooms = await fletchChatRoomsData();
         loading = true;
         checkFormValidity();
@@ -119,7 +148,7 @@
   <p>Chargement...</p>
 {:else}
   {#each chatRooms as chatRoom}
-    <button>{chatRoom.name}</button>
+    <button on:click={() => handleRoomButton(chatRoom)}>{chatRoom.name}</button>
   {/each}
 {/if}
 
@@ -138,3 +167,12 @@
 
     <button type="submit" disabled={!isFormValid}>Créer la salle</button>
   </form>
+
+  <input type="text" id="message" name="message">
+  <button type="submit" on:click={(event) => {
+        const messageInput = document.getElementById('message');
+        if (messageInput instanceof HTMLInputElement) {
+            sendMessage(event, messageInput, currentRoom);
+        }
+    }}>Envoyer</button>
+

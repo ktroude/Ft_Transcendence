@@ -28,8 +28,11 @@ export class ChatRoomService {
     const isMuted = await this.prisma.chatRoom
       .findUnique({ where: { id: chatRoom.id } })
       .muted({ where: { id: user.id } })
-      .then((user) => !!user);
-    return isMuted;
+      console.log('muted ==',isMuted)
+      if (isMuted.length)
+        return true;
+      else
+      return false;
   }
 
   async isBanned(user: User, chatRoom: ChatRoom): Promise<boolean> {
