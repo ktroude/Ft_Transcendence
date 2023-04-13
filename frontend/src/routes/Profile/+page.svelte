@@ -13,7 +13,12 @@
       margin-top: 0px;
     }
   </style>
-  
+  <main>
+    <h1>Update Username</h1>
+    <label for="username-input">New Username:</label>
+    <input type="text" id="username-input" bind:value={newUsername} />
+    <button on:click={handleUpdateUsername}>Update</button>
+  </main>
   <div class="container">
     <img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${200}px; height: ${200}px;`} />
     <input type="file" class="upload-button" on:change={handleFileUpload} />
@@ -25,14 +30,16 @@
     import { Buffer } from 'buffer';
     
     interface User {
+        id: number;
         pseudo: string;
         firstName: string;
         lastName: string;
         picture: string;
     }
         
-    let imageURL;
+    let imageURL: string;
     let user: User;
+    let newUsername: string;
     
     const fetchData = async () => {
         const cookies = document.cookie.split(';');
@@ -45,6 +52,7 @@
             const response = await fetch('http://localhost:3000/users/userInfo', { headers });
             const data = await response.json();
             user = {
+                id: data.id,
                 pseudo: data.pseudo,
                 firstName: data.firstname,
                 lastName: data.lastname,
@@ -61,7 +69,26 @@
         imageURL = URL.createObjectURL(blob); // Create a URL for the blob
       }
     
-    async function handleFileUpload(event) {
+      async function handleUpdateUsername()
+      {
+        if (!newUsername) {
+          console.log('New username not set');
+          return;
+        }
+        const cookies = document.cookie.split(';');
+        const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
+        const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+        const response = await fetch(`http://localhost:3000/users/${user.pseudo}/newPseudo`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          },
+        body: JSON.stringify({ user: user, newPseudo: newUsername })
+      });
+      }
+
+      async function handleFileUpload(event) {
       // Get the file from the input
       const file = event.target.files[0];
 

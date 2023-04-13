@@ -18,6 +18,7 @@ model User {
   firstname   String
   lastname    String
   pseudo      String @unique
+  username    String
   picture     String
 
 

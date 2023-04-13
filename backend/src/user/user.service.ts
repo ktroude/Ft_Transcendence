@@ -40,7 +40,7 @@ export class UserService {
         else {
             const updatedPseudo = await this.prisma.user.update({
                 where: { id: user.id},
-                data: { pseudo: newPseudo }
+                data: { username: newPseudo }
             })
             return updatedPseudo;
         }
