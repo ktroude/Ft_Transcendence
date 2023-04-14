@@ -50,6 +50,7 @@
 
     import { onMount } from 'svelte';
     import { goto } from "$app/navigation";
+    import {fetchData, fetchFriend, fetchAccessToken} from "../../API/api";
 
     let friends = [];
     let friendName: string;
@@ -64,13 +65,8 @@
         await fetchData();
         if (!friendName)
             return;
-        const cookies = document.cookie.split(';');
-        const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
-        const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+        const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const cookies = document.cookie.split(';');
-            const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
-            const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
             const response = await fetch(`http://localhost:3000/users/${user.pseudo}/friend`, {
             method: 'PUT',
             headers: {
@@ -80,9 +76,7 @@
             body: JSON.stringify({friend: friendName })
         });
         if (response.ok)
-        {
             friendName = '';
-        }
         else
             console.log('Error: Could not add friend');
         }
@@ -91,53 +85,20 @@
 
     let user: User;
     interface User {
+        id: number;
         pseudo: string;
         firstName: string;
         lastName: string;
     }
 
-    const getFriend = async () =>
+    const loadpage = async () =>
     {
-        await fetchData();
-        const cookies = document.cookie.split(';');
-        const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
-        const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-        if (accessToken)
-        {
-            const response = await fetch(`http://localhost:3000/users/${user.pseudo}/getallfriends`, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            if (response.ok)
-            {
-                const data = await response.json();
-                friends = data;
-                console.log(friends);
-            }
-            else
-                console.log('Error: Could not get friends');
-        }
-    }
-
-    const fetchData = async () => {
-        const cookies = document.cookie.split(';');
-        const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
-        const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-
-        if (accessToken) {
-            const headers = new Headers();
-            headers.append('Authorization', `Bearer ${accessToken}`);
-            const response = await fetch('http://localhost:3000/users/userInfo', { headers });
-            const data = await response.json();
-            user = {
-                pseudo: data.pseudo,
-                firstName: data.firstname,
-                lastName: data.lastname,
-            };
-        } else {
-            console.log('Access token not found');
-        }
+        user = await fetchData();
+        const listFriends = await fetchFriend(user.pseudo);
+        if (listFriends)
+            friends = listFriends;
+        else
+            console.log('Error: Could not get friends');
     }
 
     const gotoRoute = (route: string) => {
@@ -145,11 +106,11 @@
     }
 
     onMount(() => {
-        getFriend();
+        loadpage();
     });
 </script>
 
-<h1>Ceci est la homepage et tu es {user?.firstName}</h1>
+<h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
 
 <button on:click={() => gotoRoute('/profile')}> Profil </button>
 <button on:click={() => gotoRoute('/game')}> Game </button>
