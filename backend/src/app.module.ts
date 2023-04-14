@@ -5,9 +5,10 @@ import { AuthModule } from './auth/auth.module';
 import { ChatRoomModule } from './chat/chatRoom.module';
 import { PictureModule } from './picture/picture.module';
 import { UserModule } from './user/user.module';
+import { FriendModule } from './friend/friend.module';
 
 @Module({
-  imports: [AuthModule, ChatRoomModule, UserModule, PictureModule],
+  imports: [AuthModule, ChatRoomModule, UserModule, PictureModule, FriendModule],
   controllers: [AppController],
   providers: [AppService],
 })

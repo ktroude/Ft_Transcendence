@@ -120,12 +120,14 @@
         },
         body: JSON.stringify({ picture: base64 })
       });
-      if (response.ok)
-        location.reload(); // Reload the page to display the new image
+      if (response.ok){
+        getImageURL();
+        event.target.value = '';
+      }
       else
         console.log('Error: Could not upload the image');
       }
-
+      
     }
     onMount(() => {
         fetchData();

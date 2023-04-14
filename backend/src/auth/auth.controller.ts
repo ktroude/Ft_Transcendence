@@ -15,7 +15,7 @@ export class AuthController {
     // const signedAccessToken = sign(access_token, process.env.COOKIE_SECRET); // Signature de la valeur access_token
 
     res.cookie('access_token', access_token, { httpOnly: false });
-    res.redirect('http://localhost:5173/Homepage');
+    res.redirect('http://localhost:5173/homepage');
     return;
   }
 }
