@@ -26,4 +26,4 @@ export class UserController {
     async updatePseudo(@Param('pseudo') pseudo: string, @Body() body: { user: User, newPseudo: string }): Promise<User> {
         return this.userService.updatePseudo(body.user, body.newPseudo);
     }
-}
+  }

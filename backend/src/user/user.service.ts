@@ -49,7 +49,7 @@ export class UserService {
     async checkNewPseudo(user: User, newPseudo: string): Promise <Boolean> {
         const check = await this.prisma.user.findUnique({
             where: {
-                pseudo: newPseudo
+                username: newPseudo
             }
         });
         if (check)
