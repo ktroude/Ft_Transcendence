@@ -117,17 +117,19 @@ export class ChatRoomGateway
   @SubscribeMessage('getUser')
   async handleGetUser(@ConnectedSocket() client:Socket, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    console.log('data =', data);
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.roomId}});
+      where: {id: data.id}});
     let toSend = {
       pseudo: user.pseudo,
       status: 2,
+      room: chatRoom.id,
     };
-    if (await this.chatRoomService.isAdmin(user, chatRoom) === true) {
-      toSend.status = 1;
-    }
-    else if (await this.chatRoomService.isOwner(user, chatRoom) === true) {
+    if (await this.chatRoomService.isOwner(user, chatRoom) === true) {
       toSend.status = 2;
+    }
+    else if (await this.chatRoomService.isAdmin(user, chatRoom) === true) {
+      toSend.status = 1;
     }
     else if (await this.chatRoomService.isMuted(user, chatRoom) === true) {
       toSend.status = -1
@@ -139,6 +141,38 @@ export class ChatRoomGateway
       toSend.status = 0;
     }
     this.server.emit('returnUser', toSend);
+  }
+
+  @SubscribeMessage('checkUser')
+  async handleCheckUser(@ConnectedSocket() client:Socket, @MessageBody() data: any) {
+    const user = await this.prismaService.user.findUnique({
+      where: {id: data.id},
+    })
+    console.log('data =', data);
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.id}});
+    let toSend = {
+      pseudo: user.pseudo,
+      status: -2,
+      room: chatRoom.id,
+    };
+    if (await this.chatRoomService.isOwner(user, chatRoom) === true) {
+      toSend.status = 2;
+    }
+    else if (await this.chatRoomService.isAdmin(user, chatRoom) === true) {
+      toSend.status = 1;
+    }
+    else if (await this.chatRoomService.isMuted(user, chatRoom) === true) {
+      toSend.status = -1
+    }
+    else if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
+      toSend.status = -2
+    }
+    else if (await this.chatRoomService.isMember(user, chatRoom) === true) {
+      toSend.status = 0;
+    }
+    console.log('RETURN USER CHEKED ===', toSend);
+    this.server.emit('returnCheckUser', toSend);
   }
 
   // @SubscribeMessage('newAdmin')

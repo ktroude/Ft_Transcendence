@@ -3,6 +3,7 @@ import { ChatRoomService } from "./chatRoom.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { JwtGuard } from "src/auth/guard";
+import { get } from "http";
 
 @Controller('chat')
 export class ChatRoomController {
@@ -31,4 +32,5 @@ export class ChatRoomController {
         }));
         return ret;
     }
+
 }

@@ -6,6 +6,7 @@ CREATE TABLE "user" (
     "firstname" TEXT NOT NULL,
     "lastname" TEXT NOT NULL,
     "pseudo" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
     "picture" TEXT NOT NULL,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
@@ -18,7 +19,6 @@ CREATE TABLE "chat_room" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "passworded" BOOLEAN NOT NULL,
     "private" BOOLEAN NOT NULL,
     "ownerId" INTEGER NOT NULL,
 
