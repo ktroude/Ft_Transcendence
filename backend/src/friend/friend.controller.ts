@@ -10,8 +10,15 @@ export class FriendController {
 
     @UseGuards(JwtGuard)
     @Put(':pseudo/friend')
-  async addFriend(@Param('pseudo') pseudo: string,@Body() body:{friend: string}): Promise<User> 
-  {
-    return this.friendService.addFriend(pseudo, body.friend);
-  }
+    async addFriend(@Param('pseudo') pseudo: string,@Body() body:{friend: string}): Promise<User> 
+    {
+        return this.friendService.addFriend(pseudo, body.friend);
+    }
+
+    @UseGuards(JwtGuard)
+    @Get(':pseudo/getallfriends')
+    async getAllFriend(@Param('pseudo') pseudo: string): Promise<string[]>
+    {
+        return this.friendService.getAllFriend(pseudo);
+    }
 }

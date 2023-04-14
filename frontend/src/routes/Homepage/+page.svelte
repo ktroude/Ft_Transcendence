@@ -15,17 +15,35 @@
     padding: 5px 10px;
     margin-right: -70px;
   }
+
+  .delete-friend button {
+    font-size: 12px;
+    padding: 5px 10px;
+    margin-right: -85px;
+  }
+  .delete-friend {
+    margin-top: 30px;
+    margin-left: 20px;
+  }
   </style>
 
-  
 <div class="container">
-    <div class="friend-list">
-      <h2>Friend List</h2>
-    </div>
+  <div class="friend-list">
+    <h2>Friend List</h2>
   </div>
-  <div class = "friend-list add-friend">
+</div>
+
+<div class="friend-list add-friend">
+  <input type="text" bind:value={friendName} />
+  <button on:click={handleAddFriend}>Add Friend</button>
+  <ul>
+    {#each friends as friendName}
+      <li>{friendName}</li>
+    {/each}
+</div>
+<div class="friend-list delete-friend">
     <input type="text" bind:value={friendName} />
-    <button on:click={handleAddFriend}>Add Friend</button>
+    <button on:click={handleDeleteFriend}>Delete Friend</button>
   </div>
 
 <script lang="ts">
@@ -33,30 +51,42 @@
     import { onMount } from 'svelte';
     import { goto } from "$app/navigation";
 
+    let friends = [];
     let friendName: string;
     
+    const handleDeleteFriend = async () =>
+    {
+        console.log("DELETE FUNCTION");
+        friendName = '';
+    }
+
     const  handleAddFriend = async () => {
         await fetchData();
-        console.log(friendName);
-        console.log(user.pseudo);
         if (!friendName)
             return;
         const cookies = document.cookie.split(';');
         const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
         const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-        const response = await fetch(`http://localhost:3000/users/${user.pseudo}/friend`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          },
-        body: JSON.stringify({friend: friendName })
-      });
-      if (response.ok)
-        friendName = '';
-      else
-        console.log('Error: Could not add friend');
-      }
+        if (accessToken) {
+            const cookies = document.cookie.split(';');
+            const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
+            const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+            const response = await fetch(`http://localhost:3000/users/${user.pseudo}/friend`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({friend: friendName })
+        });
+        if (response.ok)
+        {
+            friendName = '';
+        }
+        else
+            console.log('Error: Could not add friend');
+        }
+    }
         
 
     let user: User;
@@ -66,6 +96,29 @@
         lastName: string;
     }
 
+    const getFriend = async () =>
+    {
+        await fetchData();
+        const cookies = document.cookie.split(';');
+        const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
+        const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+        if (accessToken)
+        {
+            const response = await fetch(`http://localhost:3000/users/${user.pseudo}/getallfriends`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            if (response.ok)
+            {
+                const data = await response.json();
+                friends = data;
+                console.log(friends);
+            }
+            else
+                console.log('Error: Could not get friends');
+        }
+    }
 
     const fetchData = async () => {
         const cookies = document.cookie.split(';');
@@ -92,7 +145,7 @@
     }
 
     onMount(() => {
-        fetchData();
+        getFriend();
     });
 </script>
 

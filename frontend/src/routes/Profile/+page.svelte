@@ -86,6 +86,7 @@
           },
         body: JSON.stringify({ user: user, newPseudo: newUsername })
       });
+      newUsername = '';
       }
 
       async function handleFileUpload(event) {
