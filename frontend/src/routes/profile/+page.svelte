@@ -66,8 +66,15 @@
             },
           body: JSON.stringify({ user: user, newPseudo: newUsername })
         });
+        if (response.ok){
+          console.log('Username updated');
+          newUsername = '';
+          fetchData();
+        }
+        else
+          console.log('Error: Could not update the username');
       }
-      newUsername = '';
+        newUsername = '';
       }
 
       async function handleFileUpload(event) {
