@@ -15,16 +15,6 @@
     padding: 5px 10px;
     margin-right: -70px;
   }
-
-  .delete-friend button {
-    font-size: 12px;
-    padding: 5px 10px;
-    margin-right: -85px;
-  }
-  .delete-friend {
-    margin-top: 30px;
-    margin-left: 20px;
-  }
   </style>
 
 <div class="container">
@@ -34,36 +24,89 @@
 </div>
 
 <div class="friend-list add-friend">
-  <input type="text" bind:value={friendName} />
+  <input type="text" bind:value={friendNameAdd} />
   <button on:click={handleAddFriend}>Add Friend</button>
   <ul>
     {#each friends as friendName}
-      <li>{friendName}</li>
+      <li on:click={() => handleFriendClick(friendName)}>
+        {friendName}
+        {#if clickedFriend === friendName && showButtons}
+          <button on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+          <button on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+          <button on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+          <button on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>Profile</button>
+        {/if}
+      </li>
     {/each}
+  </ul>
 </div>
-<div class="friend-list delete-friend">
-    <input type="text" bind:value={friendName} />
-    <button on:click={handleDeleteFriend}>Delete Friend</button>
-  </div>
 
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { goto } from "$app/navigation";
+  import {fetchData, fetchFriend, fetchAccessToken} from "../../API/api";
 
-    import { onMount } from 'svelte';
-    import { goto } from "$app/navigation";
-    import {fetchData, fetchFriend, fetchAccessToken} from "../../API/api";
+  let previousFriend: string;
+  let showButtons = false;
+  let clickedFriend: string;
+  let friends = [];
+  let friendNameAdd: string;
 
-    let friends = [];
-    let friendName: string;
-    
-    const handleDeleteFriend = async () =>
-    {
-        console.log("DELETE FUNCTION");
-        friendName = '';
+  let user: User;
+    interface User {
+        id: number;
+        pseudo: string;
+        firstName: string;
+        lastName: string;
     }
+
+  function handleFriendClick(friendName: string) {
+    clickedFriend = friendName;
+    setShowButtons(previousFriend !== clickedFriend ? true : !showButtons);
+    previousFriend = clickedFriend;
+  }
+
+  function setShowButtons(value: boolean) {
+    showButtons = value;
+    console.log("showButtons: " + showButtons);
+  }
+
+  function handleMessageFriend(friendName) {
+    console.log(`Sending message to ${friendName}`);
+  }
+
+  function handleProfileFriend(friendName) {
+    console.log(`Showing profile of ${friendName}`);
+  }
+
+  async function handleDeleteFriend(friendName) {
+    const accessToken = await fetchAccessToken();
+    if (accessToken)
+    {
+      const response = await fetch(`http://localhost:3000/users/${user.pseudo}/deletefriend`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({friend: friendName })
+        });
+        if (response.ok)
+            friends = friends.filter(friend => friend !== friendName);
+        else
+            console.log('Error: Could not delete friend');
+      }
+      else
+        console.log('Error: Could not delete friend');
+    }
+
+  function handleInviteFriend(friendName) {
+    console.log(`Inviting ${friendName} to play`);
+  }
 
     const  handleAddFriend = async () => {
         await fetchData();
-        if (!friendName)
+        if (!friendNameAdd)
             return;
         const accessToken = await fetchAccessToken();
         if (accessToken) {
@@ -73,22 +116,16 @@
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
             },
-            body: JSON.stringify({friend: friendName })
+            body: JSON.stringify({friend: friendNameAdd })
         });
         if (response.ok)
-            friendName = '';
+        {
+            friends.push(friendNameAdd);
+            friendNameAdd = '';
+        }
         else
             console.log('Error: Could not add friend');
         }
-    }
-        
-
-    let user: User;
-    interface User {
-        id: number;
-        pseudo: string;
-        firstName: string;
-        lastName: string;
     }
 
     const loadpage = async () =>

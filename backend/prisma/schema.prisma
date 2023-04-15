@@ -21,6 +21,11 @@ model User {
   username  String @unique
   picture   String
 
+  wins      Int @default(0)
+  losses    Int @default(0)
+  rank      Int @default(0)
+  level     Int @default(0)
+
   userFriends       Friend[] @relation("user")
   friendUserFriends Friend[] @relation("friend_users")
 

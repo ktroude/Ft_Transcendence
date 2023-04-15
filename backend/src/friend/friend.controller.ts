@@ -21,4 +21,11 @@ export class FriendController {
     {
         return this.friendService.getAllFriend(pseudo);
     }
+
+    @UseGuards(JwtGuard)
+    @Put(':pseudo/deletefriend')
+    async deleteFriend(@Param('pseudo') pseudo: string, @Body() body:{friend: string}): Promise<User>
+    {
+        return this.friendService.deleteFriend(pseudo, body.friend);
+    }
 }
