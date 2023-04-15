@@ -92,8 +92,8 @@ export class ChatRoomGateway
   async handleGetMessage(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: { id: data.id},
-      select: {messages: true},
+      where: { id: data.id },
+      select: { messages: true },
     });
     const messages = chatRoom.messages;
     this.server.emit('returnMessage', messages)
@@ -104,7 +104,8 @@ export class ChatRoomGateway
   async handleSendMessage(@ConnectedSocket() client, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.roomId}});
+      where: { id: data.roomId }
+    });
     if ((await this.chatRoomService.isMuted(user, chatRoom)) === true) {
       // handle error
     }
@@ -116,11 +117,12 @@ export class ChatRoomGateway
   }
 
   @SubscribeMessage('getUser')
-  async handleGetUser(@ConnectedSocket() client:Socket, @MessageBody() data: any) {
+  async handleGetUser(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     console.log('data =', data);
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.id}});
+      where: { id: data.id }
+    });
     let toSend = {
       pseudo: user.pseudo,
       status: 2,
@@ -145,14 +147,16 @@ export class ChatRoomGateway
   }
 
   @SubscribeMessage('checkUser')
-  async handleCheckUser(@ConnectedSocket() client:Socket, @MessageBody() data: any) {
+  async handleCheckUser(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     const user = await this.prismaService.user.findUnique({
-      where: {id: data.id},
+      where: { pseudo: data.pseudo },
     })
     console.log('data =', data);
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.id}});
+      where: { id: data.id }
+    });
     let toSend = {
+      id: user.id,
       pseudo: user.pseudo,
       status: -2,
       room: chatRoom.id,
@@ -313,25 +317,25 @@ export class ChatRoomGateway
         (await this.chatRoomService.isOwner(user, chatRoom))) ===
       false
     ) {
-        return ;
+      return;
     }
     if (
       (await this.chatRoomService.isAdmin(userToBan, chatRoom)) === true &&
       (await this.chatRoomService.isAdmin(user, chatRoom)) === true &&
       (await this.chatRoomService.isOwner(user, chatRoom)) === false
     ) {
-        return ;
+      return;
     }
     if ((await this.chatRoomService.isBanned(userToBan, chatRoom)) === true) {
-      return ;
+      return;
     }
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
       data: { banned: { connect: { id: userToBan.id } } },
     });
     const datatoSend = {
-      sender:'',
-      content:'${userToBan.pseudo} a été banni'
+      sender: '',
+      content: `${userToBan.pseudo} a été banni`
     }
     this.server.emit('newMessage', datatoSend);
     this.server.emit('newBan', userToBan.id);
@@ -369,61 +373,77 @@ export class ChatRoomGateway
   //   });
   // }
 
+  @SubscribeMessage('kick')
+  async handleKick(client: Socket, data: any) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const toKick = await this.prismaService.user.findUnique({
+      where: { id: data },
+    });
+    const roomToFree = await this.prismaService.chatRoom.findUnique({
+      where: { id: data.room },
+    });
+    if (toKick && roomToFree) {
+      await this.prismaService.chatRoom.update({
+        where: { id: roomToFree.id },
+        data: {
+          members: { disconnect: { id: toKick.id } },
+        }
+      });
+      this.server.emit('kicked', toKick.id);
+    }
+  }
+
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(client: Socket, data: any) {
-    console.log('je suis ici');
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const toCheck = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.id},
-      select: {owner:true, id: true, name:true, messages:true},
+      where: { id: data.id },
+      select: { owner: true, id: true, name: true, messages: true },
     })
     if (toCheck.owner.id === user.id) {
-      console.log('je delete ici');
       await this.prismaService.message.deleteMany({
-        where: {chatRoomId: data.id},
+        where: { chatRoomId: data.id },
       })
       await this.prismaService.chatRoom.update({
-        where: {id: data.id},
-        data: { 
-          members: {disconnect:{id:user.id}},
-          admin: {disconnect:{id:user.id}},
+        where: { id: data.id },
+        data: {
+          members: { disconnect: { id: user.id } },
+          admin: { disconnect: { id: user.id } },
         },
       })
-      console.log('delete room num', data.id);
       await this.prismaService.chatRoom.delete({
         where: { id: data.id },
       });
-      console.log('fin du delete........')
       this.server.emit('deleteRoom', data.id);
-      return ;
+      return;
     }
     else {
       await this.prismaService.chatRoom.update({
-        where: {id: data.id},
-        data: { members: {connect: {id: user.id}}},
+        where: { id: data.id },
+        data: { members: { connect: { id: user.id } } },
       });
       const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a quitté la room`,
-      {id: 0, pseudo:'server'}, {id: data.id});
+        { id: 0, pseudo: 'server' }, { id: data.id });
       this.server.emit('newMessage', toSend);
     }
   }
 
   @SubscribeMessage('joinRoom')
-  async handleJoinRoom(client:Socket, data:any) {
+  async handleJoinRoom(client: Socket, data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const toCheck = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.id},
-      select: {members:true},
+      where: { id: data.id },
+      select: { members: true },
     })
     const isMember = toCheck.members.some(member => member.id === user.id);
     console.log('isM ==', isMember);
     await this.prismaService.chatRoom.update({
-      where: {id: data.id},
-      data: { members: {connect: {id: user.id}}},
+      where: { id: data.id },
+      data: { members: { connect: { id: user.id } } },
     });
     if (!isMember) {
       const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a rejoind la room`,
-      {id: 0, pseudo:'server'}, {id: data.id});
+        { id: 0, pseudo: 'server' }, { id: data.id });
       this.server.emit('newMessage', toSend);
     }
   }
