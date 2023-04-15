@@ -32,9 +32,9 @@
         {friendName}
         {#if clickedFriend === friendName && showButtons}
           <button on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-          <button on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
           <button on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-          <button on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>Profile</button>
+          <button on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
+          <button on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
         {/if}
       </li>
     {/each}
@@ -43,6 +43,7 @@
 
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { navigate } from 'svelte-navigator';
   import { goto } from "$app/navigation";
   import {fetchData, fetchFriend, fetchAccessToken} from "../../API/api";
 
@@ -66,17 +67,21 @@
     previousFriend = clickedFriend;
   }
 
-  function setShowButtons(value: boolean) {
+  async function setShowButtons(value: boolean) {
     showButtons = value;
     console.log("showButtons: " + showButtons);
   }
 
-  function handleMessageFriend(friendName) {
+  async function handleMessageFriend(friendName) {
     console.log(`Sending message to ${friendName}`);
   }
 
-  function handleProfileFriend(friendName) {
-    console.log(`Showing profile of ${friendName}`);
+  async function handleProfileFriend(friendName) {
+    const accessToken = await fetchAccessToken();
+    if (accessToken)
+      console.log(`Showing profile of ${friendName}`);
+    else
+      console.log('Error: Could not get profile');
   }
 
   async function handleDeleteFriend(friendName) {
@@ -120,7 +125,7 @@
         });
         if (response.ok)
         {
-            friends.push(friendNameAdd);
+            friends = await fetchFriend(user.pseudo);
             friendNameAdd = '';
         }
         else

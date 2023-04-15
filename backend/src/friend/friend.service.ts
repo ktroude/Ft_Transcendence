@@ -120,8 +120,9 @@ export class FriendService{
         return deleteFriend;
     }
 
-
     async deleteFriend(pseudo: string, usernameFriend: string): Promise<User> {
+        if (pseudo == usernameFriend)
+            return null;
         const user = await this.prisma.user.findUnique({
             where: {
                 pseudo: pseudo
