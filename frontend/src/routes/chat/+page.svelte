@@ -17,9 +17,9 @@
     let messages:any[];
     let currentRoom:any = null;
     let currentUser:User;
-    let selectedUser:User;
+    let selectedUser:string;
     let showOptionsPseudo:string[] = [];
-    let isShown = true;
+    let isShown = false;
 // INTERFACES
 
     interface Message {
@@ -35,6 +35,7 @@
     }
 
     interface User {
+        id:number;
         pseudo: string;
         status: number; // 2 = owner, 1 = admin, 0 = member, -1 = muted, -2 banned
         room:number;
@@ -90,10 +91,11 @@
     }
 
     function handleRoomButton(room:ChatRoom) {
+        currentRoom = null;
         currentRoom = room;
         socket.emit('getMessage', room);
         socket.emit('getUser', room);
-        console.log('handleRoomButton');
+        socket.emit('joinRoom', room);
     }
     
     function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:ChatRoom) {
@@ -124,6 +126,32 @@
         return [];
     }
 
+    const fletchCurrentUserData = async(): Promise<User> => {
+      const cookies = document.cookie.split(';');
+        const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
+        const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+        if (accessToken) {
+            const headers = new Headers();
+            headers.append('Authorization', `Bearer ${accessToken}`);
+            const response = await fetch('http://localhost:3000/users/userInfo', { headers });
+            const data = await response.json();
+            console.log(data);
+            const user:User = {
+              id: data?.id,
+              pseudo: data?.pseudo,
+              status: -2,
+              room: -1,
+            };
+            return user;
+        }
+        const user:User = {
+          id: -1,
+          pseudo: '',
+          status: -2,
+          room: -1,
+        }
+        return user;
+    };
 
     async function displayDropdownMenu(currentUser:User, selectedUser:User):Promise<string[]> {
         if (currentUser && currentUser.status) {
@@ -179,8 +207,10 @@
         return [];
     }
 
-    async function handleClickPseudo(event:any, selectedUser:any) {
-        showOptionsPseudo = await displayDropdownMenu(currentUser, selectedUser);
+    async function handleClickPseudo(event:any, user:any) {
+        showOptionsPseudo = await displayDropdownMenu(currentUser, user);
+        isShown = true;
+        selectedUser = user;
   }
 
 
@@ -190,7 +220,54 @@
 
   function delMenu() {
     isShown = !isShown;
+    selectedUser = '';
   }
+
+  function leaveRoom() {
+    console.log('bouton marche???');
+    socket.emit('leaveRoom', currentRoom);
+    currentRoom = null;
+    messages = [];
+  }
+
+  function showProfile() {
+    window.location.pathname = '/profile';
+  }
+
+  function ban() {
+    const data = {
+      user: currentUser,
+      room: currentRoom,
+      toBan: selectedUser,
+    };
+    socket.emit('newBan', data);
+  }
+
+  function deban() {
+
+  }
+
+  function mute() {
+
+  }
+
+  function demute() {
+
+  }
+
+  function kick(id:number) {
+
+  }
+
+  function upadmin() {
+
+  }
+
+  function deUpadmin() {
+
+  }
+
+
 
     onMount(async () => {
         const cookies = document.cookie.split(';');
@@ -214,11 +291,22 @@
             messages = [...messages, msg];
         });
         socket.on('returnUser', (user:User) => {
-            console.log('USERR ===', user);
             currentUser = user;
-            console.log('CURRENT USER ===', user);
+        });
+        socket.on('newBan', (data) => {
+          kick(data.id);
+        });
+        socket.on('deleteRoom', async(data) =>  {
+          const roomToDel = chatRooms.find(element => element.id === data);
+          if (roomToDel) {
+            chatRooms = await fletchChatRoomsData();
+            chatRooms.splice(chatRooms.indexOf(roomToDel, 1));
+          }
         });
         chatRooms = await fletchChatRoomsData();
+        currentUser = await fletchCurrentUserData();
+        if (currentUser.id < 0)
+          window.location.pathname = '/';
         loading = true;
         checkFormValidity();
     });
@@ -256,11 +344,21 @@
     </label>
     <button class='form-button' type="submit" disabled={!isFormValid}>Créer la salle</button>
   </form>
-  <div class="chat-messages">
-    {#if messages && messages.length}
+  {#if currentRoom && currentRoom.name}
+  <div>
+    <p> <h3> {currentRoom.name} </h3>
+      <button on:click={leaveRoom}>Quitter la room</button>
+    </div>
+    <div class="chat-messages">
+      {#if messages && messages.length}
       {#each messages as msg}
-        <p>
+      <p>
+        {#if msg.senderPseudo == 'server'}
+        {msg.senderPseudo}: {msg.content}
+        {/if}
+          {#if msg.senderPseudo != 'server' }
           <button class="pseudo-button" on:click={(event) => handleClickPseudo(event,msg.senderPseudo)}>{msg.senderPseudo}</button> : {msg.content}
+          {/if}
         </p>
       {/each}
     {/if}
@@ -273,16 +371,17 @@
         sendMessage(event, messageInput, currentRoom);
       }
     }}>Envoyer</button>
+{/if}
 
 {#if isShown}
 <div>
         {#if showOptionsPseudo.length}
       <select id="pseudo-menu">
         {#if find(showOptionsPseudo, 'profile') === true}
-          <option value="profile">Voir le profil</option>
+          <option value="profile" on:click={showProfile}>Voir le profil</option>
         {/if}
         {#if find(showOptionsPseudo, 'ban') === true}
-          <option value="ban">Bannir</option>
+          <option value="ban" on:click={ban}>Bannir</option>
         {/if}
         {#if find(showOptionsPseudo, 'mute') === true}
           <option value="mute">Muter</option>
