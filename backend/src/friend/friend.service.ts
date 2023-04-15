@@ -69,10 +69,7 @@ export class FriendService{
             return null;
         const exist = await this.userExist(usernameFriend);
         if (!exist)
-        {
-            console.log("IL EXISTE PAS");
             return null;
-        }
         const user = await this.prisma.user.findUnique({
             where: {
                 pseudo: pseudo,
@@ -87,12 +84,8 @@ export class FriendService{
         });
         if (!friend)
             return null;
-        console.log("JAI TROUVER " + friend.username);
         if (await this.existingFriendship(user.id, friend.id))
-        {
-            console.log("ILS SONT DEJA COPAINS");
             return null;
-        }
         await this.createFriendship(user.id, friend.id);
         await this.createFriendship(friend.id, user.id);
         return user;
@@ -101,8 +94,7 @@ export class FriendService{
     // Creating friendship
     async createFriendship(userId: number, friendId: number)
     {
-        const prisma = new PrismaClient();
-        const newFriend = await prisma.friend.create({
+        const newFriend = await this.prisma.friend.create({
             data: {
               user: {
                 connect: {id: userId },
@@ -114,4 +106,37 @@ export class FriendService{
           });
           return newFriend;
     }
-}
+    
+    async deleteFriendShip(userId: number, friendId: number)
+    {
+        const deleteFriend = await this.prisma.friend.delete({
+            where: {
+                user_id_friend_id: {
+                    user_id: userId,
+                    friend_id: friendId
+                }
+            }
+        });
+        return deleteFriend;
+    }
+
+
+    async deleteFriend(pseudo: string, usernameFriend: string): Promise<User> {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                pseudo: pseudo
+            }
+          });
+        if (!user)
+            return null;
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                username: usernameFriend
+            }
+          });
+        if (!friend)
+            return null;
+        await this.deleteFriendShip(user.id, friend.id);
+        await this.deleteFriendShip(friend.id, user.id);
+    }
+  }
