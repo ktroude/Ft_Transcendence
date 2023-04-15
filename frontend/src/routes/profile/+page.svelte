@@ -20,7 +20,7 @@
     <button on:click={handleUpdateUsername}>Update</button>
   </main>
   <div class="container">
-    <img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${200}px; height: ${200}px;`} />
+  //  <img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${200}px; height: ${200}px;`} />
     <input type="file" class="upload-button" on:change={handleFileUpload} />
 </div>
 

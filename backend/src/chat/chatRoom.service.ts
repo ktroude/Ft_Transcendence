@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ChatRoom, User } from '@prisma/client';
 import { Prisma } from '@prisma/client';
+import { all } from 'axios';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -76,7 +77,7 @@ export class ChatRoomService {
   //   });
   // }
 
-  async createMessage(text: string, user: User, chatRoom: ChatRoom) {
+  async createMessage(text: string, user:any, chatRoom:any) {
     const messageData: Prisma.MessageCreateInput = {
       content: text,
       senderId: user.id,
@@ -102,4 +103,7 @@ export class ChatRoomService {
       },
     });
   }
+
+
+
 }
