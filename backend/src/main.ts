@@ -15,7 +15,13 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(cookieSession({ secret: process.env.COOKIE_SECRET }));
   config();
-  app.use(cors())
+  app.use(
+    cors({
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
+    }),
+  );
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   await app.listen(3000);
