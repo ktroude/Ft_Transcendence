@@ -7,14 +7,14 @@
 		height: 100vh;
 	}
 	.main_box {
-	  margin: 50px auto;
-	  max-width: 600px;
-	  padding: 20px;
-	  background-color: #f8f8f8;
-	  border-radius: 5px;
-	  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	  text-align: center;
-	  align-items: center;
+		margin: 50px auto;
+		max-width: 600px;
+		padding: 20px;
+		background-color: #f8f8f8;
+		border-radius: 5px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		text-align: center;
+		align-items: center;
 	}
 	button {
 		display: block;
@@ -43,13 +43,13 @@
 		align-items: center;
 	}
 	.game_navbar{
-	height:50px;
-	width:100%;
-	background:grey;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
+		height:50px;
+		width:100%;
+		background:grey;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
 </style>
 
 <main>

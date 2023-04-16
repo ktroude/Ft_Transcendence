@@ -1,21 +1,5 @@
 <style>
-    .friend-list {
-      float: right;
-      margin-right: 800px;
-      margin-top: 25px;
-    }
-
-    .add-friend {
-    margin-top: -20px;
-    margin-left: 20px;
-  }
-
-  .add-friend button {
-    font-size: 12px;
-    padding: 5px 10px;
-    margin-right: -70px;
-  }
-  button {
+	button {
 		display: block;
 		margin: 0 auto;
 		padding: 10px 20px;
@@ -32,44 +16,27 @@
 	button:hover {
 		background-color: #014b9a;
 	}
-  .game_navbar{
-	height:50px;
-	width:100%;
-	background:grey;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-  </style>
-<main>	
-<div class="game_navbar">
-	<button on:click={() => goto('/homepage')}>Home</button>
-	<button on:click={() => goto('/profile')}>Profile</button>
-	<button on:click={() => goto('/chat')}>Chat</button>
-	<button on:click={() => goto('/game')}>Game</button>
-</div>
-<div class="container">
-	<h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
+	.game_navbar{
+		height:50px;
+		width:100%;
+		background:grey;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+</style>
 
-</div>
+<main>	
+	<div class="game_navbar">
+		<button on:click={() => goto('/homepage')}>Home</button>
+		<button on:click={() => goto('/profile')}>Profile</button>
+		<button on:click={() => goto('/chat')}>Chat</button>
+		<button on:click={() => goto('/game')}>Game</button>
+	</div>
+	<div class="container">
+		<h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
+	</div>
 </main>
-<!-- <div class="friend-list add-friend">
-  <input type="text" bind:value={friendNameAdd} />
-  <button on:click={handleAddFriend}>Add Friend</button>
-  <ul>
-    {#each friends as friendName}
-      <li on:click={() => handleFriendClick(friendName)}>
-        {friendName}
-        {#if clickedFriend === friendName && showButtons}
-          <button on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-          <button on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-          <button on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
-          <button on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
-        {/if}
-      </li>
-    {/each}
-  </ul>
-</div> -->
 
 <script lang="ts">
   import { onMount } from 'svelte';
@@ -181,4 +148,3 @@
         loadpage();
     });
 </script>
-

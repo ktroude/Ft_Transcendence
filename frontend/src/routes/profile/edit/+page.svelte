@@ -1,11 +1,4 @@
  <style>
-	.home_button{
-		margin:10px;
-	}
-	.home_button:hover{
-		margin:10px;
-		background-color: #014b9a;
-	}
 	.edit_main {
 		margin:10px;
 		display:flex;
@@ -13,37 +6,32 @@
 		width:100vw;
 		height:100vh
 	}
-
 	.edit_box {
-	  margin: 50px auto;
-	  max-width: 600px;
-	  padding: 20px;
-	  background-color: #f8f8f8;
-	  border-radius: 5px;
-	  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	  text-align: center;
+		margin: 50px auto;
+		max-width: 600px;
+		padding: 20px;
+		background-color: #f8f8f8;
+		border-radius: 5px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		text-align: center;
 	}
-	
 	h1 {
-	  font-size: 24px;
-	  margin-bottom: 20px;
+		font-size: 24px;
+		margin-bottom: 20px;
 	}
-  
 	label {
-	  display: block;
-	  margin-bottom: 10px;
-	  font-weight: bold;
+		display: block;
+		margin-bottom: 10px;
+		font-weight: bold;
 	}
-  
 	input[type="text"] {
-	  width: 100%;
-	  padding: 10px;
-	  margin-bottom: 20px;
-	  border: 1px solid #ccc;
-	  border-radius: 5px;
-	  font-size: 16px;
+		width: 100%;
+		padding: 10px;
+		margin-bottom: 20px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		font-size: 16px;
 	}
-  
 	button {
 		display: block;
 		margin: 0 auto;
@@ -61,43 +49,41 @@
 	button:hover {
 		background-color: #014b9a;
 	}
-  
 	img {
-	  margin-top: 20px;
-	  max-width: 300px;
-	  max-height: 200px;
-	  object-fit: cover;
-	  border: 1px solid #ccc;
-	  border-radius: 5px;
+		margin-top: 20px;
+		max-width: 300px;
+		max-height: 200px;
+		object-fit: cover;
+		border: 1px solid #ccc;
+		border-radius: 5px;
 	}
-  
 	.upload-button {
-	  display: none;
+		display: none;
 	}
-  
 	.upload-button{
-	  display: block;
-	  margin-top: 10px;
-	  padding: 10px 20px;
-	  background-color: #007bff;
-	  color: #fff;
-	  border: none;
-	  border-radius: 5px;
-	  font-size: 16px;
-	  cursor: pointer;
-	  width: max-content;
-	  margin: 0 auto;
+		display: block;
+		margin-top: 10px;
+		padding: 10px 20px;
+		background-color: #007bff;
+		color: #fff;
+		border: none;
+		border-radius: 5px;
+		font-size: 16px;
+		cursor: pointer;
+		width: max-content;
+		margin: 0 auto;
 	}
 	.game_navbar{
-	height:50px;
-	width:100%;
-	background:grey;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
+		height:50px;
+		width:100%;
+		background:grey;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
 }
-  </style>
-  <main>
+</style>
+
+<main>
 	<div class="game_navbar">
 		<button on:click={() => goto('/homepage')}>Home</button>
 		<button on:click={() => goto('/profile')}>Profile</button>
@@ -106,12 +92,12 @@
 	</div>
 	<div class="edit_main">
 		<div class="edit_box">
-		<h1>{user?.pseudo}</h1>
-		<label for="username-input">New Username:</label>
-		<input type="text" id="username-input" bind:value={newUsername} />
-		<button on:click={handleUpdateUsername}>Update</button>
-		<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
-		<input type="file" class="upload-button" on:change={handleFileUpload} />
+			<h1>{user?.pseudo}</h1>
+			<label for="username-input">New Username:</label>
+			<input type="text" id="username-input" bind:value={newUsername} />
+			<button on:click={handleUpdateUsername}>Update</button>
+			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
+			<input type="file" class="upload-button" on:change={handleFileUpload} />
 		</div>
 	</div>
 </main>
@@ -219,4 +205,3 @@
       getImageURL()
     });
 </script>
-  
