@@ -76,10 +76,12 @@
   }
 
   async function handleProfileFriend(friendName) {
-    const accessToken = await fetchAccessToken();
-    if (accessToken)
-      console.log(`Showing profile of ${friendName}`);
-    else
+  const accessToken = await fetchAccessToken();
+    if (accessToken) 
+    {
+      navigate(`/${friendName}`);
+    } 
+    else 
       console.log('Error: Could not get profile');
   }
 
@@ -153,6 +155,6 @@
 
 <h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
 
-<button on:click={() => gotoRoute('/profile')}> Profil </button>
+<button on:click={() => gotoRoute(`/profile/${user.pseudo}`)}> Profil </button>
 <button on:click={() => gotoRoute('/game')}> Game </button>
 <button on:click={() => gotoRoute('/chat')}> Chat </button>

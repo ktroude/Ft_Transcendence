@@ -1,4 +1,4 @@
- <style>
+<style>
     .container {
       display: flex;
       flex-direction: column;
@@ -20,15 +20,16 @@
     <button on:click={handleUpdateUsername}>Update</button>
   </main>
   <div class="container">
-  //  <img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${200}px; height: ${200}px;`} />
+    <img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${200}px; height: ${200}px;`} />
     <input type="file" class="upload-button" on:change={handleFileUpload} />
 </div>
 
 <script lang="ts">
 
+    import { page } from '$app/stores';
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchFriend } from '../../API/api';
+    import { fetchAccessToken, fetchData, fetchDataOfUser} from '../../../API/api';
 
     interface User {
         id: number;
@@ -38,12 +39,11 @@
         picture: string;
     }
         
-    let imageURL: string;
-    let user: User;
-    let newUsername: string;
+      let imageURL: string;
+      let user: User;
+      let newUsername: string;
     
         async function getImageURL() {
-        user = await fetchData(); // Get the user's picture
         const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
         const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
         imageURL = URL.createObjectURL(blob); // Create a URL for the blob
@@ -119,11 +119,19 @@
     };
   }
 
+  async function loadpage() {
+    user = await fetchData();
+    if ($page.params.user == user.pseudo)
+        getImageURL();
+    else
+    {
+      user = await fetchDataOfUser($page.params.user);
+      getImageURL();
+    }
+  }
+
     onMount(() => {
-        fetchData();
-    });
-    onMount(() => {
-      getImageURL()
+        loadpage();
     });
 </script>
   
