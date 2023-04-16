@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { io, Socket } from 'socket.io-client';
-	import { null_to_empty } from 'svelte/internal';
 
 	// VARIABLES
 
@@ -25,6 +24,7 @@
 	};
 	let showOptionsPseudo: string[] = [];
 	let isShown = false;
+	let muteBan: any = [];
 	// INTERFACES
 
 	interface Message {
@@ -94,12 +94,15 @@
 		}
 	}
 
-	function handleRoomButton(room: ChatRoom) {
+	async function handleRoomButton(room: ChatRoom) {
 		currentRoom = room;
 		messages = [];
 		socket.emit('getMessage', room);
 		socket.emit('getUser', room);
 		socket.emit('joinRoom', room);
+		muteBan = await fletchMuteBanData();
+		console.log('MUTEB ==', muteBan);
+		console.log('currentUser ==', currentUser);
 	}
 
 	function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
@@ -117,10 +120,26 @@
 				content: messageValue
 			};
 			socket.emit('sendMessage', data);
-			console.log(messages);
 			messageInput.value = '';
 		}
 	}
+
+	const fletchMuteBanData = async () => {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(`http://localhost:3000/chat/getMuteBan?code=${currentRoom.id}`, {
+				headers
+			});
+			const data = await response.json();
+			return data;
+		}
+		return [];
+	};
+
 	const fletchChatRoomsData = async (): Promise<ChatRoom[]> => {
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
@@ -130,7 +149,6 @@
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			const response = await fetch('http://localhost:3000/chat/getRoom', { headers });
 			const data = await response.json();
-			console.log(data);
 			return data;
 		}
 		return [];
@@ -145,7 +163,6 @@
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			const response = await fetch('http://localhost:3000/users/userInfo', { headers });
 			const data = await response.json();
-			console.log(data);
 			const user: User = {
 				id: data?.id,
 				pseudo: data?.pseudo,
@@ -164,24 +181,19 @@
 	};
 
 	async function displayDropdownMenu(currentUser: User, user: User): Promise<string[]> {
-		console.log(1);
 		if (currentUser && currentUser.status) {
-			console.log(2);
 			if (user && !user.status) {
-				console.log(currentRoom.id);
 				const data = {
 					id: currentRoom.id,
 					pseudo: user
 				};
 				const checkUserPromise = new Promise<User>((resolve) => {
-          socket.emit('checkUser', data);
+					socket.emit('checkUser', data);
 					socket.on('returnCheckUser', (data) => {
-            console.log("data ==", data);
 						resolve(data);
 					});
 				});
 				selectedUser = await checkUserPromise;
-				console.log('selcted User === ', selectedUser);
 			}
 			if (selectedUser && selectedUser.status) {
 				// CU = currentUser | SU = selectedUser
@@ -245,7 +257,6 @@
 	}
 
 	function leaveRoom() {
-		console.log('bouton marche???');
 		socket.emit('leaveRoom', currentRoom);
 		currentRoom = null;
 		messages = [];
@@ -294,17 +305,13 @@
 			updateChatRooms(newRoom);
 		});
 		socket.on('returnMessage', (data: any) => {
-			if (currentUser.id === data.to)
-				messages = data.msg;
+			if (currentUser.id === data.to) messages = data.msg;
 		});
 		socket.on('newMessage', (msg: any) => {
-			console.log('message ======', messages)
-			if (currentRoom && currentRoom.id === msg.chatRoomId)
-				messages = [...messages, msg];
+			if (currentRoom && currentRoom.id === msg.chatRoomId) messages = [...messages, msg];
 		});
-		socket.on('returnUser', (data:any) => {
-			if (data.to === currentUser.id)
-				currentUser = data.user;
+		socket.on('returnUser', (data: any) => {
+			if (data.to === currentUser.id) currentUser = data.user;
 		});
 		socket.on('newBan', (data) => {});
 		socket.on('deleteRoom', async (data) => {
@@ -315,10 +322,11 @@
 				const message = {
 					content: 'La room a été supprimée.',
 					senderPseudo: 'server',
-					chatRoomId: roomToDel.id,
-				}
-				if (currentRoom.id === roomToDel.id)
+					chatRoomId: roomToDel.id
+				};
+				if (currentRoom.id === roomToDel.id){
 					messages = [message];
+				}
 				isShown = false;
 			}
 		});
@@ -331,7 +339,9 @@
 		});
 		chatRooms = await fletchChatRoomsData();
 		currentUser = await fletchCurrentUserData();
-		if (currentUser.id < 0) window.location.pathname = '/';
+		if (currentUser.id < 0) {
+			window.location.pathname = '/';
+		}
 		loading = true;
 		checkFormValidity();
 	});
@@ -409,8 +419,9 @@
 							<button
 								class="pseudo-button"
 								on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
-								>{msg.senderPseudo}</button
 							>
+								{msg.senderPseudo}
+							</button>
 							: {msg.content}
 						{/if}
 					</p>
@@ -467,4 +478,21 @@
 			{/if}
 		</div>
 	{/if}
+{/if}
+
+{#if currentUser?.status > 0 && muteBan?.banned && muteBan?.muted}
+<div class="admin-panel">
+	<p>Banned :</p>
+		{#each muteBan.banned as banned}
+			<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, banned.pseudo)}>
+				{banned.pseudo}
+			</button>
+		{/each}
+		<p>Muted :</p>
+		{#each muteBan.muted as muted}
+			<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, muted.pseudo)}>
+				{muted.pseudo}
+			</button>
+		{/each}
+</div>
 {/if}

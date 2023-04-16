@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, Post, UseGuards } from "@nestjs/common";
+import { Controller, Get, Headers, Post, Query, UseGuards } from "@nestjs/common";
 import { ChatRoomService } from "./chatRoom.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
@@ -31,6 +31,29 @@ export class ChatRoomController {
             ownerId: elem.ownerId,
         }));
         return ret;
+    }
+
+    @Get('getMuteBan')
+    async handleGetMuted(@Headers('Authorization') cookie: string, @Query('code') id) {
+        const token = cookie.split(' ')[1];
+        const user = await this.userService.decodeToken(token);
+        const room = await this.prisma.chatRoom.findUnique({
+            where: {id: parseInt(id, 10)},
+            select: { 
+                muted: true,
+                banned: true,
+                admin: true,
+            }
+        });
+        const admin = room.admin.find((obj) => obj.id === user.id);
+        if (admin) {
+            return {
+                muted : room.muted,
+                banned : room.banned,
+            }
+        }
+        else
+            return [];
     }
 
 }
