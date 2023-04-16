@@ -24,7 +24,8 @@
 	};
 	let showOptionsPseudo: string[] = [];
 	let isShown = false;
-	let muteBan: any = [];
+	let muted: any = [];
+	let banned: any = [];
 	// INTERFACES
 
 	interface Message {
@@ -100,8 +101,7 @@
 		socket.emit('getMessage', room);
 		socket.emit('getUser', room);
 		socket.emit('joinRoom', room);
-		muteBan = await fletchMuteBanData();
-		console.log('MUTEB ==', muteBan);
+		await fletchMuteBanData();
 		console.log('currentUser ==', currentUser);
 	}
 
@@ -135,9 +135,9 @@
 				headers
 			});
 			const data = await response.json();
-			return data;
+			muted = data.muted;
+			banned = data.banned;
 		}
-		return [];
 	};
 
 	const fletchChatRoomsData = async (): Promise<ChatRoom[]> => {
@@ -260,6 +260,8 @@
 		socket.emit('leaveRoom', currentRoom);
 		currentRoom = null;
 		messages = [];
+		muted = [];
+		banned = []
 	}
 
 	function showProfile() {
@@ -273,13 +275,20 @@
 			toBan: selectedUser
 		};
 		socket.emit('newBan', data);
+		banned = [...banned, selectedUser];
 	}
 
-	function deban() {}
+	function deban() {
 
-	function mute() {}
+	}
 
-	function demute() {}
+	function mute() {
+		muted = [...muted, selectedUser]
+	}
+
+	function demute() {
+
+	}
 
 	function kick(userToKick: User) {
 		socket.emit('kick', userToKick.id);
@@ -308,7 +317,9 @@
 			if (currentUser.id === data.to) messages = data.msg;
 		});
 		socket.on('newMessage', (msg: any) => {
-			if (currentRoom && currentRoom.id === msg.chatRoomId) messages = [...messages, msg];
+			if (currentRoom && currentRoom.id === msg.chatRoomId){
+				messages = [...messages, msg];
+			}
 		});
 		socket.on('returnUser', (data: any) => {
 			if (data.to === currentUser.id) currentUser = data.user;
@@ -480,18 +491,18 @@
 	{/if}
 {/if}
 
-{#if currentUser?.status > 0 && muteBan?.banned && muteBan?.muted}
+{#if currentUser?.status > 0 }
 <div class="admin-panel">
 	<p>Banned :</p>
-		{#each muteBan.banned as banned}
-			<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, banned.pseudo)}>
-				{banned.pseudo}
+		{#each banned as ban}
+			<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
+				{ban.pseudo}
 			</button>
 		{/each}
 		<p>Muted :</p>
-		{#each muteBan.muted as muted}
-			<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, muted.pseudo)}>
-				{muted.pseudo}
+		{#each muted as mute}
+			<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
+				{mute.pseudo}
 			</button>
 		{/each}
 </div>
