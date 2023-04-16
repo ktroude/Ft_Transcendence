@@ -1,63 +1,112 @@
+ 
 <style>
-	.main_profile {
-		margin: 10px;
-		display: flex;
-		flex-direction: column;
-		width: 100vw;
-		height: 100vh;
+	.home_button{
+		margin:10px;
 	}
-
-	button {
-		display: block;
-		margin: 0 auto;
-		padding: 10px 20px;
-		background-color: #007bff;
-		color: #fff;
-		border: none;
-		width:150px;
-		height:50px;
-		border-radius: 5px;
-		font-size: 16px;
-		cursor: pointer;
-		margin: 10px;
-	}
-
-	button:hover {
-		margin: 10px;
+	.home_button:hover{
+		margin:10px;
 		background-color: #014b9a;
 	}
-
-	img {
-		margin-top: 20px;
-		max-width: 300px;
-		max-height: 200px;
-		object-fit: cover;
-		border: 1px solid #ccc;
-		border-radius: 5px;
+	.edit_main {
+		margin:10px;
+		display:flex;
+		flex-direction: column;
+		width:100vw;
+		height:100vh
 	}
-</style>
 
-<main>
-	<div class="main_profile">
-		<button on:click={() => goto('/homepage')}>Home</button>
-		<h1>Profil de {user?.username}</h1>
-		<h3>{user?.firstname} {user?.lastname}</h3>
-		<h3>Level: {user?.level}</h3>
-		<h3>Created: {new Date(user?.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</h3>
-		<!-- svelte-ignore a11y-img-redundant-alt -->
-		<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
-		<button on:click={() => goto('/profile/edit')}>Edit profile</button>
+	.edit_box {
+	  margin: 50px auto;
+	  max-width: 600px;
+	  padding: 20px;
+	  background-color: #f8f8f8;
+	  border-radius: 5px;
+	  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	  text-align: center;
+	}
+	
+	h1 {
+	  font-size: 24px;
+	  margin-bottom: 20px;
+	}
+  
+	label {
+	  display: block;
+	  margin-bottom: 10px;
+	  font-weight: bold;
+	}
+  
+	input[type="text"] {
+	  width: 100%;
+	  padding: 10px;
+	  margin-bottom: 20px;
+	  border: 1px solid #ccc;
+	  border-radius: 5px;
+	  font-size: 16px;
+	}
+  
+	button {
+	  display: block;
+	  margin: 0 auto;
+	  padding: 10px 20px;
+	  background-color: #007bff;
+	  color: #fff;
+	  width:150px;
+	height:50px;
+	  border: none;
+	  border-radius: 5px;
+	  font-size: 16px;
+	  cursor: pointer;
+	}
+  
+	img {
+	  margin-top: 20px;
+	  max-width: 300px;
+	  max-height: 200px;
+	  object-fit: cover;
+	  border: 1px solid #ccc;
+	  border-radius: 5px;
+	}
+  
+	.upload-button {
+	  display: none;
+	}
+  
+	.upload-button{
+	  display: block;
+	  margin-top: 10px;
+	  padding: 10px 20px;
+	  background-color: #007bff;
+	  color: #fff;
+	  border: none;
+	  border-radius: 5px;
+	  font-size: 16px;
+	  cursor: pointer;
+	  width: max-content;
+	  margin: 0 auto;
+	}
+  
+  </style>
+  <main>
+	<div class="edit_main">
+		<button class="home_button" on:click={() => goto('/homepage')} style="position: absolute; top: 0; left: 0;">Home</button>
+		<div class="edit_box">
+		<h1>{user?.pseudo}</h1>
+		<label for="username-input">New Username:</label>
+		<input type="text" id="username-input" bind:value={newUsername} />
+		<button on:click={handleUpdateUsername}>Update</button>
+		<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
+		<input type="file" class="upload-button" on:change={handleFileUpload} />
+		</div>
 	</div>
 </main>
-
-  
 
 <script lang="ts">
   	
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchFriend } from '../../API/api';
+    import { fetchAccessToken, fetchData, fetchFriend } from '../../../API/api';
 
     interface User {
         id: number;
@@ -65,8 +114,6 @@
         firstName: string;
         lastName: string;
         picture: string;
-		username: string;
-		createdAt: Date;
     }
         
     let imageURL: string;
