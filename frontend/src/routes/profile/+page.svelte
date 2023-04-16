@@ -6,7 +6,16 @@
 		width: 100vw;
 		height: 100vh;
 	}
-
+	.main_box {
+	  margin: 50px auto;
+	  max-width: 600px;
+	  padding: 20px;
+	  background-color: #f8f8f8;
+	  border-radius: 5px;
+	  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	  text-align: center;
+	  align-items: center;
+	}
 	button {
 		display: block;
 		margin: 0 auto;
@@ -14,19 +23,16 @@
 		background-color: #007bff;
 		color: #fff;
 		border: none;
-		width:150px;
-		height:50px;
+		width:120px;
+		height:40px;
 		border-radius: 5px;
 		font-size: 16px;
 		cursor: pointer;
-		margin: 10px;
+		margin: auto;
 	}
-
 	button:hover {
-		margin: 10px;
 		background-color: #014b9a;
 	}
-
 	img {
 		margin-top: 20px;
 		max-width: 300px;
@@ -34,12 +40,27 @@
 		object-fit: cover;
 		border: 1px solid #ccc;
 		border-radius: 5px;
+		align-items: center;
 	}
+	.game_navbar{
+	height:50px;
+	width:100%;
+	background:grey;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
 </style>
 
 <main>
-	<div class="main_profile">
+	<div class="game_navbar">
 		<button on:click={() => goto('/homepage')}>Home</button>
+		<button on:click={() => goto('/profile')}>Profile</button>
+		<button on:click={() => goto('/chat')}>Chat</button>
+		<button on:click={() => goto('/game')}>Game</button>
+	</div>
+	<div class="main_profile">
+		<div class="main_box">
 		<h1>Profil de {user?.username}</h1>
 		<h3>{user?.firstname} {user?.lastname}</h3>
 		<h3>Level: {user?.level}</h3>
@@ -47,6 +68,7 @@
 		<!-- svelte-ignore a11y-img-redundant-alt -->
 		<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
 		<button on:click={() => goto('/profile/edit')}>Edit profile</button>
+	</div>
 	</div>
 </main>
 

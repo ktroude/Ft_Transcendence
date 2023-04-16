@@ -1,5 +1,4 @@
- 
-<style>
+ <style>
 	.home_button{
 		margin:10px;
 	}
@@ -46,17 +45,21 @@
 	}
   
 	button {
-	  display: block;
-	  margin: 0 auto;
-	  padding: 10px 20px;
-	  background-color: #007bff;
-	  color: #fff;
-	  width:150px;
-	height:50px;
-	  border: none;
-	  border-radius: 5px;
-	  font-size: 16px;
-	  cursor: pointer;
+		display: block;
+		margin: 0 auto;
+		padding: 10px 20px;
+		background-color: #007bff;
+		color: #fff;
+		border: none;
+		width:120px;
+		height:40px;
+		border-radius: 5px;
+		font-size: 16px;
+		cursor: pointer;
+		margin: auto;
+	}
+	button:hover {
+		background-color: #014b9a;
 	}
   
 	img {
@@ -85,11 +88,23 @@
 	  width: max-content;
 	  margin: 0 auto;
 	}
-  
+	.game_navbar{
+	height:50px;
+	width:100%;
+	background:grey;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
   </style>
   <main>
+	<div class="game_navbar">
+		<button on:click={() => goto('/homepage')}>Home</button>
+		<button on:click={() => goto('/profile')}>Profile</button>
+		<button on:click={() => goto('/chat')}>Chat</button>
+		<button on:click={() => goto('/game')}>Game</button>
+	</div>
 	<div class="edit_main">
-		<button class="home_button" on:click={() => goto('/homepage')} style="position: absolute; top: 0; left: 0;">Home</button>
 		<div class="edit_box">
 		<h1>{user?.pseudo}</h1>
 		<label for="username-input">New Username:</label>

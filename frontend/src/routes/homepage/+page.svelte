@@ -15,15 +15,45 @@
     padding: 5px 10px;
     margin-right: -70px;
   }
+  button {
+		display: block;
+		margin: 0 auto;
+		padding: 10px 20px;
+		background-color: #007bff;
+		color: #fff;
+		border: none;
+		width:120px;
+		height:40px;
+		border-radius: 5px;
+		font-size: 16px;
+		cursor: pointer;
+		margin: auto;
+	}
+	button:hover {
+		background-color: #014b9a;
+	}
+  .game_navbar{
+	height:50px;
+	width:100%;
+	background:grey;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
   </style>
-
-<div class="container">
-  <div class="friend-list">
-    <h2>Friend List</h2>
-  </div>
+<main>	
+<div class="game_navbar">
+	<button on:click={() => goto('/homepage')}>Home</button>
+	<button on:click={() => goto('/profile')}>Profile</button>
+	<button on:click={() => goto('/chat')}>Chat</button>
+	<button on:click={() => goto('/game')}>Game</button>
 </div>
+<div class="container">
+	<h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
 
-<div class="friend-list add-friend">
+</div>
+</main>
+<!-- <div class="friend-list add-friend">
   <input type="text" bind:value={friendNameAdd} />
   <button on:click={handleAddFriend}>Add Friend</button>
   <ul>
@@ -39,7 +69,7 @@
       </li>
     {/each}
   </ul>
-</div>
+</div> -->
 
 <script lang="ts">
   import { onMount } from 'svelte';
@@ -152,8 +182,3 @@
     });
 </script>
 
-<h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
-
-<button on:click={() => gotoRoute('/profile')}> Profil </button>
-<button on:click={() => gotoRoute('/game')}> Game </button>
-<button on:click={() => gotoRoute('/chat')}> Chat </button>
