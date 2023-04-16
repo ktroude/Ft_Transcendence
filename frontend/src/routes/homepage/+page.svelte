@@ -43,7 +43,6 @@
 
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { navigate } from 'svelte-navigator';
   import { goto } from "$app/navigation";
   import {fetchData, fetchFriend, fetchAccessToken} from "../../API/api";
 

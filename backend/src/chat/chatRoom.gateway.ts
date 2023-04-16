@@ -96,7 +96,11 @@ export class ChatRoomGateway
       select: { messages: true },
     });
     const messages = chatRoom.messages;
-    this.server.emit('returnMessage', messages)
+    const toSend = {
+      msg: messages,
+      to: user.id,
+    }
+    this.server.emit('returnMessage', toSend);
   }
 
 
@@ -107,6 +111,7 @@ export class ChatRoomGateway
       where: { id: data.roomId }
     });
     if ((await this.chatRoomService.isMuted(user, chatRoom)) === true) {
+
       // handle error
     }
     else {
@@ -124,24 +129,27 @@ export class ChatRoomGateway
       where: { id: data.id }
     });
     let toSend = {
-      pseudo: user.pseudo,
-      status: 2,
-      room: chatRoom.id,
+      to: user.id,
+      user: {
+        pseudo: user.pseudo,
+        status: 2,
+        room: chatRoom.id,
+      },
     };
     if (await this.chatRoomService.isOwner(user, chatRoom) === true) {
-      toSend.status = 2;
+      toSend.user.status = 2;
     }
     else if (await this.chatRoomService.isAdmin(user, chatRoom) === true) {
-      toSend.status = 1;
+      toSend.user.status = 1;
     }
     else if (await this.chatRoomService.isMuted(user, chatRoom) === true) {
-      toSend.status = -1
+      toSend.user.status = -1
     }
     else if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
-      toSend.status = -2
+      toSend.user.status = -2
     }
     else if (await this.chatRoomService.isMember(user, chatRoom) === true) {
-      toSend.status = 0;
+      toSend.user.status = 0;
     }
     this.server.emit('returnUser', toSend);
   }
@@ -420,7 +428,7 @@ export class ChatRoomGateway
     else {
       await this.prismaService.chatRoom.update({
         where: { id: data.id },
-        data: { members: { connect: { id: user.id } } },
+        data: { members: { disconnect: { id: user.id } } },
       });
       const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a quitté la room`,
         { id: 0, pseudo: 'server' }, { id: data.id });

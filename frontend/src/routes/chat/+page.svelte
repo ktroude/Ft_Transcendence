@@ -95,8 +95,8 @@
 	}
 
 	function handleRoomButton(room: ChatRoom) {
-		currentRoom = null;
 		currentRoom = room;
+		messages = [];
 		socket.emit('getMessage', room);
 		socket.emit('getUser', room);
 		socket.emit('joinRoom', room);
@@ -163,20 +163,20 @@
 		return user;
 	};
 
-	async function displayDropdownMenu(currentUser: User, selectedUser: User): Promise<string[]> {
+	async function displayDropdownMenu(currentUser: User, user: User): Promise<string[]> {
 		console.log(1);
 		if (currentUser && currentUser.status) {
 			console.log(2);
-			if (selectedUser && !selectedUser.status) {
+			if (user && !user.status) {
 				console.log(currentRoom.id);
 				const data = {
 					id: currentRoom.id,
-					pseudo: selectedUser
+					pseudo: user
 				};
-				console.log(data);
 				const checkUserPromise = new Promise<User>((resolve) => {
-					socket.emit('checkUser', data);
+          socket.emit('checkUser', data);
 					socket.on('returnCheckUser', (data) => {
+            console.log("data ==", data);
 						resolve(data);
 					});
 				});
@@ -224,10 +224,9 @@
 	}
 
 	async function handleClickPseudo(event: any, user: any) {
-		console.log('JE SUIS ICI');
 		showOptionsPseudo = await displayDropdownMenu(currentUser, user);
 		console.log('CU ==', currentUser);
-		console.log('U ==', user);
+		console.log('SU ==', selectedUser);
 		isShown = true;
 	}
 
@@ -294,14 +293,18 @@
 		socket.on('roomCreated', (newRoom: ChatRoom) => {
 			updateChatRooms(newRoom);
 		});
-		socket.on('returnMessage', (msg: any[]) => {
-			messages = msg;
+		socket.on('returnMessage', (data: any) => {
+			if (currentUser.id === data.to)
+				messages = data.msg;
 		});
 		socket.on('newMessage', (msg: any) => {
-			messages = [...messages, msg];
+			console.log('message ======', messages)
+			if (currentRoom && currentRoom.id === msg.chatRoomId)
+				messages = [...messages, msg];
 		});
-		socket.on('returnUser', (user: User) => {
-			currentUser = user;
+		socket.on('returnUser', (data:any) => {
+			if (data.to === currentUser.id)
+				currentUser = data.user;
 		});
 		socket.on('newBan', (data) => {});
 		socket.on('deleteRoom', async (data) => {
@@ -309,6 +312,13 @@
 			if (roomToDel) {
 				chatRooms = await fletchChatRoomsData();
 				chatRooms.splice(chatRooms.indexOf(roomToDel, 1));
+				const message = {
+					content: 'La room a été supprimée.',
+					senderPseudo: 'server',
+					chatRoomId: roomToDel.id,
+				}
+				if (currentRoom.id === roomToDel.id)
+					messages = [message];
 				isShown = false;
 			}
 		});

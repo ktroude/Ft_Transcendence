@@ -21,6 +21,7 @@ export class ChatRoomService {
       where: { id: chatRoom.id },
       select: { owner: { select: { id: true } } },
     });
+    console.log('isOwner ===', isOwner);
       if (isOwner)
         return true;
       else
