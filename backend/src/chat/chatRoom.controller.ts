@@ -140,4 +140,17 @@ export class ChatRoomController {
         });
         return await this.chatRoomService.isBanned(user,room);
     }
+
+    @Get('getMembers')
+    async handleGetMembers(@Headers('Authorization') cookie: string, @Query('code') id) {
+        const token = cookie.split(' ')[1];
+        const user = await this.userService.decodeToken(token);
+        const room = await this.prisma.chatRoom.findUnique({
+            where: {id: parseInt(id, 10)},
+            select: {members: true}
+        });
+        return room.members;
+    }
+
+
 }

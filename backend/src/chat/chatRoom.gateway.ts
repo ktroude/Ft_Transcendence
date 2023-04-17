@@ -185,68 +185,45 @@ export class ChatRoomGateway
     this.server.emit('returnCheckUser', toSend);
   }
 
-  // @SubscribeMessage('newAdmin')
-  // async handleNewAdmin(
-  //   @ConnectedSocket() client: Socket,
-  //   @MessageBody() data: any,
-  // ) {
-  //   const user = this.clients.find(([, socket]) => socket === client)?.[0];
-  //   const newAdmin = await this.userService.findUserByPseudo(
-  //     data.newAdminPseudo,
-  //   );
-  //   const chatRoom = await this.prismaService.chatRoom.findUnique(
-  //     data.chatRoomId,
-  //   );
-  //   if (
-  //     ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
-  //       (await this.chatRoomService.isOwner(user, chatRoom))) ===
-  //     false
-  //   ) {
-  //     //handle error
-  //   }
-  //   if (
-  //     (await this.chatRoomService.isAdmin(user, chatRoom)) === true ||
-  //     (await this.chatRoomService.isOwner(user, chatRoom)) === true
-  //   ) {
-  //     //handle error
-  //   }
-  //   await this.prismaService.chatRoom.update({
-  //     where: { id: chatRoom.id },
-  //     data: {
-  //       admin: { connect: { id: newAdmin.id } },
-  //     },
-  //   });
-  // }
+  @SubscribeMessage('newAdmin')
+  async handleNewAdmin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.room.id},
+    });
+    const userToUp = await this.prismaService.user.findUnique({
+      where: {id: data.user.id}
+    });
+    await this.prismaService.chatRoom.update({
+      where: { id: chatRoom.id },
+      data: {
+        admin: { connect: { id: userToUp.id } },
+      },
+    });
+    this.server.emit('adminAdded', {user: userToUp, room: chatRoom});
+  }
 
-  // @SubscribeMessage('unAdminded')
-  // async handleUnAdminded(
-  //   @ConnectedSocket() client: Socket,
-  //   @MessageBody() data: any,
-  // ) {
-  //   const user = this.clients.find(([, socket]) => socket === client)?.[0];
-  //   const chatRoom = await this.prismaService.chatRoom.findUnique(
-  //     data.chatRoomId,
-  //   );
-  //   if ((await this.chatRoomService.isOwner(user, chatRoom)) === false) {
-  //     // handle error
-  //     // checker si le user est bien un owner pour pouvoir unadmined un admin
-  //   }
-  //   const userToUnadmin = await this.userService.findUserByPseudo(
-  //     data.userToUnadmined,
-  //   );
-  //   if (
-  //     (await this.chatRoomService.isAdmin(userToUnadmin, chatRoom)) === false ||
-  //     (await this.chatRoomService.isOwner(userToUnadmin, chatRoom)) === true
-  //   ) {
-  //     // checker si le adminToUnadmin est bien un admin et n'est pas le owner
-  //     // handle error
-  //   }
-  //   await this.prismaService.chatRoom.update({
-  //     where: { id: chatRoom.id },
-  //     data: { admin: { disconnect: { id: userToUnadmin.id } } },
-  //   });
-  //   // envoyer un ptit message pour dire que admin n'est plus admin
-  // }
+  @SubscribeMessage('unAdminded')
+  async handleUnAdminded(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.room.id},
+    });
+    const userToUnadmin = await this.prismaService.user.findUnique({
+      where: {id: data.user.id}
+    });
+    await this.prismaService.chatRoom.update({
+      where: { id: chatRoom.id },
+      data: { admin: { disconnect: { id: userToUnadmin.id } } },
+    });
+    this.server.emit('adminRemoved', {user: userToUnadmin, room: chatRoom});
+  }
 
   // @SubscribeMessage('newMute')
   // async handleNewMuted(
@@ -442,6 +419,7 @@ export class ChatRoomGateway
       const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a quitté la room`,
         { id: 0, pseudo: 'server' }, { id: data.id });
       this.server.emit('newMessage', toSend);
+      this.server.emit('roomLeaved', toCheck.id);
     }
   }
 
