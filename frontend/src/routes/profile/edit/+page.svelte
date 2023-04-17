@@ -1,4 +1,7 @@
  <style>
+	*{
+		font-family: 'Roboto', sans-serif;
+	}
 	.edit_main {
 		margin:10px;
 		display:flex;
@@ -10,7 +13,7 @@
 		margin: 50px auto;
 		max-width: 600px;
 		padding: 20px;
-		background-color: #f8f8f8;
+		background-color: #bdbdbd;
 		border-radius: 5px;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 		text-align: center;
@@ -25,18 +28,19 @@
 		font-weight: bold;
 	}
 	input[type="text"] {
-		width: 100%;
+		width: 80%;
 		padding: 10px;
 		margin-bottom: 20px;
 		border: 1px solid #ccc;
 		border-radius: 5px;
+		margin: 5px;
 		font-size: 16px;
 	}
 	button {
 		display: block;
 		margin: 0 auto;
 		padding: 10px 20px;
-		background-color: #007bff;
+		background-color: #000000;
 		color: #fff;
 		border: none;
 		width:120px;
@@ -45,9 +49,6 @@
 		font-size: 16px;
 		cursor: pointer;
 		margin: auto;
-	}
-	button:hover {
-		background-color: #014b9a;
 	}
 	img {
 		margin-top: 20px;
@@ -64,7 +65,7 @@
 		display: block;
 		margin-top: 10px;
 		padding: 10px 20px;
-		background-color: #007bff;
+		background-color: #000000;
 		color: #fff;
 		border: none;
 		border-radius: 5px;
@@ -73,22 +74,41 @@
 		width: max-content;
 		margin: 0 auto;
 	}
+	.button_nav {
+		display: block;
+		margin: 0 auto;
+		padding: 10px 20px;
+		background-color: transparent;
+		border: white;
+		color:rgb(146, 146, 146);
+		border: none;
+		width:120px;
+		height:40px;
+		border-radius: 5px;
+		font-size: 20px;
+		cursor: pointer;
+		margin: auto;
+	}
+	.button_nav:hover {
+		color:white;
+		font-size: 22px;
+	}
 	.game_navbar{
 		height:50px;
 		width:100%;
-		background:grey;
+		background:#201207;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-}
+	}
 </style>
 
 <main>
 	<div class="game_navbar">
-		<button on:click={() => goto('/homepage')}>Home</button>
-		<button on:click={() => goto('/profile')}>Profile</button>
-		<button on:click={() => goto('/chat')}>Chat</button>
-		<button on:click={() => goto('/game')}>Game</button>
+		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+		<button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button>
+		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
+		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
 	</div>
 	<div class="edit_main">
 		<div class="edit_box">
@@ -96,6 +116,7 @@
 			<label for="username-input">New Username:</label>
 			<input type="text" id="username-input" bind:value={newUsername} />
 			<button on:click={handleUpdateUsername}>Update</button>
+			<!-- svelte-ignore a11y-img-redundant-alt -->
 			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
 			<input type="file" class="upload-button" on:change={handleFileUpload} />
 		</div>
