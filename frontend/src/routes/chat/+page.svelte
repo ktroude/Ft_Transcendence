@@ -78,6 +78,23 @@
 		isFormValid = formData.roomName.length > 0 && formData.private !== undefined;
 	}
 
+	function handleMessageInput(event: any) {
+		const message = event.target.value;
+    	const sendButton = document.getElementById('sendMessageButton');
+    	if (sendButton instanceof HTMLButtonElement) {
+    	  	sendButton.disabled = message.trim().length === 0;
+    	}
+  	}
+
+	function handleMessageKeyPress(event:any) {
+		if (event.key === 'Enter') {
+    	const sendButton = document.getElementById('sendMessageButton');
+    	if (sendButton instanceof HTMLButtonElement && !sendButton.disabled) {
+        	sendButton.click();
+      	}
+    }
+	}
+
 	async function checkBan(room: any) {
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
@@ -618,13 +635,14 @@
 	</div>
 	<div>
 		{#if currentRoom.name.length}
-			<p><input type="text" id="message" name="message" /></p>
-			<button
-				type="submit"
+			<p><input on:input={handleMessageInput} on:keypress={handleMessageKeyPress} class="message-input" type="text" id="message" name="message" /></p>
+			<button id="sendMessageButton"
+				type="submit" disabled
 				on:click={(event) => {
 					const messageInput = document.getElementById('message');
 					if (messageInput instanceof HTMLInputElement) {
 						sendMessage(event, messageInput, currentRoom);
+						messageInput.value = '';
 					}
 				}}>Envoyer</button
 			>
