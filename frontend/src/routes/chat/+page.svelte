@@ -96,11 +96,14 @@
 	}
 
 	async function handleRoomButton(room: ChatRoom) {
+		if (currentRoom && currentRoom.id === room.id)
+			return ;
 		currentRoom = room;
 		messages = [];
 		socket.emit('getMessage', room);
 		socket.emit('getUser', room);
 		socket.emit('joinRoom', room);
+		await fletchUserData()
 		await fletchMuteBanData();
 		console.log('currentUser ==', currentUser);
 	}
@@ -180,6 +183,22 @@
 		return user;
 	};
 
+	const fletchUserData = async () => {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			if (currentRoom?.id > 0) {
+				const response = await fetch(`http://localhost:3000/chat/userInfo?code=${currentRoom.id}`, { headers });
+				const data = await response.json();
+				console.log('return ====', data);
+				currentUser.status = data;
+			}
+		}
+	}
+
 	async function displayDropdownMenu(currentUser: User, user: User): Promise<string[]> {
 		if (currentUser && currentUser.status) {
 			if (user && !user.status) {
@@ -188,18 +207,21 @@
 					pseudo: user
 				};
 				const checkUserPromise = new Promise<User>((resolve) => {
+				
 					socket.emit('checkUser', data);
 					socket.on('returnCheckUser', (data) => {
 						resolve(data);
+						console.log('data ====', data);
 					});
 				});
 				selectedUser = await checkUserPromise;
+				console.log('SUUUU ===', selectedUser);
 			}
 			if (selectedUser && selectedUser.status) {
 				// CU = currentUser | SU = selectedUser
-				// if (currentUser.id === selectedUser.id) {
-				//   return ['profile'];
-				// }
+				if (currentUser.id === selectedUser.id) {
+				  return ['profile'];
+				}
 				if (currentUser.status === 2 && selectedUser.status === 1) {
 					return ['profile', 'unAdmin'];
 					// CU = owner | SU = admin
@@ -236,10 +258,13 @@
 	}
 
 	async function handleClickPseudo(event: any, user: any) {
+		console.log(isShown);
+		isShown = false;
 		showOptionsPseudo = await displayDropdownMenu(currentUser, user);
 		console.log('CU ==', currentUser);
 		console.log('SU ==', selectedUser);
 		isShown = true;
+		console.log(isShown);
 	}
 
 	function find(array: any[], toFind: any): boolean {
@@ -247,7 +272,7 @@
 	}
 
 	function delMenu() {
-		isShown = !isShown;
+		isShown = false;
 		selectedUser = {
 			id: -1,
 			pseudo: '',
@@ -258,7 +283,8 @@
 
 	function leaveRoom() {
 		socket.emit('leaveRoom', currentRoom);
-		currentRoom = null;
+		if (currentUser.status != 2)
+			currentRoom = null;
 		messages = [];
 		muted = [];
 		banned = []
@@ -326,7 +352,7 @@
 		});
 		socket.on('newBan', (data) => {});
 		socket.on('deleteRoom', async (data) => {
-			const roomToDel = chatRooms.find((element) => element.id === data);
+			const roomToDel = chatRooms.find((element) => element?.id === data);
 			if (roomToDel) {
 				chatRooms = await fletchChatRoomsData();
 				chatRooms.splice(chatRooms.indexOf(roomToDel, 1));
@@ -491,19 +517,24 @@
 	{/if}
 {/if}
 
-{#if currentUser?.status > 0 }
+{#if currentUser?.status > 0}
 <div class="admin-panel">
+
 	<p>Banned :</p>
+	{#if banned?.length}
 		{#each banned as ban}
 			<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
 				{ban.pseudo}
 			</button>
 		{/each}
-		<p>Muted :</p>
+	{/if}
+	<p>Muted :</p>
+	{#if muted?.length}
 		{#each muted as mute}
 			<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
 				{mute.pseudo}
 			</button>
 		{/each}
+	{/if}
 </div>
 {/if}

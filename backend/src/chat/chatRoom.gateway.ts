@@ -40,7 +40,7 @@ export class ChatRoomGateway
   private clients: [User, Socket][] = [];
 
   afterInit(server: any) {
-    console.log('Init done');
+    ('Init done');
   }
 
   async handleConnection(client: Socket) {
@@ -116,7 +116,6 @@ export class ChatRoomGateway
     }
     else {
       const newMessage = await this.chatRoomService.createMessage(data.content, user, chatRoom);
-      console.log("n message =====", newMessage);
       this.server.emit('newMessage', newMessage);
     }
   }
@@ -124,7 +123,6 @@ export class ChatRoomGateway
   @SubscribeMessage('getUser')
   async handleGetUser(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-    console.log('data =', data);
     const chatRoom = await this.prismaService.chatRoom.findUnique({
       where: { id: data.id }
     });
@@ -151,6 +149,7 @@ export class ChatRoomGateway
     else if (await this.chatRoomService.isMember(user, chatRoom) === true) {
       toSend.user.status = 0;
     }
+    console.log('TO SEND ==============', toSend);
     this.server.emit('returnUser', toSend);
   }
 
@@ -159,7 +158,6 @@ export class ChatRoomGateway
     const user = await this.prismaService.user.findUnique({
       where: { pseudo: data.pseudo },
     })
-    console.log('data =', data);
     const chatRoom = await this.prismaService.chatRoom.findUnique({
       where: { id: data.id }
     });
@@ -184,7 +182,6 @@ export class ChatRoomGateway
     else if (await this.chatRoomService.isMember(user, chatRoom) === true) {
       toSend.status = 0;
     }
-    console.log('RETURN USER CHEKED ===', toSend);
     this.server.emit('returnCheckUser', toSend);
   }
 
@@ -444,7 +441,6 @@ export class ChatRoomGateway
       select: { members: true },
     })
     const isMember = toCheck.members.some(member => member.id === user.id);
-    console.log('isM ==', isMember);
     await this.prismaService.chatRoom.update({
       where: { id: data.id },
       data: { members: { connect: { id: user.id } } },

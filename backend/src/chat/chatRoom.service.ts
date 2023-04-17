@@ -28,7 +28,7 @@ export class ChatRoomService {
       if (isOwner.owner.id === user.id)
         return true;
       else
-      return false;
+        return false;
   }
 
   async isMuted(user: User, chatRoom: ChatRoom): Promise<boolean> {

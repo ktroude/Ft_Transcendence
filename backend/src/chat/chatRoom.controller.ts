@@ -56,4 +56,27 @@ export class ChatRoomController {
             return [];
     }
 
+    @Get('userInfo')
+    async handleUser(@Headers('Authorization') cookie: string, @Query('code') id) {
+        const token = cookie.split(' ')[1];
+        const user = await this.userService.decodeToken(token);
+        const room = await this.prisma.chatRoom.findUnique({
+            where: {id: parseInt(id, 10)}
+        });
+        if (await this.chatRoomService.isOwner(user, room) === true) {
+            return 2;
+          }
+          else if (await this.chatRoomService.isAdmin(user, room) === true) {
+            return 1;
+          }
+          else if (await this.chatRoomService.isMuted(user, room) === true) {
+            return -1
+          }
+          else if (await this.chatRoomService.isBanned(user, room) === true) {
+            return -2
+          }
+          else if (await this.chatRoomService.isMember(user,room) === true) {
+            return 0;
+          }
+    }
 }
