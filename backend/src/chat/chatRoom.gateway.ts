@@ -149,7 +149,6 @@ export class ChatRoomGateway
     else if (await this.chatRoomService.isMember(user, chatRoom) === true) {
       toSend.user.status = 0;
     }
-    console.log('TO SEND ==============', toSend);
     this.server.emit('returnUser', toSend);
   }
 

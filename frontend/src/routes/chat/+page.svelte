@@ -99,13 +99,15 @@
 		if (currentRoom && currentRoom.id === room.id)
 			return ;
 		currentRoom = room;
-		messages = [];
+		if (room?.id)
+			messages = await fletchMessageOfRoom(room.id);
+		else
+			messages = [];
 		socket.emit('getMessage', room);
 		socket.emit('getUser', room);
 		socket.emit('joinRoom', room);
 		await fletchUserData()
 		await fletchMuteBanData();
-		console.log('currentUser ==', currentUser);
 	}
 
 	function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
@@ -143,6 +145,21 @@
 		}
 	};
 
+	const fletchMessageOfRoom = async(id:number) => {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			if (currentRoom?.id > 0) {
+				const response = await fetch(`http://localhost:3000/chat/getMessages?code=${id}`, { headers });
+				const data = await response?.json();
+				return data;
+			}
+		}
+	}
+
 	const fletchChatRoomsData = async (): Promise<ChatRoom[]> => {
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
@@ -155,6 +172,20 @@
 			return data;
 		}
 		return [];
+	};
+
+	const fletchUserByRoom = async (pseudo:string) => {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(`http://localhost:3000/chat/UserbyRoom?room=${currentRoom?.id}&pseudo=${pseudo}`, { headers });
+			const data = await response.json();
+			return data;
+		}
+		return -2;
 	};
 
 	const fletchCurrentUserData = async (): Promise<User> => {
@@ -192,32 +223,15 @@
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			if (currentRoom?.id > 0) {
 				const response = await fetch(`http://localhost:3000/chat/userInfo?code=${currentRoom.id}`, { headers });
-				const data = await response.json();
-				console.log('return ====', data);
+				const data = await response?.json();
 				currentUser.status = data;
 			}
 		}
 	}
 
-	async function displayDropdownMenu(currentUser: User, user: User): Promise<string[]> {
-		if (currentUser && currentUser.status) {
-			if (user && !user.status) {
-				const data = {
-					id: currentRoom.id,
-					pseudo: user
-				};
-				const checkUserPromise = new Promise<User>((resolve) => {
-				
-					socket.emit('checkUser', data);
-					socket.on('returnCheckUser', (data) => {
-						resolve(data);
-						console.log('data ====', data);
-					});
-				});
-				selectedUser = await checkUserPromise;
-				console.log('SUUUU ===', selectedUser);
-			}
-			if (selectedUser && selectedUser.status) {
+	async function displayDropdownMenu(): Promise<string[]> {
+		console.log('Je suis ici')
+		if (currentUser && selectedUser) {
 				// CU = currentUser | SU = selectedUser
 				if (currentUser.id === selectedUser.id) {
 				  return ['profile'];
@@ -252,16 +266,18 @@
 				} else if (currentUser.status === selectedUser.status) {
 					return ['profile'];
 				}
-			}
 		}
 		return [];
 	}
 
 	async function handleClickPseudo(event: any, user: any) {
-		console.log(isShown);
+		console.log('pseudo ====', user);
 		isShown = false;
-		showOptionsPseudo = await displayDropdownMenu(currentUser, user);
+		selectedUser = await fletchUserByRoom(user);
 		console.log('CU ==', currentUser);
+		console.log('SU ==', selectedUser);
+		showOptionsPseudo = await displayDropdownMenu();
+		console.log('optionPseudo == ', showOptionsPseudo);
 		console.log('SU ==', selectedUser);
 		isShown = true;
 		console.log(isShown);
@@ -283,11 +299,15 @@
 
 	function leaveRoom() {
 		socket.emit('leaveRoom', currentRoom);
-		if (currentUser.status != 2)
-			currentRoom = null;
+		// if (currentUser.status != 2)
+		// 	currentRoom = null;
 		messages = [];
 		muted = [];
 		banned = []
+		console.log('messages == ', messages);
+		console.log('currentRoom ==', currentRoom)
+		console.log('currentUser ==', currentUser)
+		console.log('selectedUser ==', selectedUser);
 	}
 
 	function showProfile() {
@@ -343,7 +363,7 @@
 			if (currentUser.id === data.to) messages = data.msg;
 		});
 		socket.on('newMessage', (msg: any) => {
-			if (currentRoom && currentRoom.id === msg.chatRoomId){
+			if (currentRoom && currentRoom?.id === msg.chatRoomId){
 				messages = [...messages, msg];
 			}
 		});
@@ -352,20 +372,29 @@
 		});
 		socket.on('newBan', (data) => {});
 		socket.on('deleteRoom', async (data) => {
-			const roomToDel = chatRooms.find((element) => element?.id === data);
-			if (roomToDel) {
-				chatRooms = await fletchChatRoomsData();
-				chatRooms.splice(chatRooms.indexOf(roomToDel, 1));
-				const message = {
-					content: 'La room a été supprimée.',
+			if (currentRoom && currentRoom?.id === data){
+				messages = [{
 					senderPseudo: 'server',
-					chatRoomId: roomToDel.id
-				};
-				if (currentRoom.id === roomToDel.id){
-					messages = [message];
-				}
-				isShown = false;
+					content: 'La room a été détruite.'
+				}];
 			}
+			// const roomToDel = chatRooms.find((element) => element?.id === data);
+			// if (roomToDel)
+			// 	chatRooms.splice(chatRooms.indexOf(roomToDel, 1));
+			// if (roomToDel) {
+			// 	const message = {
+			// 		content: 'La room a été supprimée.',
+			// 		senderPseudo: 'server',
+			// 		chatRoomId: roomToDel.id
+			// 	};
+			// 	if (currentRoom.id === roomToDel.id){
+			// 		messages = [message];
+			// 	}
+			// 	isShown = false;
+			// 	console.log('RoomToDel ==', roomToDel)
+				chatRooms = await fletchChatRoomsData();
+			// }
+			console.log(chatRooms);
 		});
 		socket.on('kicked', async (data) => {
 			if (currentUser?.id === data) {
@@ -438,7 +467,7 @@
 	</label>
 	<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
 </form>
-{#if currentRoom && currentRoom.name}
+{#if currentRoom && currentRoom?.name}
 	<div>
 		<p />
 		<h3>{currentRoom.name}</h3>
@@ -448,7 +477,7 @@
 		<div class="chat-messages">
 			{#if messages && messages.length}
 				{#each messages as msg}
-					<p>
+					<p class='message'>
 						{#if msg.senderPseudo == 'server'}
 							{msg.senderPseudo}: {msg.content}
 						{/if}

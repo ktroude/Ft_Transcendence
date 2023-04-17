@@ -5,6 +5,10 @@ h1, h2 {
   font-size: 22px;
 }
 
+h3 {
+  overflow: hidden;
+}
+
 .chatroom-button {
   display: block; /* afficher en tant que bloc */
   border: none; /* pas de bordure */
@@ -16,8 +20,12 @@ h1, h2 {
   cursor: pointer; /* curseur de la souris en forme de main */
   text-align: left; /* aligner le texte à gauche */
   width: 200px;
+  overflow: hidden;
 }
 
+.message {
+  word-wrap: break-word;
+}
   
 .form-input {
   display: block;
@@ -93,6 +101,7 @@ button {
 
 button:hover {
   background-color: #666;
+  overflow: hidden;
 }
 
 .list-room {
