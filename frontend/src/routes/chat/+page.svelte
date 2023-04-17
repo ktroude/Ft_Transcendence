@@ -477,7 +477,7 @@
 		<div class="chat-messages">
 			{#if messages && messages.length}
 				{#each messages as msg}
-					<p>
+					<p class='message'>
 						{#if msg.senderPseudo == 'server'}
 							{msg.senderPseudo}: {msg.content}
 						{/if}
