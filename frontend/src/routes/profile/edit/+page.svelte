@@ -1,12 +1,12 @@
-<style>
-	.main_profile {
-		margin: 10px;
-		display: flex;
+ <style>
+	.edit_main {
+		margin:10px;
+		display:flex;
 		flex-direction: column;
-		width: 100vw;
-		height: 100vh;
+		width:100vw;
+		height:100vh
 	}
-	.main_box {
+	.edit_box {
 		margin: 50px auto;
 		max-width: 600px;
 		padding: 20px;
@@ -14,7 +14,23 @@
 		border-radius: 5px;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 		text-align: center;
-		align-items: center;
+	}
+	h1 {
+		font-size: 24px;
+		margin-bottom: 20px;
+	}
+	label {
+		display: block;
+		margin-bottom: 10px;
+		font-weight: bold;
+	}
+	input[type="text"] {
+		width: 100%;
+		padding: 10px;
+		margin-bottom: 20px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		font-size: 16px;
 	}
 	button {
 		display: block;
@@ -40,7 +56,22 @@
 		object-fit: cover;
 		border: 1px solid #ccc;
 		border-radius: 5px;
-		align-items: center;
+	}
+	.upload-button {
+		display: none;
+	}
+	.upload-button{
+		display: block;
+		margin-top: 10px;
+		padding: 10px 20px;
+		background-color: #007bff;
+		color: #fff;
+		border: none;
+		border-radius: 5px;
+		font-size: 16px;
+		cursor: pointer;
+		width: max-content;
+		margin: 0 auto;
 	}
 	.game_navbar{
 		height:50px;
@@ -49,38 +80,34 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-	}
+}
 </style>
 
 <main>
 	<div class="game_navbar">
 		<button on:click={() => goto('/homepage')}>Home</button>
-		<button>Profile</button>
+		<button on:click={() => goto('/profile')}>Profile</button>
 		<button on:click={() => goto('/chat')}>Chat</button>
 		<button on:click={() => goto('/game')}>Game</button>
 	</div>
-	<div class="main_profile">
-		<div class="main_box">
-		<h1>Profil de {user?.username}</h1>
-		<h3>{user?.firstname} {user?.lastname}</h3>
-		<h3>Level: {user?.level}</h3>
-		<h3>Created: {new Date(user?.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</h3>
-		<!-- svelte-ignore a11y-img-redundant-alt -->
-		<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
-		<button on:click={() => goto('/profile/edit')}>Edit profile</button>
-	</div>
+	<div class="edit_main">
+		<div class="edit_box">
+			<h1>{user?.pseudo}</h1>
+			<label for="username-input">New Username:</label>
+			<input type="text" id="username-input" bind:value={newUsername} />
+			<button on:click={handleUpdateUsername}>Update</button>
+			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
+			<input type="file" class="upload-button" on:change={handleFileUpload} />
+		</div>
 	</div>
 </main>
 
-  
-
 <script lang="ts">
   	
-	import { page } from '$app/stores';
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchDataOfUser} from '../../../API/api';
+    import { fetchAccessToken, fetchData, fetchFriend } from '../../../API/api';
 
     interface User {
         id: number;
@@ -88,15 +115,14 @@
         firstName: string;
         lastName: string;
         picture: string;
-		username: string;
-		createdAt: Date;
     }
         
-      let imageURL: string;
-      let user: User;
-      let newUsername: string;
+    let imageURL: string;
+    let user: User;
+    let newUsername: string;
     
         async function getImageURL() {
+        user = await fetchData(); // Get the user's picture
         const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
         const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
         imageURL = URL.createObjectURL(blob); // Create a URL for the blob
@@ -172,19 +198,10 @@
     };
   }
 
-  async function loadpage() {
-    user = await fetchData();
-    if ($page.params.user == user.pseudo)
-        getImageURL();
-    else
-    {
-      user = await fetchDataOfUser($page.params.user);
-      getImageURL();
-    }
-  }
-
     onMount(() => {
-        loadpage();
+        fetchData();
+    });
+    onMount(() => {
+      getImageURL()
     });
 </script>
-  
