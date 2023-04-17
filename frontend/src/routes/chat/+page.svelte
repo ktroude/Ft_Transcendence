@@ -15,7 +15,10 @@
 		private: false
 	};
 	let messages: any[];
-	let currentRoom: any = null;
+	let currentRoom: any = {
+		id: 0,
+		name: ''
+	};
 	let currentUser: User;
 	let selectedUser: User = {
 		id: -1,
@@ -74,6 +77,21 @@
 		isFormValid = formData.roomName.length > 0 && formData.private !== undefined;
 	}
 
+	async function checkBan(room:any) {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(`http://localhost:3000/chat/getBan?code=${room.id}`, {
+				headers
+			});
+			const data = await response.json();
+			return data;
+		}
+	}
+
 	async function handleSubmit(event: Event, socket: Socket) {
 		event.preventDefault();
 		if (isFormValid && formData.roomName.length) {
@@ -97,6 +115,14 @@
 	}
 
 	async function handleRoomButton(room: ChatRoom) {
+		if (await checkBan(room) === true) {
+			messages = [];
+			messages = [{
+				content: 'Vous avez été banni de cette room.',
+				senderPseudo: 'server',
+			},]
+			return ;
+		}
 		if (currentRoom && currentRoom.id === room.id)
 			return ;
 		currentRoom = room;
@@ -205,7 +231,6 @@
 				status: -2,
 				room: -1
 			};
-			console.log('data ==', data);
 			return user;
 		}
 		const user: User = {
@@ -227,14 +252,12 @@
 			if (currentRoom?.id > 0) {
 				const response = await fetch(`http://localhost:3000/chat/userInfo?code=${currentRoom.id}`, { headers });
 				const data = await response.json();
-				console.log('problematique data ==', data);
 				currentUser.status = parseInt(data, 10);
 			}
 		}
 	}
 
 	async function displayDropdownMenu(): Promise<string[]> {
-		console.log('Je suis ici')
 		if (currentUser && selectedUser) {
 				// CU = currentUser | SU = selectedUser
 				if (currentUser.id === selectedUser.id) {
@@ -275,16 +298,10 @@
 	}
 
 	async function handleClickPseudo(event: any, user: any) {
-		console.log('pseudo ====', user);
 		isShown = false;
 		selectedUser = await fletchUserByRoom(user);
-		console.log('CU ==', currentUser);
-		console.log('SU ==', selectedUser);
 		showOptionsPseudo = await displayDropdownMenu();
-		console.log('optionPseudo == ', showOptionsPseudo);
-		console.log('SU ==', selectedUser);
 		isShown = true;
-		console.log(isShown);
 	}
 
 	function find(array: any[], toFind: any): boolean {
@@ -308,10 +325,6 @@
 		messages = [];
 		muted = [];
 		banned = [];
-		console.log('messages == ', messages);
-		console.log('currentRoom ==', currentRoom)
-		console.log('currentUser ==', currentUser)
-		console.log('selectedUser ==', selectedUser);
 		currentRoom = null;
 	}
 
@@ -321,7 +334,7 @@
     		kick(selectedUser, currentRoom);
     	}
 		else if (event.target.value === "ban") {
-      		ban();
+      		ban(selectedUser, currentRoom);
     	}
 		else if (event.target.value === "profile") {
 			showProfile();
@@ -332,14 +345,9 @@
 		goto(`/profile/${selectedUser.pseudo}`);
 	}
 
-	function ban() {
-		const data = {
-			user: currentUser,
-			room: currentRoom,
-			toBan: selectedUser
-		};
-		socket.emit('newBan', data);
-		banned = [...banned, selectedUser];
+	function ban(userToBan:any, room: any) {
+		socket.emit('newBan', {user: userToBan, room: room});
+		isShown = false;
 	}
 
 	function deban() {
@@ -355,7 +363,6 @@
 	}
 
 	function kick(userToKick: User, room:any) {
-		console.log('kicked et currentUser ==', currentUser)
 		if (currentRoom.id === room.id)
 			messages = [...messages, {senderPseudo: 'server', content: `${userToKick.pseudo} a été kick de la room`}]
 		socket.emit('kick', userToKick);
@@ -390,16 +397,26 @@
 			}
 		});
 		socket.on('returnUser', (data: any) => {
-			console.log('CURRENT USER ===', currentUser);
 			if (data.to === currentUser.id) {
 				currentUser = data.user;
-			console.log('CURRENT USER ===', currentUser);
 			}
-			console.log('data ==', data)
-
 		});
-		socket.on('newBan', (data) => {
-
+		socket.on('newBan', async(data) => {
+			console.log('data ====', data)
+			if (currentUser.id === data.user.id && currentRoom.id === data.room.id) {
+				chatRooms = await fletchChatRoomsData();
+				currentRoom = {
+					name: '',
+					id: -1,
+				};
+				messages = [...messages, {
+					senderPseudo: 'server',
+					content: 'Vous avez été banni de la room par un administrateur'
+				}];
+			}
+			else if (currentRoom.id === data.room.id) {
+				banned = [...banned, data.user.pseudo];
+			}
 		});
 		socket.on('deleteRoom', async (data) => {
 			if (currentRoom && currentRoom?.id === data){
@@ -424,12 +441,14 @@
 			// 	console.log('RoomToDel ==', roomToDel)
 				chatRooms = await fletchChatRoomsData();
 			// }
-			console.log(chatRooms);
 		});
 		socket.on('kicked', async (data) => {
 			if (currentUser.id === data.user.id && currentRoom.id === data.room.id) {
 				chatRooms = await fletchChatRoomsData();
-				currentRoom = null;
+				currentRoom = {
+					name: '',
+					id: 0,
+				};
 				messages = [...messages, {
 					senderPseudo: 'server',
 					content: 'Vous avez été kick de la room par un administrateur'
@@ -438,12 +457,12 @@
 		});
 		chatRooms = await fletchChatRoomsData();
 		currentUser = await fletchCurrentUserData();
-			console.log('CU1 ==', currentUser)
 		if (currentUser.id < 0) {
 			window.location.pathname = '/';
 		}
 		checkFormValidity();
 		loading = true;
+		console.log(currentRoom);
 	});
 </script>
 
@@ -501,11 +520,13 @@
 	</label>
 	<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
 </form>
-{#if currentRoom && currentRoom?.name}
+
+{#if currentRoom }
 	<div>
-		<p />
+		{#if currentRoom.name.length}
 		<h3>{currentRoom.name}</h3>
 		<button on:click={leaveRoom}>Quitter la room</button>
+		{/if}
 	</div>
 	<div class="container">
 		<div class="chat-messages">
@@ -530,9 +551,8 @@
 		</div>
 	</div>
 	<div>
-		<p />
+		{#if currentRoom.name.length}
 		<p><input type="text" id="message" name="message" /></p>
-		<p>
 			<button
 				type="submit"
 				on:click={(event) => {
@@ -542,8 +562,12 @@
 					}
 				}}>Envoyer</button
 			>
-		</p>
+		{/if}
 	</div>
+
+
+
+
 
 	{#if isShown === true}
 		<div class="menu">
@@ -551,10 +575,10 @@
 				<select id="pseudo-menu" on:change={handleSelect}>
 						<option>Options</option>
 					{#if find(showOptionsPseudo, 'profile') === true}
-						<option value="profile" on:click={showProfile}>Voir le profil</option>
+						<option value="profile">Voir le profil</option>
 					{/if}
 					{#if find(showOptionsPseudo, 'ban') === true}
-						<option value="ban" on:click={ban}>Bannir</option>
+						<option value="ban">Bannir</option>
 					{/if}
 					{#if find(showOptionsPseudo, 'mute') === true}
 						<option value="mute">Muter</option>
@@ -582,7 +606,7 @@
 {/if}
 
 <div class="admin-panel">
-	{#if currentRoom && currentUser.status > 0}
+	{#if currentRoom?.id && currentUser.status > 0}
 	<p>Banned :</p>
 	{#if banned?.length}
 		{#each banned as ban}
@@ -600,7 +624,7 @@
 		{/each}
 	{/if}
 	{/if}
-	{#if currentRoom}
+	{#if currentRoom?.id}
 	<p>Membres: </p>
 	{/if}
 </div>

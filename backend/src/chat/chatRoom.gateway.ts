@@ -313,37 +313,44 @@ export class ChatRoomGateway
     @MessageBody() data: any,
   ) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-    const chatRoom = await this.prismaService.chatRoom.findUnique(
-      data.room.id,
-    );
-    const userToBan = await this.userService.findUserByPseudo(data.toBan);
-    if (
-      ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
-        (await this.chatRoomService.isOwner(user, chatRoom))) ===
-      false
-    ) {
-      return;
-    }
-    if (
-      (await this.chatRoomService.isAdmin(userToBan, chatRoom)) === true &&
-      (await this.chatRoomService.isAdmin(user, chatRoom)) === true &&
-      (await this.chatRoomService.isOwner(user, chatRoom)) === false
-    ) {
-      return;
-    }
-    if ((await this.chatRoomService.isBanned(userToBan, chatRoom)) === true) {
-      return;
-    }
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.room.id},
+    });
+    const userToBan = await this.prismaService.user.findUnique({
+      where: {id: data.user.id}
+    });
+    // if (
+    //   ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
+    //     (await this.chatRoomService.isOwner(user, chatRoom))) ===
+    //   false
+    // ) {
+    //   return;
+    // }
+    // if (
+    //   (await this.chatRoomService.isAdmin(userToBan, chatRoom)) === true &&
+    //   (await this.chatRoomService.isAdmin(user, chatRoom)) === true &&
+    //   (await this.chatRoomService.isOwner(user, chatRoom)) === false
+    // ) {
+    //   return;
+    // }
+    // if ((await this.chatRoomService.isBanned(userToBan, chatRoom)) === true) {
+    //   return;
+    // }
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
       data: { banned: { connect: { id: userToBan.id } } },
     });
-    const datatoSend = {
-      sender: '',
-      content: `${userToBan.pseudo} a été banni`
+    
+    const newMsg = {
+      sender: 'server',
+      content: `${userToBan.pseudo} a été banni de la room`
     }
-    this.server.emit('newMessage', datatoSend);
-    this.server.emit('newBan', userToBan.id);
+    const toSend = {
+      user: userToBan,
+      room: chatRoom
+    }
+    this.server.emit('newMessage', newMsg);
+    this.server.emit('newBan', toSend);
   }
 
   // @SubscribeMessage('unBan')
