@@ -55,7 +55,7 @@
 <main>
 	<div class="game_navbar">
 		<button on:click={() => goto('/homepage')}>Home</button>
-		<button on:click={() => goto('/profile')}>Profile</button>
+		<button>Profile</button>
 		<button on:click={() => goto('/chat')}>Chat</button>
 		<button on:click={() => goto('/game')}>Game</button>
 	</div>
@@ -76,10 +76,11 @@
 
 <script lang="ts">
   	
+	import { page } from '$app/stores';
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchFriend } from '../../API/api';
+    import { fetchAccessToken, fetchData, fetchDataOfUser} from '../../../API/api';
 
     interface User {
         id: number;
@@ -91,12 +92,11 @@
 		createdAt: Date;
     }
         
-    let imageURL: string;
-    let user: User;
-    let newUsername: string;
+      let imageURL: string;
+      let user: User;
+      let newUsername: string;
     
         async function getImageURL() {
-        user = await fetchData(); // Get the user's picture
         const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
         const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
         imageURL = URL.createObjectURL(blob); // Create a URL for the blob
@@ -172,11 +172,19 @@
     };
   }
 
+  async function loadpage() {
+    user = await fetchData();
+    if ($page.params.user == user.pseudo)
+        getImageURL();
+    else
+    {
+      user = await fetchDataOfUser($page.params.user);
+      getImageURL();
+    }
+  }
+
     onMount(() => {
-        fetchData();
-    });
-    onMount(() => {
-      getImageURL()
+        loadpage();
     });
 </script>
   

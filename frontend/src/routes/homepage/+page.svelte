@@ -29,7 +29,7 @@
 <main>	
 	<div class="game_navbar">
 		<button on:click={() => goto('/homepage')}>Home</button>
-		<button on:click={() => goto('/profile')}>Profile</button>
+		<button on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button>
 		<button on:click={() => goto('/chat')}>Chat</button>
 		<button on:click={() => goto('/game')}>Game</button>
 	</div>
@@ -40,7 +40,6 @@
 
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { navigate } from 'svelte-navigator';
   import { goto } from "$app/navigation";
   import {fetchData, fetchFriend, fetchAccessToken} from "../../API/api";
 
@@ -74,10 +73,12 @@
   }
 
   async function handleProfileFriend(friendName) {
-    const accessToken = await fetchAccessToken();
-    if (accessToken)
-      console.log(`Showing profile of ${friendName}`);
-    else
+  const accessToken = await fetchAccessToken();
+    if (accessToken) 
+    {
+      navigate(`/${friendName}`);
+    } 
+    else 
       console.log('Error: Could not get profile');
   }
 

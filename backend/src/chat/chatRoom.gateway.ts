@@ -40,7 +40,7 @@ export class ChatRoomGateway
   private clients: [User, Socket][] = [];
 
   afterInit(server: any) {
-    console.log('Init done');
+    ('Init done');
   }
 
   async handleConnection(client: Socket) {
@@ -96,7 +96,11 @@ export class ChatRoomGateway
       select: { messages: true },
     });
     const messages = chatRoom.messages;
-    this.server.emit('returnMessage', messages)
+    const toSend = {
+      msg: messages,
+      to: user.id,
+    }
+    this.server.emit('returnMessage', toSend);
   }
 
 
@@ -107,11 +111,11 @@ export class ChatRoomGateway
       where: { id: data.roomId }
     });
     if ((await this.chatRoomService.isMuted(user, chatRoom)) === true) {
+
       // handle error
     }
     else {
       const newMessage = await this.chatRoomService.createMessage(data.content, user, chatRoom);
-      console.log("n message =====", newMessage);
       this.server.emit('newMessage', newMessage);
     }
   }
@@ -119,30 +123,33 @@ export class ChatRoomGateway
   @SubscribeMessage('getUser')
   async handleGetUser(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-    console.log('data =', data);
     const chatRoom = await this.prismaService.chatRoom.findUnique({
       where: { id: data.id }
     });
     let toSend = {
-      pseudo: user.pseudo,
-      status: 2,
-      room: chatRoom.id,
+      to: user.id,
+      user: {
+        pseudo: user.pseudo,
+        status: 2,
+        room: chatRoom.id,
+      },
     };
     if (await this.chatRoomService.isOwner(user, chatRoom) === true) {
-      toSend.status = 2;
+      toSend.user.status = 2;
     }
     else if (await this.chatRoomService.isAdmin(user, chatRoom) === true) {
-      toSend.status = 1;
+      toSend.user.status = 1;
     }
     else if (await this.chatRoomService.isMuted(user, chatRoom) === true) {
-      toSend.status = -1
+      toSend.user.status = -1
     }
     else if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
-      toSend.status = -2
+      toSend.user.status = -2
     }
     else if (await this.chatRoomService.isMember(user, chatRoom) === true) {
-      toSend.status = 0;
+      toSend.user.status = 0;
     }
+    console.log('TO SEND ==============', toSend);
     this.server.emit('returnUser', toSend);
   }
 
@@ -151,7 +158,6 @@ export class ChatRoomGateway
     const user = await this.prismaService.user.findUnique({
       where: { pseudo: data.pseudo },
     })
-    console.log('data =', data);
     const chatRoom = await this.prismaService.chatRoom.findUnique({
       where: { id: data.id }
     });
@@ -176,7 +182,6 @@ export class ChatRoomGateway
     else if (await this.chatRoomService.isMember(user, chatRoom) === true) {
       toSend.status = 0;
     }
-    console.log('RETURN USER CHEKED ===', toSend);
     this.server.emit('returnCheckUser', toSend);
   }
 
@@ -420,7 +425,7 @@ export class ChatRoomGateway
     else {
       await this.prismaService.chatRoom.update({
         where: { id: data.id },
-        data: { members: { connect: { id: user.id } } },
+        data: { members: { disconnect: { id: user.id } } },
       });
       const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a quitté la room`,
         { id: 0, pseudo: 'server' }, { id: data.id });
@@ -436,7 +441,6 @@ export class ChatRoomGateway
       select: { members: true },
     })
     const isMember = toCheck.members.some(member => member.id === user.id);
-    console.log('isM ==', isMember);
     await this.prismaService.chatRoom.update({
       where: { id: data.id },
       data: { members: { connect: { id: user.id } } },
