@@ -26,6 +26,8 @@ model User {
   rank      Int @default(0)
   level     Int @default(0)
 
+  status    Int @default(0) // 0 = offline, 1 = online, 2 = in game
+
   userFriends       Friend[] @relation("user")
   friendUserFriends Friend[] @relation("friend_users")
 

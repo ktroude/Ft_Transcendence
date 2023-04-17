@@ -50,14 +50,17 @@
 	<div class="container">
 		<h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
 	</div>
+  <button on:click={sendMessage}>Send message</button>
+
 </body>
 
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from "$app/navigation";
-  import {fetchData, fetchFriend} from "../../API/api";
+  import {fetchData} from "../../API/api";
+  import {io, Socket} from 'socket.io-client';
 
-  let friends = [];
+  let socket: Socket;
 
   let user: User;
     interface User {
@@ -67,17 +70,20 @@
         lastName: string;
     }
 
-    const loadpage = async () =>
-    {
-        user = await fetchData();
-        const listFriends = await fetchFriend(user.pseudo);
-        if (listFriends)
-            friends = listFriends;
-        else
-            console.log('Error: Could not get friends');
+    function sendMessage() {
+      socket.emit('message', 'Hello, world!');
     }
+    
+    onMount(async function() {
+		user = await fetchData();
+		
+		const socket = io('http://localhost:3000');
 
-    onMount(() => {
-        loadpage();
-    });
+		socket.on('connect', async function() {
+			console.log('connected');
+			
+			socket.emit('userConnected', { userId: user.id });
+		});
+	});
+
 </script>

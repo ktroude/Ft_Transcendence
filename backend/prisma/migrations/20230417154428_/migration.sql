@@ -12,6 +12,7 @@ CREATE TABLE "user" (
     "losses" INTEGER NOT NULL DEFAULT 0,
     "rank" INTEGER NOT NULL DEFAULT 0,
     "level" INTEGER NOT NULL DEFAULT 0,
+    "status" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
