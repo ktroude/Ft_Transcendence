@@ -1,35 +1,26 @@
 <style>
+	@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Signika+Negative:wght@500&display=swap');
+
 	*{
 		font-family: 'Roboto', sans-serif;
-	}
-	body{
 		margin:0px;
 		padding:0px;
-		width: 100vw;
+	}
+
+	body {
+		margin: 0;
+		padding:0px;
 		height: 100vh;
+		width:100vw;
+		overflow: hidden;
 	}
-	.main_profile {
-		margin: 10px;
-		display: flex;
-		flex-direction: column;
-	}
-	.main_box {
-		margin: 50px auto;
-		max-width: 600px;
-		padding: 20px;
-		background-color: #f8f8f8;
-		border-radius: 5px;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		text-align: center;
-		align-items: center;
-	}
+
 	button {
 		display: block;
 		margin: 0 auto;
 		padding: 10px 20px;
 		background-color: #000000;
 		color: #fff;
-		border: none;
 		width:120px;
 		height:40px;
 		border-radius: 5px;
@@ -37,6 +28,7 @@
 		cursor: pointer;
 		margin: auto;
 	}
+
 	.button_nav {
 		display: block;
 		margin: 0 auto;
@@ -52,19 +44,12 @@
 		cursor: pointer;
 		margin: auto;
 	}
+
 	.button_nav:hover {
 		color:white;
 		font-size: 22px;
 	}
-	img {
-		margin-top: 20px;
-		max-width: 300px;
-		max-height: 200px;
-		object-fit: cover;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-		align-items: center;
-	}
+
 	.game_navbar{
 		height:50px;
 		width:100%;
@@ -79,36 +64,20 @@
 <body>
 	<div class="game_navbar">
 		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
-		<!-- <button on:click={() => goto('/profile/edit')}>Edit profile</button> -->
-		{#if user?.username === currentUser}
-			<button class="button_nav">Profile</button>
-		{:else}
-			<button class="button_nav" on:click={() => goto(`/profile/${realUser}`) && loadpage()}>Profile</button>
-		{/if}
-		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
-		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
-	</div>
-	<div class="main_profile">
-		<div class="main_box">
-		<h1>{user?.username}</h1>
-		<h3>{user?.firstname} {user?.lastname}</h3>
-		<h3>Level: {user?.level}</h3>
-		<h3>Created: {new Date(user?.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</h3>
-		<!-- svelte-ignore a11y-img-redundant-alt -->
-		<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
-		 {#if user?.username === currentUser} 
-		 <button on:click={() => goto('/profile/edit')}>Edit profile</button>
-		 {/if}
 	</div>
 </body>
 
+
 <script lang="ts">
-  	
-	import { page } from '$app/stores';
 	import { goto } from "$app/navigation";
-    import { onMount } from 'svelte';
-    import { Buffer } from 'buffer';
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
     import { fetchAccessToken, fetchData, fetchDataOfUser } from '../../../API/api';
+	
+	/*
+	Room ID = id of user1 + id of user2?
+	Only accepts the 2 selected users (checks ID or username with cookie)
+	*/
 
     interface User {
 		id: number;
@@ -148,9 +117,7 @@
 		}
 	}
 
-
 	onMount(() => {
 		loadpage();
 	});
-
 </script>

@@ -1,122 +1,194 @@
 <style>
 
-*{
-	margin:0px;
-	padding:0px;
-}
+	*{
+		font-family: 'Roboto', sans-serif;
+		margin:0px;
+		padding:0px;
+	}
 
-body {
-    margin: 0;
-    height: 100%;
-    overflow: hidden;
-}
+	body {
+		margin: 0;
+		padding:0px;
+		height: 100vh;
+		width:100vw;
+		overflow: hidden;
+	}
 
-button {
-	display: block;
-	margin: 0 auto;
-	padding: 10px 20px;
-	background-color: #007bff;
-	color: #fff;
-	border: none;
-	width:120px;
-	height:40px;
-	border-radius: 5px;
-	font-size: 16px;
-	cursor: pointer;
-	margin: auto;
-}
-button:hover {
-		background-color: #014b9a;
-}
+	button {
+		display: block;
+		margin: 0 auto;
+		padding: 10px 20px;
+		background-color: #000000;
+		color: #fff;
+		width:120px;
+		height:40px;
+		border-radius: 5px;
+		font-size: 16px;
+		cursor: pointer;
+		margin: auto;
+	}
 
-.main_game{
-	margin:0px;
-	padding:0px;
-	height:100vh;
-	width:100vw;
-	display: flex;
-	flex-direction: row;
-}
+	.button_nav {
+		display: block;
+		margin: 0 auto;
+		padding: 10px 20px;
+		background-color: transparent;
+		border: white;
+		color:rgb(146, 146, 146);
+		border: none;
+		width:120px;
+		height:40px;
+		border-radius: 5px;
+		font-size: 20px;
+		cursor: pointer;
+		margin: auto;
+	}
 
-.historic_box{
-	height:100vh;
-	width:15%;
-text-align: center;
-}
-.game_box{
-	height:100vh;
-	background:rgb(56, 56, 56);
-	width:70%;
-}
-.friendlist_box{
-	width:15%;
-	height:100vh;
-	text-align: center;
-}
+	.button_nav:hover {
+		color:white;
+		font-size: 22px;
+	}
 
-.game_navbar{
-	height:50px;
-	width:100%;
-	background:grey;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-.friend_button{
-	padding:0px;
-	width:100px;
-	height:30px;
-	align-items: center;
-	text-align: center;
-	font-size: 12px;
-}
-.friend-list{
-	padding:5px;
-	font-size: 20px;
-	display:flex;
-	flex-direction: column;
-	align-items: center;
-	text-align: center;
-}
-.input_friend{
-	background:grey;
-	border:none;
-	border-radius: 3px;
-	height:20px;
-	font-size: 20px;
-}
+	.main_game{
+		margin:0px;
+		padding:0px;
+		height:100vh;
+		width:100vw;
+		display: flex;
+		flex-direction: row;
+	}
 
-.ul_friends{
-	align-items: center;
-	text-align: center;
-	list-style: none;
-}
-.addfriend_button {
-	width: 20px;
-	height: 20px;
-	margin: 5px;
-	font-size: 20px;
-	color:black;
-	align-items: center;
-	text-align: center;
-	display: flex; 
-	justify-content: center;
-	align-items: center;
-	background:greenyellow;
-}
-.addfriend_bloc{
-	text-align: center;
-	display: flex;
-	align-items: center;
-}
+	.historic_box{
+		padding:5px;
+		height:100vh;
+		width:15%;
+		text-align: center;
+	}
+
+	.game_box{
+		height:100vh;
+		background:rgb(56, 56, 56);
+		width:70%;
+	}
+
+	.friendlist_box{
+		padding:5px;
+		width:15%;
+		height:100vh;
+		text-align: center;
+	}
+
+	.game_navbar{
+		height:50px;
+		width:100%;
+		background:#201207;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.friend_button{
+		padding:0px;
+		width:100px;
+		height:30px;
+		align-items: center;
+		text-align: center;
+		font-size: 12px;
+	}
+
+	.friend-list{
+		padding:5px;
+		font-size: 20px;
+		display:flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.input_friend{
+		background:grey;
+		border:none;
+		border-radius: 3px;
+		height:20px;
+		font-size: 20px;
+	}
+
+	.ul_friends{
+		align-items: center;
+		text-align: center;
+		list-style: none;
+	}
+	.ul_friends:hover{
+		cursor: pointer;
+	}
+
+	.addfriend_button {
+		width: 20px;
+		height: 20px;
+		margin: 5px;
+		font-size: 20px;
+		color:black;
+		align-items: center;
+		text-align: center;
+		display: flex; 
+		justify-content: center;
+		align-items: center;
+		background:greenyellow;
+	}
+
+	.addfriend_button:hover {
+		background:rgb(215, 254, 206);
+	}
+
+	.addfriend_bloc{
+		text-align: center;
+		display: flex;
+		align-items: center;
+	}
+
+	.accept_invite{
+		background:black;
+		color:rgb(92, 255, 47);
+		width: 20px;
+		height: 20px;
+		margin: 5px;
+		font-size: 16px;
+		align-items: center;
+		text-align: center;
+		display: flex; 
+		justify-content: center;
+		align-items: center;
+	}
+
+	.deny_invite{
+		color:red;
+		width: 20px;
+		height: 20px;
+		margin: 5px;
+		font-size: 16px;
+		background-color: rgb(0, 0, 0);
+		align-items: center;
+		text-align: center;
+		display: flex; 
+		justify-content: center;
+		align-items: center;
+	}
+
+	.friendBloc{
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+
+	}
 </style>
 
 <body>
 	<div class="game_navbar">
-		<button on:click={() => goto('/homepage')}>Home</button>
-		<button on:click={() => goto('/profile')}>Profile</button>
-		<button on:click={() => goto('/chat')}>Chat</button>
-		<button on:click={() => goto('/game')}>Game</button>
+		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+		<button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button>
+		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
+		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
 	</div>
 	<div class="main_game">
 			<div class="historic_box">
@@ -131,14 +203,21 @@ text-align: center;
 						<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
 					<ul class="ul_friends">
 					  {#each friends as friendName}
-						<li on:click={() => handleFriendClick(friendName)}>
-						  {friendName}
-						  {#if clickedFriend === friendName && showButtons}
-							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
-						  {/if}
+					  <!-- svelte-ignore a11y-click-events-have-key-events -->
+					  <li class="friends_list" on:click={() => handleFriendClick(friendName)}>
+						{friendName}
+						<div class="friendBloc">
+							{#if invited === 1 }
+								<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
+								<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
+							{/if}
+						</div>
+							{#if clickedFriend === friendName && showButtons && invited === 2}
+								<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+								<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+								<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
+								<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+							{/if}
 						</li>
 					  {/each}
 					</ul>
@@ -157,9 +236,9 @@ text-align: center;
     let showButtons = false;
     let clickedFriend: string;
     let friends = [];
-    let friendNameAdd: string;
+    let friendNameAdd: string = '';
 
-    let user: User;
+    let user: User = undefined;
     interface User {
         id: number;
         pseudo: string;
@@ -169,17 +248,44 @@ text-align: center;
         username: string;
         createdAt: Date;
     }
+	/*	
+		-1 -> no invitation received
+		 0 -> invitation denied or accepted
+		 1 -> invitation received -> must be actualized when receiving an invitation
+		 2 -> prevents buttons from showing up when accepting/denying invitation
+	*/
+
+	let invited = 1;
+
+
+	async function acceptInvitation() {
+		console.log("Accepted the invitation");
+		goto(`/game/${'roomid'}`);
+		/*function that sends to the other user that the invitation has been accepted*/
+		invited = 0;
+	}
+
+	async function denyInvitation() {
+		console.log("Denied the invitation");
+		/*function that sends to the other user that the invitation has been denied*/
+		invited = 0;
+	}
 
     function handleFriendClick(friendName: string) {
-        clickedFriend = friendName;
-        setShowButtons(previousFriend !== clickedFriend ? true : !showButtons);
-        previousFriend = clickedFriend;
-    }
+		clickedFriend = friendName;
+		setShowButtons(previousFriend !== clickedFriend ? true : !showButtons);
+		previousFriend = clickedFriend;
+	}
 
-    async function setShowButtons(value: boolean) {
-        showButtons = value;
-        console.log("showButtons: " + showButtons);
-    }
+	async function setShowButtons(value: boolean) {
+		if (invited == 0)
+			invited = 2;
+		else if (invited == 2 || invited == -1){
+			invited = 2;
+			showButtons = value;
+			console.log("showButtons: " + showButtons);
+		}
+	}
 
     async function handleMessageFriend(friendName) {
         console.log(`Sending message to ${friendName}`);
@@ -188,7 +294,7 @@ text-align: center;
     async function handleProfileFriend(friendName) {
         const accessToken = await fetchAccessToken();
         if (accessToken)
-            console.log(`Showing profile of ${friendName}`);
+			goto(`/profile/${friendName}`)
         else
             console.log('Error: Could not get profile');
     }
@@ -214,6 +320,7 @@ text-align: center;
 
     function handleInviteFriend(friendName) {
         console.log(`Inviting ${friendName} to play`);
+		/*If accepted -> goto(`/game/${roomid}`); */
     }
 
     const handleAddFriend = async () => {
@@ -238,8 +345,8 @@ text-align: center;
         }
     }
 
-    let imageURL: string;
-    let newUsername: string;
+    let imageURL: string = '';
+    let newUsername: string = '';
 
     async function getImageURL() {
         user = await fetchData(); // Get the user's picture
