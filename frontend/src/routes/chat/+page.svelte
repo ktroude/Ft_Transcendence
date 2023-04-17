@@ -415,7 +415,7 @@
 				}];
 			}
 			else if (currentRoom.id === data.room.id) {
-				banned = [...banned, data.user.pseudo];
+				await fletchMuteBanData()
 			}
 		});
 		socket.on('deleteRoom', async (data) => {
