@@ -26,7 +26,19 @@ h3 {
 .message {
   word-wrap: break-word;
 }
-  
+ 
+.message-input {
+  display: block;
+  background-color: #333333;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  word-wrap: break-word;
+}
+
 .form-input {
   display: block;
   background-color: #333333;
@@ -36,6 +48,7 @@ h3 {
   font-size: 16px;
   border-radius: 4px;
   cursor: pointer;
+  word-wrap: break-word;
 }
 
 .form-button {
