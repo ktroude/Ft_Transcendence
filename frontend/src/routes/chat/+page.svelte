@@ -336,8 +336,20 @@
 		else if (event.target.value === "ban") {
       		ban(selectedUser, currentRoom);
     	}
-		else if (event.target.value === "profile") {
-			showProfile();
+		else if (event.target.value === "unBan") {
+			deban(selectedUser, currentRoom);
+		}
+		else if (event.target.value === "mute") {
+
+		}
+		else if (event.target.value === "unMute") {
+		
+		}
+		else if (event.target.value === "upAdmin") {
+		
+		}
+		else if (event.target.value === "unAdmin") {
+		
 		}
 	}
 
@@ -350,8 +362,9 @@
 		isShown = false;
 	}
 
-	function deban() {
-
+	function deban(userTodeBan:any, room: any) {
+		socket.emit('unBan', {user: userTodeBan, room: room});
+		isShown = false;
 	}
 
 	function mute() {
@@ -453,6 +466,19 @@
 					senderPseudo: 'server',
 					content: 'Vous avez été kick de la room par un administrateur'
 				}];
+			}
+		});
+		socket.on('newDeban', async(data) => {
+			if (data.user.id === currentUser.id) {
+				chatRooms = await fletchChatRoomsData();
+				messages = [...messages, {
+					senderPseudo: 'server',
+					content: `Vous avez été débanni de la room ${data.room.name}`
+				}];
+			
+			}
+			else if (currentRoom.id === data.room.id) {
+				await fletchMuteBanData()
 			}
 		});
 		chatRooms = await fletchChatRoomsData();

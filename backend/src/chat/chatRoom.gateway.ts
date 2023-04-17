@@ -353,37 +353,42 @@ export class ChatRoomGateway
     this.server.emit('newBan', toSend);
   }
 
-  // @SubscribeMessage('unBan')
-  // async handleUnBan(
-  //   @ConnectedSocket() client: Socket,
-  //   @MessageBody() data: any,
-  // ) {
-  //   const user = this.clients.find(([, socket]) => socket === client)?.[0];
-  //   const chatRoom = await this.prismaService.chatRoom.findUnique(
-  //     data.chatRoomId,
-  //   );
-  //   const userToUnban = await this.userService.findUserByPseudo(
-  //     data.userToUnban,
-  //   );
-  //   if (
-  //     ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
-  //       (await this.chatRoomService.isOwner(user, chatRoom))) ===
-  //     false
-  //   ) {
-  //     // checker si le user est un admin ou le owner
-  //     //handle error
-  //   }
-  //   if (
-  //     (await this.chatRoomService.isBanned(userToUnban, chatRoom)) === false
-  //   ) {
-  //     // checker si userToUnban est bien deja ban
-  //     // handle error
-  //   }
-  //   await this.prismaService.chatRoom.update({
-  //     where: { id: chatRoom.id },
-  //     data: { banned: { disconnect: { id: userToUnban.id } } },
-  //   });
-  // }
+  @SubscribeMessage('unBan')
+  async handleUnBan(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.room.id},
+    });
+    const userToUnban = await this.prismaService.user.findUnique({
+      where: {id: data.user.id}
+    });
+    // if (
+    //   ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
+    //     (await this.chatRoomService.isOwner(user, chatRoom))) ===
+    //   false
+    // ) {
+    //   // checker si le user est un admin ou le owner
+    //   //handle error
+    // }
+    // if (
+    //   (await this.chatRoomService.isBanned(userToUnban, chatRoom)) === false
+    // ) {
+    //   // checker si userToUnban est bien deja ban
+    //   // handle error
+    // }
+    await this.prismaService.chatRoom.update({
+      where: { id: chatRoom.id },
+      data: { banned: { disconnect: { id: userToUnban.id } } },
+    });
+    const toSend = {
+      user: userToUnban,
+      room: chatRoom,
+    }
+    this.server.emit('newDeban', toSend);
+  }
 
   @SubscribeMessage('kick')
   async handleKick(client: Socket, data: any) {
