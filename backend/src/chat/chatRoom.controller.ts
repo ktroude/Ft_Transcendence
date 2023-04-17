@@ -96,7 +96,7 @@ export class ChatRoomController {
         let toSend = {
             id: 0,
             pseudo: '',
-            status: -2,
+            status: -3,
             room: 0
         };
         console.log('idroom ==', idRoom)

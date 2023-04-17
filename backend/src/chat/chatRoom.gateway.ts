@@ -129,6 +129,7 @@ export class ChatRoomGateway
     let toSend = {
       to: user.id,
       user: {
+        id: user.id,
         pseudo: user.pseudo,
         status: 2,
         room: chatRoom.id,
@@ -381,7 +382,7 @@ export class ChatRoomGateway
   async handleKick(client: Socket, data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const toKick = await this.prismaService.user.findUnique({
-      where: { id: data },
+      where: { id: data.id },
     });
     const roomToFree = await this.prismaService.chatRoom.findUnique({
       where: { id: data.room },
@@ -393,7 +394,7 @@ export class ChatRoomGateway
           members: { disconnect: { id: toKick.id } },
         }
       });
-      this.server.emit('kicked', toKick.id);
+      this.server.emit('kicked', {user: toKick, room: roomToFree});
     }
   }
 
