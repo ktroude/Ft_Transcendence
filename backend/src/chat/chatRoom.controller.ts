@@ -79,4 +79,57 @@ export class ChatRoomController {
             return 0;
           }
     }
+
+    @Get('getMessages')
+    async handleGetMessage(@Headers('Authorization') cookie: string, @Query('code') id) {
+        const token = cookie.split(' ')[1];
+        const user = await this.userService.decodeToken(token);
+        const room = await this.prisma.chatRoom.findUnique({
+            where: {id: parseInt(id, 10)},
+            select: {messages:true}
+        });
+        return room.messages;
+    }
+
+    @Get('UserbyRoom')
+    async handleUserbyRoom(@Headers('Authorization') cookie: string, @Query('room') idRoom, @Query('pseudo') pseudo) {
+        let toSend = {
+            id: 0,
+            pseudo: '',
+            status: -2,
+            room: 0
+        };
+        console.log('idroom ==', idRoom)
+        console.log('pseudo ==', pseudo)
+        // if (!userPseudo || !idRoom)
+        //     return toSend;
+        const user = await this.prisma.user.findUnique({
+            where: {pseudo : pseudo},
+        });
+        const room = await this.prisma.chatRoom.findUnique({
+            where: {id: parseInt(idRoom, 10)},
+        });
+        toSend.room = room.id;
+        toSend.id = user.id;
+        toSend.pseudo = user.pseudo;
+
+        if (await this.chatRoomService.isOwner(user, room) === true) {
+            toSend.status = 2;
+          }
+          else if (await this.chatRoomService.isAdmin(user, room) === true) {
+            toSend.status = 1;
+          }
+          else if (await this.chatRoomService.isMuted(user, room) === true) {
+            toSend.status = -1
+          }
+          else if (await this.chatRoomService.isBanned(user, room) === true) {
+            toSend.status = -2
+          }
+          else if (await this.chatRoomService.isMember(user,room) === true) {
+            toSend.status = 0;
+          }
+        return toSend;
+    } 
+
+
 }
