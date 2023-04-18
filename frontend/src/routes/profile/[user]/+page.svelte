@@ -73,6 +73,16 @@
 		flex-direction: row;
 		align-items: center;
 	}
+	.unblock_button {
+		background: rgb(255, 234, 0);
+		width:15px;
+		height:15px;
+		margin:auto;
+		color:black;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 	.block_button {
 		background: red;
 		width:15px;
@@ -110,6 +120,9 @@
 				{#if user?.username != currentUser}
 					<button class="block_button" on:click={() => block(realUser, user.pseudo)}>X</button>
 				{/if}
+				{#if user?.username != currentUser}
+					<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>O</button>
+				{/if}
 			</div>
 		<h3>{user?.firstname} {user?.lastname}</h3>
 		<h3>Level: {user?.level}</h3>
@@ -143,7 +156,8 @@
 	
 	let imageURL: string;
 	let user: User;
-	
+	let blockedusers: any[] = [];
+
 	async function getImageURL() {
 		const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
 		const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
@@ -160,7 +174,47 @@
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
                 },
-                body: JSON.stringify({blockerUser: blockerUser})
+                body: JSON.stringify({block: blockerUser})
+            });
+        } else
+			console.log('Error: Could not delete friend');
+
+		// console.log(realUser, 'is blocking', user.pseudo);
+    }
+	
+    // async function checkBlocked() {
+	// 	const accessToken = await fetchAccessToken();
+	// 	user = await fetchData();
+    //     if (accessToken) {
+    //         const response = await fetch(`http://localhost:3000/users/${user.pseudo}/deletefriend`, {
+    //             method: 'PUT',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': `Bearer ${accessToken}`
+    //             },
+    //             body: JSON.stringify({ block: user.pseudo })
+    //         });
+    //         if (response.ok)
+	// 			blockedusers = blockedusers.filter(friend => friend !== user.pseudo);
+    //         else
+    //             console.log('Error: Could not delete friend');
+    //     } else
+    //         console.log('Error: Could not delete friend');
+    // }
+
+
+
+	async function unblock(realUser, blockerUser) {
+		await fetchData();
+		const accessToken = await fetchAccessToken();
+		if (accessToken) {
+            const response = await fetch(`http://localhost:3000/users/${realUser}/deleteBlock`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({block: blockerUser})
             });
         } else
 			console.log('Error: Could not delete friend');
@@ -187,6 +241,7 @@
 		}
 	}
 	onMount(() => {
+		// let is_blocked = checkBlocked();
 		loadpage();
 	});
 

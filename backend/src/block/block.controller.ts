@@ -15,17 +15,18 @@ export class BlockController {
 		console.log(pseudo, "is blockingoto", body.block);
         return this.blockService.blockUser(pseudo, body.block);
     }
-
+	
     @UseGuards(JwtGuard)
     @Get(':pseudo/getBlock')
     async getBlock(@Param('pseudo') pseudo: string): Promise<string[]> {
-        return this.blockService.getAllBlock(pseudo);
+		return this.blockService.getAllBlock(pseudo);
     }
-
-    // @UseGuards(JwtGuard)
-    // @Put(':pseudo/deleteBlock')
-    // async deleteBlock(@Param('pseudo') pseudo: string, @Body() body:{block: string}): Promise<User>
-    // {
-    //     return this.blockService.deleteBlock(pseudo, body.block);
-    // }
+	
+    @UseGuards(JwtGuard)
+    @Put(':pseudo/deleteBlock')
+    async deleteBlock(@Param('pseudo') pseudo: string, @Body() body:{block: string}): Promise<User>
+    {
+		console.log(pseudo, "is DEBLOCKING", body.block);
+        return this.blockService.deleteBlock(pseudo, body.block);
+    }
 }   

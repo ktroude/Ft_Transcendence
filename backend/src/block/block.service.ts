@@ -24,6 +24,51 @@ export class BlockService {
             return null;
         return block;
     }
+
+    async unblock(userId: number, blockId: number)
+    {
+        const deleteFriend = this.prisma.block.findUnique({
+			where: {
+				user_id_blocked_id: {
+					user_id: userId,
+					blocked_id: blockId
+				}
+		}});
+		if (!deleteFriend) {
+			console.log("Cannot unblock, friend is not blocked");
+			return ;
+		}
+		await this.prisma.block.delete({
+            where: {
+                user_id_blocked_id: {
+                    user_id: userId,
+                    blocked_id: blockId
+                }
+        }});
+        return deleteFriend;
+    }
+
+    async deleteBlock(pseudo: string, usernameBlock: string) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                pseudo: pseudo,
+            }
+        });
+        if (!user)
+            return null;
+        if (user.username === usernameBlock)
+            return null;
+			const userBlock = await this.prisma.user.findUnique({
+				where: {
+					username: usernameBlock,
+				}
+			});
+		const isBlocked = await this.existingBlock(user.id, userBlock.id);
+		if (isBlocked == false)
+			return null;
+		await this.unblock(user.id, userBlock.id);
+		return;
+    }
        
     async existingBlock(userId: number, blockId: number): Promise<Boolean> {
         const block = await this.prisma.block.findUnique({

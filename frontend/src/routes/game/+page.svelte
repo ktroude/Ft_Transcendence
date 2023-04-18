@@ -183,10 +183,18 @@
 	}
 	.search_profile{
 		padding:5px;
-		height:50vh;
+		height:100%;
 		text-align: center;
-		background:red;
 	}
+	.friend-list{
+		height:100%;
+	}
+	.search_bloc{
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+
 </style>
 
 <body>
@@ -203,8 +211,8 @@
 			<div class="game_box">
 			</div>
 			<div class="friendlist_box">
-				<h2>Friendlist</h2>
 				<div class="friend-list add-friend">
+					<h2>Friendlist</h2>
 					<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
 						<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
 					<ul class="ul_friends">
@@ -229,7 +237,11 @@
 					</ul>
 				  </div>
 				  <div class="search_profile">
-					<h1>Test</h1>
+					<h1>Search profile</h1>
+					<div class="search_bloc">
+						<input class="input_friend" type="text" bind:value={friendNameAdd} />
+						<button class="addfriend_button" on:click={handleAddFriend}>+</button>
+					</div>
 				  </div>
 			</div>
 	</div>
