@@ -152,5 +152,14 @@ export class ChatRoomController {
         return room.members;
     }
 
-
+    @Get('getBlock')
+    async handleGetBlock(@Headers('Authorization') cookie: string, @Query('code') id) {
+        const token = cookie.split(' ')[1];
+        const user = await this.userService.decodeToken(token);
+        const room = await this.prisma.chatRoom.findUnique({
+            where: {id: parseInt(id, 10)},
+            select: {members: true}
+        });
+        return room.members;
+    }
 }

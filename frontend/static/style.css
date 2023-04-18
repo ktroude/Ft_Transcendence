@@ -23,6 +23,20 @@ h3 {
   overflow: hidden;
 }
 
+.pv-chatroom-button {
+  display: block; /* afficher en tant que bloc */
+  border: none; /* pas de bordure */
+  background-color: transparent; /* pas de couleur de fond */
+  color: rgb(251, 255, 0); /* couleur du texte */
+  font-size: 16px; /* taille de police */
+  padding: 8px; /* espacement interne */
+  margin: 8px 0; /* espacement externe */
+  cursor: pointer; /* curseur de la souris en forme de main */
+  text-align: left; /* aligner le texte à gauche */
+  width: 200px;
+  overflow: hidden;
+}
+
 .message {
   word-wrap: break-word;
 }

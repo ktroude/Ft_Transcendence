@@ -23,7 +23,7 @@
 	let selectedUser: User = {
 		id: -1,
 		pseudo: '',
-		status: -2,
+		status: -3,
 		room: -1
 	};
 	let showOptionsPseudo: string[] = [];
@@ -31,6 +31,7 @@
 	let muted: any = [];
 	let banned: any = [];
 	let membres: any = [];
+	let blocked: any = [];
 	// INTERFACES
 
 	interface Message {
@@ -63,6 +64,11 @@
 	function handleNameInput(event: any) {
 		formData.roomName = (event.target as HTMLInputElement).value;
 		checkFormValidity();
+	}
+
+	function handleInvitInput(event: any) {
+		formData.roomName = (event.target as HTMLInputElement).value;
+		socket.emit('addUser', {pseudo: formData.roomName, room:currentRoom});
 	}
 
 	function handlePasswordInput(event: any) {
@@ -153,7 +159,14 @@
 		await fletchUserData();
 		await fletchMuteBanData();
 		await fletchMembres();
+		await fletchBlocked();
 		isShown = false;
+	}
+
+	function checkPrivate() {
+		chatRooms.forEach(elem => {
+			
+		});
 	}
 
 	function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
@@ -179,6 +192,21 @@
 			messageInput.value = '';
 		}
 	}
+
+	const fletchBlocked = async() => {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(`http://localhost:3000/chat/getBlock?code=${currentRoom.id}`, {
+				headers
+			});
+			const data = await response.json();
+			// gerer data
+		}		
+	};
 
 	const fletchMuteBanData = async () => {
 		const cookies = document.cookie.split(';');
@@ -567,7 +595,23 @@
 				messages = [...messages, {content: `Vous devez encore attendre ${data.time} secondes pour envoyer un message`, senderPseudo: 'server'}];
 			}
 		});
+		socket.on('UserAdded', async(data) => {
+			if (data.sucess === false && !data.user) {
+				messages = [...messages, {senderPseudo:'server', content:"Cette utilisateur n'existe pas"}]
+			}
+			else if (data.sucess === false && data.user) {
+				messages = [...messages,{senderPseudo:'server', content:"Cette utilisateur est deja membre"} ]
+			}
+			else if (data.sucess === true && data.user) {
+				if (data.user.id === currentUser.id) {
+					chatRooms = await fletchChatRoomsData();
+				}
+				membres = [...membres, data.user];
+			}
+
+		});
 		chatRooms = await fletchChatRoomsData();
+		console.log('CRS == ', chatRooms);
 		currentUser = await fletchCurrentUserData();
 		if (currentUser.id < 0) {
 			window.location.pathname = '/';
@@ -584,17 +628,23 @@
 <!-- HTML CODE -->
 
 <!-- <h1>Chat</h1> -->
-<h2>Liste des rooms:</h2>
+<h2>Liste des rooms publics:</h2>
 {#if loading === false}
 	<p>Chargement...</p>
 {:else}
-	<div class="list-room">
-		{#each chatRooms as chatRoom}
-			<p>
+<div class="list-room">
+	{#each chatRooms as chatRoom}
+		{#if chatRoom.private === false}
 				<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom)}
 					>{chatRoom.name}</button
 				>
-			</p>{/each}
+		{/if}
+		{#if chatRoom.private === true}
+				<button class="pv-chatroom-button" on:click={() => handleRoomButton(chatRoom)}
+					>PV {chatRoom.name}</button
+				>
+		{/if}
+	{/each}
 	</div>
 {/if}
 
@@ -637,6 +687,8 @@
 		{#if currentRoom.name.length}
 			<h3>{currentRoom.name}</h3>
 			<button on:click={leaveRoom}>Quitter la room</button>
+			
+			<button on:click={handleInvitInput}>Ajouter un utilisateur </button>
 		{/if}
 	</div>
 	<div class="container">

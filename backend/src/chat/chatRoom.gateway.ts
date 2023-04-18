@@ -427,6 +427,39 @@ export class ChatRoomGateway
     }
   }
 
+  @SubscribeMessage('addUser')
+  async handleAddUser(client: Socket, data: any) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.room.id}
+    })
+    const userToAdd = await this.prismaService.user.findUnique({
+      where: { pseudo: data.pseudo },
+    });
+    if (!userToAdd) {
+      this.server.emit('UserAdded', {sucess: false, user:null})
+      return ;
+    }
+    else {
+      await this.prismaService.chatRoom.update({
+        where: {id: data.room.id},
+        data: {
+          members: {connect: {id:userToAdd.id}}
+        }
+      });
+      if (await this.chatRoomService.isMember(userToAdd, chatRoom) === true){
+        this.server.emit('UserAdded', {sucess: false, user:userToAdd});
+        return ;
+      }
+      else {
+        const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a rejoind la room`,
+        { id: 0, pseudo: 'server' }, { id: data.id });
+        this.server.emit('newMessage', toSend);
+        this.server.emit('UserAdded', {sucess: true, user:userToAdd})
+      }
+    }
+  }
+
 
 
 }

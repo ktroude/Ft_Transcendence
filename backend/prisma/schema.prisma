@@ -26,6 +26,9 @@ model User {
   rank      Int @default(0)
   level     Int @default(0)
 
+  // pitié monsieur donne un autre nom a cette variable, je m'en sers deja dans le front du chat et je fais des gros user =  donc ca va ecraser mon status du front
+  // onLine c'est bien non?
+  // pitié j'ai 1200 lignes de code a checker sinon
   status    Int @default(0) // 0 = offline, 1 = online, 2 = in game
 
   userFriends       Friend[] @relation("user")
