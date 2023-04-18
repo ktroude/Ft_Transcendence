@@ -758,47 +758,53 @@
 </div>
 
 {#if currentRoom}
-	<div>
+	<div class='room-bandeau'>
 		{#if currentRoom.name.length}
-			<h3>{currentRoom.name}</h3>
-			<button class='leave-chat' on:click={leaveRoom}>X</button>
-			<input class="form-input" on:keypress={handleInvitKeyPress} bind:value={userPseudoInput} />
-			<button on:click={handleInvitInput}>Ajouter un utilisateur </button>
+		<input class="room-bandeau-form-input" on:keypress={handleInvitKeyPress} bind:value={userPseudoInput} />
+		<button class= "room-bandeau-button" on:click={handleInvitInput}>Ajouter un utilisateur </button>
+		<h3 class='room-name'>{currentRoom.name}</h3>
+		<button class='leave-chat' on:click={leaveRoom}>Quitter la room</button>
 		{/if}
 	</div>
-	{#if messages && messages.length}
+
+
+
+	{#if currentRoom?.id}
+	<div class='message-container'>
 		<div class="chat-messages">
-				{#each messages as msg}
-					<p class="message">
-						{#if msg.senderPseudo == 'server'}
-							{msg.senderPseudo}: {msg.content}
-						{/if}
-						{#if msg.senderPseudo != 'server'}
-							<button
-								class="pseudo-button"
-								on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
-							>
-								{msg.senderPseudo}
-							</button>
-							: {msg.content}
-						{/if}
-					</p>
-				{/each}
-			</div>
-		{/if}
-	<div>
-		{#if currentRoom.name.length}
+			{#if messages && messages.length}
+			{#each messages as msg}
 			<p>
-				<input
-					on:input={handleMessageInput}
-					on:keypress={handleMessageKeyPress}
+				{#if msg.senderPseudo == 'server'}
+				{msg.senderPseudo}: {msg.content}
+				{/if}
+				{#if msg.senderPseudo != 'server'}
+				<button
+				class="pseudo-button-message"
+				on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
+				>
+				{msg.senderPseudo}
+			</button>
+			<span class='message'> 
+				{msg.content}
+			</span>
+			{/if}
+		</p>
+			{/each}
+			{/if}
+		</div>
+		{#if currentRoom.name.length}
+		<div class='message-input-container'>
+			<input
+			on:input={handleMessageInput}
+			on:keypress={handleMessageKeyPress}
 					class="message-input"
 					type="text"
 					id="message"
 					name="message"
-				/>
-			</p>
-			<button
+					/>
+				<button
+				class='send-message-button'
 				id="sendMessageButton"
 				type="submit"
 				disabled
@@ -810,10 +816,16 @@
 					}
 				}}>Envoyer</button
 			>
-		{/if}
-	</div>
+		</div>
+			{/if}
+		</div>
+			{/if}
 
-	{#if isShown === true}
+
+
+
+
+			{#if isShown === true}
 		<div class="menu">
 			{#if showOptionsPseudo.length}
 				<select id="pseudo-menu" on:change={handleSelect}>
@@ -850,32 +862,46 @@
 {/if}
 
 <div class="admin-panel">
-	{#if currentRoom?.id && currentUser.status > 0}
-		<p>Banned :</p>
-		{#if banned?.length}
-			{#each banned as ban}
-				<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
-					{ban.pseudo}
-				</button>
-			{/each}
-		{/if}
-		<p>Muted :</p>
-		{#if muted?.length}
-			{#each muted as mute}
-				<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
-					{mute.pseudo}
-				</button>
-			{/each}
-		{/if}
-	{/if}
+
+
 	{#if currentRoom?.id}
-		<p>Membres:</p>
+	<div class="membre">
+		<p class='pannel-title'>Membres</p>
 		{#if membres && membres.length}
-			{#each membres as member}
-				<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, member.pseudo)}>
-					{member.pseudo}
-				</button>
-			{/each}
+		{#each membres as member}
+		<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, member.pseudo)}>
+			{member.pseudo}
+		</button>
+		{/each}
 		{/if}
+	</div>
 	{/if}
+
+
+	{#if currentRoom?.id}
+	<div class="banned">
+		<p class='pannel-title'>Banned</p>
+		{#if banned?.length}
+		{#each banned as ban}
+		<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
+			{ban.pseudo}
+		</button>
+		{/each}
+		{/if}
+	</div>
+
+<div class= "muted">
+	{#if currentRoom?.id}
+	<p class='pannel-title'>Muted</p>
+	{#if muted?.length}
+	{#each muted as mute}
+	<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
+		{mute.pseudo}
+	</button>
+	{/each}
+	{/if}
+	{/if}
+</div>
+	{/if}
+
 </div>
