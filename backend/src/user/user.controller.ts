@@ -33,4 +33,12 @@ export class UserController {
     async updatePseudo(@Param('pseudo') pseudo: string, @Body() body: { user: User, newPseudo: string }): Promise<User> {
         return this.userService.updatePseudo(body.user, body.newPseudo);
     }
-  }
+
+    @UseGuards(JwtGuard)
+    @Get(':user/search')
+    async searchUser(@Param('user') searchProfile: string): Promise<Boolean> {
+		let toto = await(this.userService.findUserByUsernameBool(searchProfile));
+		console.log("searchUser ->", searchProfile, "bool value ->", toto);
+        return toto;
+	}
+}

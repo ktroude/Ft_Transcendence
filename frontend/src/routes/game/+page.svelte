@@ -106,11 +106,13 @@
 	}
 
 	.input_friend{
-		background:grey;
+		background:rgb(174, 174, 174);
 		border:none;
 		border-radius: 3px;
 		height:20px;
 		font-size: 20px;
+		width:200px;
+		margin:auto;
 	}
 
 	.ul_friends{
@@ -126,7 +128,7 @@
 		width: 20px;
 		height: 20px;
 		margin: 5px;
-		font-size: 20px;
+		font-size: 15px;
 		color:black;
 		align-items: center;
 		text-align: center;
@@ -182,6 +184,7 @@
 
 	}
 	.search_profile{
+		background:green;
 		padding:5px;
 		height:100%;
 		text-align: center;
@@ -194,7 +197,23 @@
 		flex-direction: row;
 		align-items: center;
 	}
-
+	.search_button{
+		width: 20px;
+		height: 20px;
+		font-size: 15px;
+		color:black;
+		align-items: center;
+		text-align: center;
+		display: flex; 
+		justify-content: center;
+		align-items: center;
+		background: transparent;
+		border: none;
+	}
+	.search_button:hover{
+		transform: rotate(-10deg)
+	}
+	
 </style>
 
 <body>
@@ -239,8 +258,8 @@
 				  <div class="search_profile">
 					<h1>Search profile</h1>
 					<div class="search_bloc">
-						<input class="input_friend" type="text" bind:value={friendNameAdd} />
-						<button class="addfriend_button" on:click={handleAddFriend}>+</button>
+						<input class="input_friend" type="text" bind:value={searchProfile} />
+						<button class="search_button" on:click={() => handleSearchProfile(searchProfile)}>🔍</button>
 					</div>
 				  </div>
 			</div>
@@ -258,6 +277,7 @@
     let clickedFriend: string;
     let friends = [];
     let friendNameAdd: string = '';
+    let searchProfile: string = '';
 
     let user: User = undefined;
     interface User {
@@ -278,6 +298,29 @@
 
 	let invited = 1;
 
+	async function handleSearchProfile(searchProfile: string) {
+	console.log("handleSearchProfile:", searchProfile);
+	if (!searchProfile) {
+		return;
+	}
+
+	const accessToken = await fetchAccessToken();
+	const url = `http://localhost:3000/users/${searchProfile}/search`;
+	const response = await fetch(url, {
+		method: 'GET',
+		headers: {
+		'Authorization': `Bearer ${accessToken}`,
+		},
+	});
+
+	const userExists = await response.json(); // Parse response body as JSON
+	if (userExists) { // Check if user exists
+		goto(`/profile/${searchProfile}`);
+	} else {
+		console.log("user", searchProfile, "does not exist");
+		return;
+	}
+	}
 
 	async function acceptInvitation() {
 		console.log("Accepted the invitation");

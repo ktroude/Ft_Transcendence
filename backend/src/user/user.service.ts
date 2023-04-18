@@ -37,6 +37,17 @@ export class UserService {
         return user;
     }
 
+    async findUserByUsernameBool(username: string): Promise<Boolean> {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                username: username,
+            }
+        });
+        if (!user)
+			return false;
+		return true;
+    }
+
     async findUserByPseudo(pseudo: string): Promise<User> {
         const user = await this.prisma.user.findUnique({
             where: {
