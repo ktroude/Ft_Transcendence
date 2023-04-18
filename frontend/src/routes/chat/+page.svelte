@@ -702,7 +702,7 @@
 			<p>Chargement...</p>
 			{#each chatRooms as chatRoom}
 				{#if chatRoom.private === true}
-					<button class="pv-chatroom-button" on:click={() => handleRoomButton(chatRoom)}
+					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom)}
 						>{chatRoom.name}</button
 					>
 				{/if}
@@ -720,24 +720,26 @@
 
 
 <div class='create-room'>
-	<h2>Creer une room:</h2>
+	<h2 class='room-form-title'>Creer une room:</h2>
 	<form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
-	<label for="roomName">Nom de la salle *</label>
+	<label for="roomName"></label>
 	<input
 	class="form-input"
 	type="text"
 	id="roomName"
 	name="roomName"
+	placeholder="Nom de la salle *"
 	on:input={handleNameInput}
 	required
 	/>
 	
-	<label for="password">Mot de passe</label>
+	<label for="password"></label>
 	<input
 	class="form-input"
 		type="password"
 		id="password"
 		name="password"
+		placeholder="Mot de passe"
 		on:input={handlePasswordInput}
 		/>
 		
@@ -759,14 +761,13 @@
 	<div>
 		{#if currentRoom.name.length}
 			<h3>{currentRoom.name}</h3>
-			<button on:click={leaveRoom}>Quitter la room</button>
+			<button class='leave-chat' on:click={leaveRoom}>X</button>
 			<input class="form-input" on:keypress={handleInvitKeyPress} bind:value={userPseudoInput} />
 			<button on:click={handleInvitInput}>Ajouter un utilisateur </button>
 		{/if}
 	</div>
-	<div class="container">
+	{#if messages && messages.length}
 		<div class="chat-messages">
-			{#if messages && messages.length}
 				{#each messages as msg}
 					<p class="message">
 						{#if msg.senderPseudo == 'server'}
@@ -783,9 +784,8 @@
 						{/if}
 					</p>
 				{/each}
-			{/if}
-		</div>
-	</div>
+			</div>
+		{/if}
 	<div>
 		{#if currentRoom.name.length}
 			<p>
