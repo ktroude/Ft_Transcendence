@@ -250,7 +250,7 @@
 				headers
 			});
 			const data = await response.json();
-			membres = data;
+			membres = await data;
 		}
 	};
 
@@ -810,10 +810,10 @@
 	{/if}
 	{#if currentRoom?.id}
 		<p>Membres:</p>
-		{#if membres?.length}
-			{#each banned as ban}
-				<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
-					{ban.pseudo}
+		{#if membres && membres.length}
+			{#each membres as member}
+				<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, member.pseudo)}>
+					{member.pseudo}
 				</button>
 			{/each}
 		{/if}
