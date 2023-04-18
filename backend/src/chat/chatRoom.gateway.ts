@@ -16,6 +16,7 @@ import { runInThisContext } from 'vm';
 import { ChatRoomService } from './chatRoom.service';
 import { log } from 'console';
 import { emit } from 'process';
+import { REQUEST_CONTEXT_ID } from '@nestjs/core/router/request/request-constants';
 
 @WebSocketGateway({
   cors: {
@@ -38,6 +39,7 @@ export class ChatRoomGateway
   // nos tableaux de chatrooms et de client (avec le User associé)
   private chatRooms: ChatRoom[] = [];
   private clients: [User, Socket][] = [];
+  private muted= new Map();
 
   afterInit(server: any) {
     ('Init done');
@@ -225,64 +227,79 @@ export class ChatRoomGateway
     this.server.emit('adminRemoved', {user: userToUnadmin, room: chatRoom});
   }
 
-  // @SubscribeMessage('newMute')
-  // async handleNewMuted(
-  //   @ConnectedSocket() client: Socket,
-  //   @MessageBody() data: any,
-  // ) {
-  //   const user = this.clients.find(([, socket]) => socket === client)?.[0];
-  //   const chatRoom = await this.prismaService.chatRoom.findUnique(
-  //     data.chatRoomId,
-  //   );
-  //   const userToMute = await this.userService.findUserByPseudo(data.userToMute);
-  //   if (
-  //     ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
-  //       (await this.chatRoomService.isOwner(user, chatRoom))) ===
-  //     false
-  //   ) {
-  //     // checker si le user est un admin ou le owner
-  //     //handle error
-  //   }
-  //   if ((await this.chatRoomService.isMuted(userToMute, chatRoom)) === true) {
-  //     // checker si le userToMute n'est pas deja mute
-  //     // hanle error
-  //   }
-  //   await this.prismaService.chatRoom.update({
-  //     where: { id: chatRoom.id },
-  //     data: { muted: { connect: { id: userToMute.id } } },
-  //   });
-  //   // envoyer un ptit message pour dire aue userToMute a ete Mute
-  // }
+  @SubscribeMessage('newMute')
+  async handleNewMuted(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.room.id},
+    });
+    const userToMute = await this.prismaService.user.findUnique({
+      where: {id: data.user.id}
+    });
+    await this.prismaService.chatRoom.update({
+      where: { id: chatRoom.id },
+      data: { muted: { connect: { id: userToMute.id } } },
+    });
+    this.server.emit('muted', {user: userToMute, room: chatRoom});
+    this.startMuteTimer(userToMute.id, chatRoom.id);
+  }
+  
+  startMuteTimer(userId: number, roomId:number) {
+    let TimeInMs = 120000; // 2min
+    const timer = setInterval(() => {
+        TimeInMs -= 1000;
+        this.muted.set(userId,TimeInMs);
+        const TimeInSec = Math.ceil(TimeInMs / 1000);
+        const seconds = TimeInSec % 60;
+        this.muted.set(userId, seconds);
+        if (TimeInMs <= 0) {
+            clearInterval(timer);
+            this.muted.delete(userId);
+            this.server.emit('unMuted', {user: userId, room: roomId});
+        }
+    }, 1000); // chaque sec
+  }
 
-  // @SubscribeMessage('unMuted')
-  // async handleUnMuted(
-  //   @ConnectedSocket() client: Socket,
-  //   @MessageBody() data: any,
-  // ) {
-  //   const user = this.clients.find(([, socket]) => socket === client)?.[0];
-  //   const chatRoom = await this.prismaService.chatRoom.findUnique(
-  //     data.chatRoomId,
-  //   );
-  //   const userToUnmute = await this.userService.findUserByPseudo(
-  //     data.userToUnmute,
-  //   );
-  //   if (
-  //     ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
-  //       (await this.chatRoomService.isOwner(user, chatRoom))) ===
-  //     false
-  //   ) {
-  //     // checker si le user est un admin ou le owner
-  //     //handle error
-  //   }
-  //   if ((await this.chatRoomService.isMuted(userToUnmute, chatRoom)) === true) {
-  //     // checker si userToUnmute est bien dans la room et est bien mute
-  //     // handle error
-  //   }
-  //   await this.prismaService.chatRoom.update({
-  //     where: { id: chatRoom.id },
-  //     data: { muted: { disconnect: { id: userToUnmute.id } } },
-  //   });
-  // }
+  @SubscribeMessage('checkMute')
+  async handleCheckMute(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+      const user = this.clients.find(([, socket]) => socket === client)?.[0];
+      const chatRoom = await this.prismaService.chatRoom.findUnique({
+        where: {id: data.room.id},
+      });
+      const userToUnmuted = await this.prismaService.user.findUnique({
+        where: {id: data.user.id}
+      });
+      await this.prismaService.chatRoom.update({
+        where: { id: chatRoom.id },
+        data: { muted: { disconnect: { id: userToUnmuted.id } } },
+      });
+      this.server.emit('unMuted', {room: chatRoom, user: userToUnmuted});
+    }
+
+  @SubscribeMessage('unMuted')
+  async handleunMuted(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: {id: data.room.id},
+    });
+    const userToMute = await this.prismaService.user.findUnique({
+      where: {id: data.user.id}
+    });
+    await this.prismaService.chatRoom.update({
+      where: { id: chatRoom.id },
+      data: { muted: { connect: { id: userToMute.id } } },
+    });
+    this.server.emit('muted', {user: userToMute, room: chatRoom});
+    }
 
   @SubscribeMessage('newBan')
   async handleNewBan(
@@ -296,28 +313,10 @@ export class ChatRoomGateway
     const userToBan = await this.prismaService.user.findUnique({
       where: {id: data.user.id}
     });
-    // if (
-    //   ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
-    //     (await this.chatRoomService.isOwner(user, chatRoom))) ===
-    //   false
-    // ) {
-    //   return;
-    // }
-    // if (
-    //   (await this.chatRoomService.isAdmin(userToBan, chatRoom)) === true &&
-    //   (await this.chatRoomService.isAdmin(user, chatRoom)) === true &&
-    //   (await this.chatRoomService.isOwner(user, chatRoom)) === false
-    // ) {
-    //   return;
-    // }
-    // if ((await this.chatRoomService.isBanned(userToBan, chatRoom)) === true) {
-    //   return;
-    // }
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
       data: { banned: { connect: { id: userToBan.id } } },
     });
-    
     const newMsg = {
       sender: 'server',
       content: `${userToBan.pseudo} a été banni de la room`
@@ -342,20 +341,6 @@ export class ChatRoomGateway
     const userToUnban = await this.prismaService.user.findUnique({
       where: {id: data.user.id}
     });
-    // if (
-    //   ((await this.chatRoomService.isAdmin(user, chatRoom)) ===
-    //     (await this.chatRoomService.isOwner(user, chatRoom))) ===
-    //   false
-    // ) {
-    //   // checker si le user est un admin ou le owner
-    //   //handle error
-    // }
-    // if (
-    //   (await this.chatRoomService.isBanned(userToUnban, chatRoom)) === false
-    // ) {
-    //   // checker si userToUnban est bien deja ban
-    //   // handle error
-    // }
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
       data: { banned: { disconnect: { id: userToUnban.id } } },

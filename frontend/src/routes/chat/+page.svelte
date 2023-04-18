@@ -170,7 +170,12 @@
 				roomId: currentRoom.id,
 				content: messageValue
 			};
-			socket.emit('sendMessage', data);
+			if (currentUser.status === -1) {
+				socket.emit('checkMute', {room: currentRoom, user: currentUser});
+			}
+			else {
+				socket.emit('sendMessage', data);
+			}
 			messageInput.value = '';
 		}
 	}
@@ -378,7 +383,9 @@
 		} else if (event.target.value === 'unBan') {
 			deban(selectedUser, currentRoom);
 		} else if (event.target.value === 'mute') {
+			mute(selectedUser, currentRoom);
 		} else if (event.target.value === 'unMute') {
+			unmute(selectedUser, currentRoom);
 		} else if (event.target.value === 'upAdmin') {
 			upadmin(selectedUser, currentRoom);
 		} else if (event.target.value === 'unAdmin') {
@@ -402,11 +409,15 @@
 		isShown = false;
 	}
 
-	function mute() {
-		muted = [...muted, selectedUser];
+	function mute(userTodeBan: any, room: any) {
+		socket.emit('newMute', { user: userTodeBan, room: room });
+		isShown = false;
 	}
 
-	function demute() {}
+	function unmute(userTodeBan: any, room: any) {
+		socket.emit('unMuted', { user: userTodeBan, room: room });
+		isShown = false;
+	}
 
 	function kick(userToKick: User, room: any) {
 		if (currentRoom.id === room.id)
@@ -537,6 +548,23 @@
 				if (currentRoom.id === data.room.id) {
 					currentUser.status = 0;
 				}
+			}
+		});
+		socket.on('muted', async(data) => {
+			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
+				messages = [...messages, {content: `Vous avez été mute pour 120 sec'`, senderPseudo: 'server'}]
+				currentUser.status = -1;
+			}
+		});
+		socket.on('unMuted', async(data) => {
+			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
+				messages = [...messages, {content: `Vous n'etes plus mute'`, senderPseudo: 'server'}]
+				currentUser.status = 0;
+			}
+		});
+		socket.on('returnMuteTime', async(data) => {
+			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
+				messages = [...messages, {content: `Vous devez encore attendre ${data.time} secondes pour envoyer un message`, senderPseudo: 'server'}];
 			}
 		});
 		chatRooms = await fletchChatRoomsData();
