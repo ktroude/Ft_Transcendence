@@ -65,7 +65,7 @@
 		border-radius: 5px;
 		align-items: center;
 	}
-	.game_navbar{
+	.game_navbar {
 		height:50px;
 		width:100%;
 		background:#201207;
@@ -73,7 +73,23 @@
 		flex-direction: row;
 		align-items: center;
 	}
-
+	.block_button {
+		background: red;
+		width:15px;
+		height:15px;
+		margin:auto;
+		color:black;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.username_bloc {
+		align-items: center;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		padding:20px;
+	}
 </style>
 
 <body>
@@ -90,7 +106,12 @@
 	</div>
 	<div class="main_profile">
 		<div class="main_box">
-		<h1>{user?.username}</h1>
+			<div class="username_bloc">
+				<h1>{user?.username}</h1>
+				{#if user?.username != currentUser}
+					<button class="block_button" on:click={() => block()}>X</button>
+				{/if}
+			</div>
 		<h3>{user?.firstname} {user?.lastname}</h3>
 		<h3>Level: {user?.level}</h3>
 		<h3>Created: {new Date(user?.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</h3>
@@ -130,6 +151,10 @@
 		imageURL = URL.createObjectURL(blob); // Create a URL for the blob
 	}
 
+	function block() {
+		console.log(realUser, 'is blocking', user.pseudo);
+	}
+
 	let realUser = ''; 
 	let currentUser = ''; 
 	
@@ -147,9 +172,8 @@
 			getImageURL();
 		}
 	}
-
-
 	onMount(() => {
+
 		loadpage();
 	});
 

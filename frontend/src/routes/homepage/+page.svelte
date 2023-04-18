@@ -69,21 +69,9 @@
         firstName: string;
         lastName: string;
     }
-
-    function sendMessage() {
-      socket.emit('message', 'Hello, world!');
-    }
     
     onMount(async function() {
 		user = await fetchData();
-		
-		const socket = io('http://localhost:3000');
-
-		socket.on('connect', async function() {
-			console.log('connected');
-			
-			socket.emit('userConnected', { userId: user.id });
-		});
 	});
 
 </script>

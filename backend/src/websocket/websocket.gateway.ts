@@ -5,6 +5,8 @@ import { Server } from 'socket.io';
 import { OnGatewayDisconnect, OnGatewayConnection } from '@nestjs/websockets';
 import { User } from '@prisma/client';
 import { io } from 'socket.io-client';
+import { map } from 'rxjs';
+import { Socket } from 'dgram';
 
 @WebSocketGateway()
 export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
@@ -16,20 +18,18 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
     console.log(`Client connected: ${client.id}`);
 
       client.on('userConnected', (payload) => {
-      const userId = payload.userId;
-      client.id = userId;
-      console.log(`User connected with ID ${client.id}`);
+      if (this.clients.has(client.id) == true)
+      {
+        console.log("User already connected");
+      }
+      console.log(`User connected with ID ${payload.userId}`);
+      this.clients.set(client.id, payload.userId);
     });
   }
 
-
-  handleDisconnect(client: any) {
-    for (const [id, c] of this.clients.entries()) {
-      if (c === client) {
-        this.clients.delete(id); 
-        console.log(`Client disconnected: ${id}`);
-        break;
-      }
-    }
+  handleDisconnect(client: any) 
+  {
+    this.clients.delete(client.id);
+    console.log(`Client disconnected: ${client.id}`);
   }
 }
