@@ -12,24 +12,22 @@ import { Socket } from 'dgram';
 export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
   @WebSocketServer()
   server: Server;
-  clients: Map<string, number> = new Map()
+  clients: Map<number, string> = new Map()
 
   handleConnection(client: any, ...args: any[]) {
     console.log(`Client connected: ${client.id}`);
 
       client.on('userConnected', (payload) => {
-      if (this.clients.has(client.id) == true)
-      {
-        console.log("User already connected");
-      }
       console.log(`User connected with ID ${payload.userId}`);
-      this.clients.set(client.id, payload.userId);
+      this.clients.set(payload.userId, client.id);
+      console.log(this.clients.size);
     });
   }
-
+  
   handleDisconnect(client: any) 
   {
     this.clients.delete(client.id);
     console.log(`Client disconnected: ${client.id}`);
+    console.log(this.clients.size);
   }
 }

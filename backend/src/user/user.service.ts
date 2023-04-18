@@ -33,7 +33,6 @@ export class UserService {
                 username: username,
             }
         });
-        console.log(user.pseudo);
         return user;
     }
 

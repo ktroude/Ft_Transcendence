@@ -80,9 +80,10 @@ export class BlockService {
             return false;
         if (user.username === usernameBlock)
             return false;
+        console.log("userBlock: " + usernameBlock);
 		const userBlock = await this.prisma.user.findUnique({
 			where: {
-				username: usernameBlock,
+				pseudo: usernameBlock,
 			}
 		});
 		const block = await this.prisma.block.findUnique({
