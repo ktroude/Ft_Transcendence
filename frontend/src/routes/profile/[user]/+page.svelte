@@ -86,9 +86,9 @@
 	.username_bloc {
 		align-items: center;
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 		justify-content: center;
-		padding:20px;
+		background:green;
 	}
 </style>
 
