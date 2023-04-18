@@ -279,8 +279,7 @@
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			const response = await fetch('http://localhost:3000/chat/getRoom', { headers });
-			const data = await response.json();
-			return data;
+			return await response.json();
 		}
 		return [];
 	};
@@ -339,8 +338,8 @@
 				const response = await fetch(`http://localhost:3000/chat/userInfo?code=${currentRoom.id}`, {
 					headers
 				});
-				const data = await response.json();
-				currentUser.status = parseInt(data, 10);
+				const data = parseInt(await response.json(), 10);
+				currentUser.status = data;
 			}
 		}
 	};
@@ -603,20 +602,34 @@
 			}
 		});
 		socket.on('muted', async(data) => {
+			if (currentRoom.id === data.room.id) {
+				fletchMuteBanData();
+			}
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [...messages, {content: `Vous avez été mute pour 120 sec'`, senderPseudo: 'server'}]
 				currentUser.status = -1;
 			}
 		});
 		socket.on('unMuted', async(data) => {
+			console.log('CRI ===',currentRoom.id)
+			console.log('DRI ===',data.room.id )
+			console.log('CUI ===',currentUser.id)
+			console.log('DUI ===',data.user.id)
+			if (currentRoom.id === data.room.id) {
+				fletchMuteBanData();
+			}
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [...messages, {content: `Vous n'etes plus mute'`, senderPseudo: 'server'}]
 				currentUser.status = 0;
 			}
 		});
-		socket.on('returnMuteTime', async(data) => {
+		socket.on('stayMute', async(data) => {
+			console.log('CRI ===',currentRoom.id)
+			console.log('DRI ===',data.room.id )
+			console.log('CUI ===',currentUser.id)
+			console.log('DUI ===',data.user.id)
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
-				messages = [...messages, {content: `Vous devez encore attendre ${data.time} secondes pour envoyer un message`, senderPseudo: 'server'}];
+				messages = [...messages, data.message];
 			}
 		});
 		socket.on('UserAdded', async(data) => {

@@ -112,8 +112,7 @@ export class ChatRoomGateway
       where: { id: data.roomId }
     });
     if ((await this.chatRoomService.isMuted(user, chatRoom)) === true) {
-
-      // handle error
+      return ;
     }
     else {
       const newMessage = await this.chatRoomService.createMessage(data.content, user, chatRoom);
@@ -243,21 +242,22 @@ export class ChatRoomGateway
       data: { muted: { connect: { id: userToMute.id } } },
     });
     this.server.emit('muted', {user: userToMute, room: chatRoom});
-    this.startMuteTimer(userToMute.id, chatRoom.id);
+    this.startMuteTimer(userToMute, chatRoom);
   }
   
-  startMuteTimer(userId: number, roomId:number) {
+  startMuteTimer(user:User, room:ChatRoom) {
     let TimeInMs = 120000; // 2min
     const timer = setInterval(() => {
-        TimeInMs -= 1000;
-        this.muted.set(userId,TimeInMs);
-        const TimeInSec = Math.ceil(TimeInMs / 1000);
+      TimeInMs -= 1000;
+      this.muted.set(user.id,TimeInMs);
+      // console.log('timer ==', this.muted.get(user.id));
+      const TimeInSec = Math.ceil(TimeInMs / 1000);
         const seconds = TimeInSec % 60;
-        this.muted.set(userId, seconds);
+        this.muted.set(user.id, seconds);
         if (TimeInMs <= 0) {
-            clearInterval(timer);
-            this.muted.delete(userId);
-            this.server.emit('unMuted', {user: userId, room: roomId});
+          this.server.emit('unMuted', {user: user, room: room});
+          this.muted.delete(user.id);
+          clearInterval(timer);
         }
     }, 1000); // chaque sec
   }
@@ -271,14 +271,15 @@ export class ChatRoomGateway
       const chatRoom = await this.prismaService.chatRoom.findUnique({
         where: {id: data.room.id},
       });
-      const userToUnmuted = await this.prismaService.user.findUnique({
-        where: {id: data.user.id}
-      });
-      await this.prismaService.chatRoom.update({
-        where: { id: chatRoom.id },
-        data: { muted: { disconnect: { id: userToUnmuted.id } } },
-      });
-      this.server.emit('unMuted', {room: chatRoom, user: userToUnmuted});
+      console.log('timer ==', this.muted.get(user.id));
+      if (await this.chatRoomService.isMuted(user, chatRoom) === true){
+        const data = {
+          message: {senderPseudo: 'server', content:`Vous etes encore mute pour ${this.muted.get(user.id).toString()} secondes`},
+          user: user,
+          room: chatRoom,
+        }
+        this.server.emit('stayMute', data);
+      }
     }
 
   @SubscribeMessage('unMuted')
@@ -295,9 +296,9 @@ export class ChatRoomGateway
     });
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
-      data: { muted: { connect: { id: userToMute.id } } },
+      data: { muted: { disconnect: { id: userToMute.id } } },
     });
-    this.server.emit('muted', {user: userToMute, room: chatRoom});
+    this.server.emit('unMuted', {user: userToMute, room: chatRoom});
     }
 
   @SubscribeMessage('newBan')
