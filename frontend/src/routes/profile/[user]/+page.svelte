@@ -147,9 +147,8 @@
 			getImageURL();
 		}
 	}
-
-
 	onMount(() => {
+
 		loadpage();
 	});
 

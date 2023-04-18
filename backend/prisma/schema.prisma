@@ -29,7 +29,11 @@ model User {
   // pitié monsieur donne un autre nom a cette variable, je m'en sers deja dans le front du chat et je fais des gros user =  donc ca va ecraser mon status du front
   // onLine c'est bien non?
   // pitié j'ai 1200 lignes de code a checker sinon
-  status    Int @default(0) // 0 = offline, 1 = online, 2 = in game
+  connected    Int @default(0) // 0 = offline, 1 = online, 2 = in game
+
+
+  userBlocks        Block[] @relation("user")
+  blockedUserBlocks Block[] @relation("blocked_users")
 
   userFriends       Friend[] @relation("user")
   friendUserFriends Friend[] @relation("friend_users")
@@ -42,6 +46,22 @@ model User {
   ownerOf  ChatRoom[] @relation("ChatRoomOwned")
 
   @@map("user") // indique que le nom de la table est "user" plutôt que "User"
+}
+
+model Block {
+
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User    @relation("user", fields: [user_id], references: [id])
+  user_id   Int
+
+  blocked   User    @relation("blocked_users", fields: [blocked_id], references: [id])
+  blocked_id Int
+
+  @@unique([user_id, blocked_id])
+  @@map("block")
 }
 
 model Friend {
