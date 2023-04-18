@@ -242,12 +242,12 @@ export class ChatRoomGateway
       data: { muted: { connect: { id: userToMute.id } } },
     });
     this.server.emit('muted', {user: userToMute, room: chatRoom});
-    this.startMuteTimer(userToMute, chatRoom);
+    await this.startMuteTimer(userToMute, chatRoom);
   }
   
-  startMuteTimer(user:User, room:ChatRoom) {
-    let TimeInMs = 120000; // 2min
-    const timer = setInterval(() => {
+  async startMuteTimer(user:User, room:ChatRoom) {
+    let TimeInMs = 12000; // 2min
+    const timer = setInterval(async() => {
       TimeInMs -= 1000;
       this.muted.set(user.id,TimeInMs);
       // console.log('timer ==', this.muted.get(user.id));
@@ -255,6 +255,12 @@ export class ChatRoomGateway
         const seconds = TimeInSec % 60;
         this.muted.set(user.id, seconds);
         if (TimeInMs <= 0) {
+          await this.prismaService.chatRoom.update({
+            where: {id: room.id},
+            data: {
+              muted: {disconnect: {id: user.id}}
+            }
+          });
           this.server.emit('unMuted', {user: user, room: room});
           this.muted.delete(user.id);
           clearInterval(timer);

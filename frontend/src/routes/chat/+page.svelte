@@ -615,19 +615,16 @@
 			console.log('DRI ===',data.room.id )
 			console.log('CUI ===',currentUser.id)
 			console.log('DUI ===',data.user.id)
-			if (currentRoom.id === data.room.id) {
-				fletchMuteBanData();
-			}
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [...messages, {content: `Vous n'etes plus mute'`, senderPseudo: 'server'}]
 				currentUser.status = 0;
+				console.log('my status =============', currentUser.status);
+			}
+			if (currentRoom.id === data.room.id) {
+				await fletchMuteBanData();
 			}
 		});
 		socket.on('stayMute', async(data) => {
-			console.log('CRI ===',currentRoom.id)
-			console.log('DRI ===',data.room.id )
-			console.log('CUI ===',currentUser.id)
-			console.log('DUI ===',data.user.id)
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [...messages, data.message];
 			}
