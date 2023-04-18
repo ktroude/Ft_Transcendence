@@ -14,6 +14,7 @@
 		roomName: '',
 		private: false
 	};
+	let userPseudoInput:any;
 	let messages: any[];
 	let currentRoom: any = {
 		id: 0,
@@ -68,7 +69,7 @@
 
 	function handleInvitInput(event: any) {
 		formData.roomName = (event.target as HTMLInputElement).value;
-		socket.emit('addUser', {pseudo: formData.roomName, room:currentRoom});
+		socket.emit('addUser', { pseudo: formData.roomName, room: currentRoom });
 	}
 
 	function handlePasswordInput(event: any) {
@@ -86,20 +87,30 @@
 
 	function handleMessageInput(event: any) {
 		const message = event.target.value;
-    	const sendButton = document.getElementById('sendMessageButton');
-    	if (sendButton instanceof HTMLButtonElement) {
-    	  	sendButton.disabled = message.trim().length === 0;
+		const sendButton = document.getElementById('sendMessageButton');
+		if (sendButton instanceof HTMLButtonElement) {
+			sendButton.disabled = message.trim().length === 0;
+		}
+	}
+
+	function handleMessageKeyPress(event: any) {
+		if (event.key === 'Enter') {
+			const sendButton = document.getElementById('sendMessageButton');
+			if (sendButton instanceof HTMLButtonElement && !sendButton.disabled) {
+				sendButton.click();
+			}
+		}
+	}
+
+	function handleInvitUserInput() {
+    	console.log('Valeur de l\'input :', userPseudoInput);
+	}
+
+  	function handleInvitKeyPress(event:any) {
+    	if (event.key === 'Enter') {
+      		handleInvitUserInput();
     	}
   	}
-
-	function handleMessageKeyPress(event:any) {
-		if (event.key === 'Enter') {
-    	const sendButton = document.getElementById('sendMessageButton');
-    	if (sendButton instanceof HTMLButtonElement && !sendButton.disabled) {
-        	sendButton.click();
-      	}
-    }
-	}
 
 	async function checkBan(room: any) {
 		const cookies = document.cookie.split(';');
@@ -133,7 +144,8 @@
 
 	async function updateChatRooms(newRoom: ChatRoom) {
 		const isRoomExist = chatRooms.some((room) => room.id === newRoom.id);
-		if (!isRoomExist) { //&& await fletchIsPvAndMember(newRoom) === true) {
+		if (!isRoomExist) {
+			//&& await fletchIsPvAndMember(newRoom) === true) {
 			chatRooms = [...chatRooms, newRoom];
 		}
 	}
@@ -164,9 +176,7 @@
 	}
 
 	function checkPrivate() {
-		chatRooms.forEach(elem => {
-			
-		});
+		chatRooms.forEach((elem) => {});
 	}
 
 	function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
@@ -184,16 +194,15 @@
 				content: messageValue
 			};
 			if (currentUser.status === -1) {
-				socket.emit('checkMute', {room: currentRoom, user: currentUser});
-			}
-			else {
+				socket.emit('checkMute', { room: currentRoom, user: currentUser });
+			} else {
 				socket.emit('sendMessage', data);
 			}
 			messageInput.value = '';
 		}
 	}
 
-	const fletchBlocked = async() => {
+	const fletchBlocked = async () => {
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -205,10 +214,10 @@
 			});
 			const data = await response.json();
 			// gerer data
-		}		
+		}
 	};
 
-	const fletchIsPvAndMember = async(room:ChatRoom) => {
+	const fletchIsPvAndMember = async (room: ChatRoom) => {
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -221,7 +230,7 @@
 			return await response.json();
 		}
 		return false;
-	}
+	};
 
 	const fletchMuteBanData = async () => {
 		const cookies = document.cookie.split(';');
@@ -417,7 +426,6 @@
 	}
 
 	function handleSelect(event: any) {
-		console.log('event ===', event.target.value);
 		if (event.target.value === 'kick') {
 			kick(selectedUser, currentRoom);
 		} else if (event.target.value === 'ban') {
@@ -431,7 +439,7 @@
 		} else if (event.target.value === 'upAdmin') {
 			upadmin(selectedUser, currentRoom);
 		} else if (event.target.value === 'unAdmin') {
-			deUpadmin(selectedUser, currentRoom);	
+			deUpadmin(selectedUser, currentRoom);
 		} else if (event.target.value === 'profile') {
 			showProfile();
 		}
@@ -472,37 +480,31 @@
 	}
 
 	function upadmin(userToUp: any, room: any) {
-		socket.emit('newAdmin', {user: userToUp, room: room});
+		socket.emit('newAdmin', { user: userToUp, room: room });
 		isShown = false;
 	}
 
 	function deUpadmin(userToDowngrade: any, room: any) {
-		socket.emit('unAdminded', {user: userToDowngrade, room: room});
+		socket.emit('unAdminded', { user: userToDowngrade, room: room });
 		isShown = false;
 	}
 
-	function isMember(){
-      const finded = membres?.find((obj:any) => obj?.id === currentUser.id);
-      if (finded)
-        return true;
-      else
-      return false;
-  }
-
 	onMount(async () => {
-		const cookies = document.cookie.split(';');
-		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
-		const access_token = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		const cookies = document?.cookie?.split(';');
+		const accessTokenCookie = cookies?.find((cookie) => cookie?.trim()?.startsWith('access_token='));
+		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
 		socket = io('http://localhost:3000', {
 			extraHeaders: {
 				Authorization: 'Bearer ' + access_token
 			}
 		});
+		if (!access_token) {
+			window.location.pathname = '/';
+		}
 		socket.on('connect', () => {
 			console.log('Connected to server');
 		});
-		socket.on('roomCreated', async(newRoom: ChatRoom) => {
-			console.log('newRoom ==', newRoom)
+		socket.on('roomCreated', async (newRoom: ChatRoom) => {
 			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('returnMessage', (data: any) => {
@@ -519,7 +521,6 @@
 			}
 		});
 		socket.on('newBan', async (data) => {
-			console.log('data ====', data);
 			if (currentUser.id === data.user.id && currentRoom.id === data.room.id) {
 				chatRooms = await fletchChatRoomsData();
 				currentRoom = {
@@ -585,67 +586,84 @@
 				membres = await fletchMembres();
 			}
 		});
-		socket.on('adminAdded', async(data) => {
+		socket.on('adminAdded', async (data) => {
 			if (currentUser.id === data.user.id) {
-				messages = [...messages, {content: `Vous etes maintenant un administrateur de la room ${data.room.name}`, senderPseudo: 'server'}];
+				messages = [
+					...messages,
+					{
+						content: `Vous etes maintenant un administrateur de la room ${data.room.name}`,
+						senderPseudo: 'server'
+					}
+				];
 				if (currentRoom.id === data.room.id) {
 					currentUser.status = 1;
 				}
 			}
 		});
-		socket.on('adminRemoved', async(data) => {
+		socket.on('adminRemoved', async (data) => {
 			if (currentUser.id === data.user.id) {
-				messages = [...messages, {content: `Vous n'etes plus administrateur de la room ${data.room.name}`, senderPseudo: 'server'}];
+				messages = [
+					...messages,
+					{
+						content: `Vous n'etes plus administrateur de la room ${data.room.name}`,
+						senderPseudo: 'server'
+					}
+				];
 				if (currentRoom.id === data.room.id) {
 					currentUser.status = 0;
 				}
 			}
 		});
-		socket.on('muted', async(data) => {
+		socket.on('muted', async (data) => {
 			if (currentRoom.id === data.room.id) {
 				fletchMuteBanData();
 			}
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
-				messages = [...messages, {content: `Vous avez été mute pour 120 sec'`, senderPseudo: 'server'}]
+				messages = [
+					...messages,
+					{ content: `Vous avez été mute pour 120 sec'`, senderPseudo: 'server' }
+				];
 				currentUser.status = -1;
 			}
 		});
-		socket.on('unMuted', async(data) => {
-			console.log('CRI ===',currentRoom.id)
-			console.log('DRI ===',data.room.id )
-			console.log('CUI ===',currentUser.id)
-			console.log('DUI ===',data.user.id)
+		socket.on('unMuted', async (data) => {
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
-				messages = [...messages, {content: `Vous n'etes plus mute'`, senderPseudo: 'server'}]
+				messages = [...messages, { content: `Vous n'etes plus mute'`, senderPseudo: 'server' }];
 				currentUser.status = 0;
-				console.log('my status =============', currentUser.status);
 			}
 			if (currentRoom.id === data.room.id) {
 				await fletchMuteBanData();
 			}
 		});
-		socket.on('stayMute', async(data) => {
+		socket.on('stayMute', async (data) => {
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [...messages, data.message];
 			}
 		});
-		socket.on('UserAdded', async(data) => {
-			if (data.sucess === false && !data.user) {
-				messages = [...messages, {senderPseudo:'server', content:"Cette utilisateur n'existe pas"}]
-			}
-			else if (data.sucess === false && data.user) {
-				messages = [...messages,{senderPseudo:'server', content:"Cette utilisateur est deja membre"} ]
-			}
-			else if (data.sucess === true && data.user) {
+		socket.on('UserAdded', async (data) => {
+			console.log('data ===', data);
+			if (data.sucess === false && !data.userToAdd) {
+				if (currentUser.id === data.user.id) {
+					messages = [
+						...messages,
+						{ senderPseudo: 'server', content: "Cette utilisateur n'existe pas" }
+					];
+				}
+			} else if (data.sucess === false && data.userToAdd) {
+				if (currentUser.id === data.user.id) {
+					messages = [
+						...messages,
+						{ senderPseudo: 'server', content: 'Cette utilisateur est deja membre' }
+					];
+				}
+			} else if (data.sucess === true && data.userToAdd) {
 				if (data.user.id === currentUser.id) {
 					chatRooms = await fletchChatRoomsData();
 				}
 				membres = [...membres, data.user];
 			}
-
 		});
 		chatRooms = await fletchChatRoomsData();
-		console.log('CRS == ', chatRooms);
 		currentUser = await fletchCurrentUserData();
 		if (currentUser.id < 0) {
 			window.location.pathname = '/';
@@ -662,52 +680,72 @@
 <!-- HTML CODE -->
 
 <!-- <h1>Chat</h1> -->
-<h2>Liste des rooms publics:</h2>
-{#if loading === false}
-	<p>Chargement...</p>
-{:else}
-<div class="list-room">
-	{#each chatRooms as chatRoom}
-		{#if chatRoom.private === false}
-				<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom)}
-					>{chatRoom.name}</button
-				>
+<div class='room-list-bloc'>
+	<div class='public-room'>
+		<h2 class='room-title'>Rooms publics</h2>
+		{#if loading === false}
+			<p>Chargement...</p>
+		{:else}
+			{#each chatRooms as chatRoom}
+				{#if chatRoom.private === false}
+					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom)}
+						>{chatRoom.name}</button
+					>
+				{/if}
+			{/each}
 		{/if}
-		{#if chatRoom.private === true}
-				<button class="pv-chatroom-button" on:click={() => handleRoomButton(chatRoom)}
-					>PV {chatRoom.name}</button
-				>
-		{/if}
-	{/each}
-	</div>
-{/if}
+		</div>
 
-<h2>Creer une room:</h2>
-<form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
+	<div class='private-room'>
+		<h2 class='room-title'>Rooms Privées</h2>
+		{#if loading === false}
+			<p>Chargement...</p>
+			{#each chatRooms as chatRoom}
+				{#if chatRoom.private === true}
+					<button class="pv-chatroom-button" on:click={() => handleRoomButton(chatRoom)}
+						>{chatRoom.name}</button
+					>
+				{/if}
+			{/each}
+		{/if}
+	</div>
+
+	<div class='direct-room'>
+		<h2 class='room-title'>Messages Directs</h2>
+
+	</div>
+
+</div>
+
+
+
+<div class='create-room'>
+	<h2>Creer une room:</h2>
+	<form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
 	<label for="roomName">Nom de la salle *</label>
 	<input
-		class="form-input"
-		type="text"
-		id="roomName"
-		name="roomName"
-		on:input={handleNameInput}
-		required
+	class="form-input"
+	type="text"
+	id="roomName"
+	name="roomName"
+	on:input={handleNameInput}
+	required
 	/>
-
+	
 	<label for="password">Mot de passe</label>
 	<input
-		class="form-input"
+	class="form-input"
 		type="password"
 		id="password"
 		name="password"
 		on:input={handlePasswordInput}
-	/>
-
-	<label>
+		/>
+		
+		<label>
 		<input
-			class="form-input"
-			type="checkbox"
-			id="private"
+		class="form-input"
+		type="checkbox"
+		id="private"
 			name="private"
 			on:change={handlePrivateOption}
 		/>
@@ -715,13 +753,14 @@
 	</label>
 	<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
 </form>
+</div>
 
 {#if currentRoom}
 	<div>
 		{#if currentRoom.name.length}
 			<h3>{currentRoom.name}</h3>
 			<button on:click={leaveRoom}>Quitter la room</button>
-			
+			<input class="form-input" on:keypress={handleInvitKeyPress} bind:value={userPseudoInput} />
 			<button on:click={handleInvitInput}>Ajouter un utilisateur </button>
 		{/if}
 	</div>
@@ -749,9 +788,20 @@
 	</div>
 	<div>
 		{#if currentRoom.name.length}
-			<p><input on:input={handleMessageInput} on:keypress={handleMessageKeyPress} class="message-input" type="text" id="message" name="message" /></p>
-			<button id="sendMessageButton"
-				type="submit" disabled
+			<p>
+				<input
+					on:input={handleMessageInput}
+					on:keypress={handleMessageKeyPress}
+					class="message-input"
+					type="text"
+					id="message"
+					name="message"
+				/>
+			</p>
+			<button
+				id="sendMessageButton"
+				type="submit"
+				disabled
 				on:click={(event) => {
 					const messageInput = document.getElementById('message');
 					if (messageInput instanceof HTMLInputElement) {

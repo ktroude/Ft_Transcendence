@@ -8,15 +8,10 @@ import {
 } from '@nestjs/websockets';
 import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { ChatRoom, User } from '@prisma/client';
-import { subscribeOn } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
-import { runInThisContext } from 'vm';
 import { ChatRoomService } from './chatRoom.service';
-import { log } from 'console';
-import { emit } from 'process';
-import { REQUEST_CONTEXT_ID } from '@nestjs/core/router/request/request-constants';
 
 @WebSocketGateway({
   cors: {
@@ -39,7 +34,7 @@ export class ChatRoomGateway
   // nos tableaux de chatrooms et de client (avec le User associé)
   private chatRooms: ChatRoom[] = [];
   private clients: [User, Socket][] = [];
-  private muted= new Map();
+  private muted = new Map();
 
   afterInit(server: any) {
     ('Init done');
@@ -112,7 +107,7 @@ export class ChatRoomGateway
       where: { id: data.roomId }
     });
     if ((await this.chatRoomService.isMuted(user, chatRoom)) === true) {
-      return ;
+      return;
     }
     else {
       const newMessage = await this.chatRoomService.createMessage(data.content, user, chatRoom);
@@ -192,10 +187,10 @@ export class ChatRoomGateway
   ) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.room.id},
+      where: { id: data.room.id },
     });
     const userToUp = await this.prismaService.user.findUnique({
-      where: {id: data.user.id}
+      where: { id: data.user.id }
     });
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
@@ -203,7 +198,7 @@ export class ChatRoomGateway
         admin: { connect: { id: userToUp.id } },
       },
     });
-    this.server.emit('adminAdded', {user: userToUp, room: chatRoom});
+    this.server.emit('adminAdded', { user: userToUp, room: chatRoom });
   }
 
   @SubscribeMessage('unAdminded')
@@ -213,16 +208,16 @@ export class ChatRoomGateway
   ) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.room.id},
+      where: { id: data.room.id },
     });
     const userToUnadmin = await this.prismaService.user.findUnique({
-      where: {id: data.user.id}
+      where: { id: data.user.id }
     });
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
       data: { admin: { disconnect: { id: userToUnadmin.id } } },
     });
-    this.server.emit('adminRemoved', {user: userToUnadmin, room: chatRoom});
+    this.server.emit('adminRemoved', { user: userToUnadmin, room: chatRoom });
   }
 
   @SubscribeMessage('newMute')
@@ -232,39 +227,38 @@ export class ChatRoomGateway
   ) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.room.id},
+      where: { id: data.room.id },
     });
     const userToMute = await this.prismaService.user.findUnique({
-      where: {id: data.user.id}
+      where: { id: data.user.id }
     });
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
       data: { muted: { connect: { id: userToMute.id } } },
     });
-    this.server.emit('muted', {user: userToMute, room: chatRoom});
+    this.server.emit('muted', { user: userToMute, room: chatRoom });
     await this.startMuteTimer(userToMute, chatRoom);
   }
-  
-  async startMuteTimer(user:User, room:ChatRoom) {
+
+  async startMuteTimer(user: User, room: ChatRoom) {
     let TimeInMs = 12000; // 2min
-    const timer = setInterval(async() => {
+    const timer = setInterval(async () => {
       TimeInMs -= 1000;
-      this.muted.set(user.id,TimeInMs);
-      // console.log('timer ==', this.muted.get(user.id));
+      this.muted.set(user.id, TimeInMs);
       const TimeInSec = Math.ceil(TimeInMs / 1000);
-        const seconds = TimeInSec % 60;
-        this.muted.set(user.id, seconds);
-        if (TimeInMs <= 0) {
-          await this.prismaService.chatRoom.update({
-            where: {id: room.id},
-            data: {
-              muted: {disconnect: {id: user.id}}
-            }
-          });
-          this.server.emit('unMuted', {user: user, room: room});
-          this.muted.delete(user.id);
-          clearInterval(timer);
-        }
+      const seconds = TimeInSec % 60;
+      this.muted.set(user.id, seconds);
+      if (TimeInMs <= 0) {
+        await this.prismaService.chatRoom.update({
+          where: { id: room.id },
+          data: {
+            muted: { disconnect: { id: user.id } }
+          }
+        });
+        this.server.emit('unMuted', { user: user, room: room });
+        this.muted.delete(user.id);
+        clearInterval(timer);
+      }
     }, 1000); // chaque sec
   }
 
@@ -273,20 +267,19 @@ export class ChatRoomGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-      const user = this.clients.find(([, socket]) => socket === client)?.[0];
-      const chatRoom = await this.prismaService.chatRoom.findUnique({
-        where: {id: data.room.id},
-      });
-      console.log('timer ==', this.muted.get(user.id));
-      if (await this.chatRoomService.isMuted(user, chatRoom) === true){
-        const data = {
-          message: {senderPseudo: 'server', content:`Vous etes encore mute pour ${this.muted.get(user.id).toString()} secondes`},
-          user: user,
-          room: chatRoom,
-        }
-        this.server.emit('stayMute', data);
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const chatRoom = await this.prismaService.chatRoom.findUnique({
+      where: { id: data.room.id },
+    });
+    if (await this.chatRoomService.isMuted(user, chatRoom) === true) {
+      const data = {
+        message: { senderPseudo: 'server', content: `Vous etes encore mute pour ${this.muted.get(user.id).toString()} secondes` },
+        user: user,
+        room: chatRoom,
       }
+      this.server.emit('stayMute', data);
     }
+  }
 
   @SubscribeMessage('unMuted')
   async handleunMuted(
@@ -295,17 +288,17 @@ export class ChatRoomGateway
   ) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.room.id},
+      where: { id: data.room.id },
     });
     const userToMute = await this.prismaService.user.findUnique({
-      where: {id: data.user.id}
+      where: { id: data.user.id }
     });
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
       data: { muted: { disconnect: { id: userToMute.id } } },
     });
-    this.server.emit('unMuted', {user: userToMute, room: chatRoom});
-    }
+    this.server.emit('unMuted', { user: userToMute, room: chatRoom });
+  }
 
   @SubscribeMessage('newBan')
   async handleNewBan(
@@ -314,10 +307,10 @@ export class ChatRoomGateway
   ) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.room.id},
+      where: { id: data.room.id },
     });
     const userToBan = await this.prismaService.user.findUnique({
-      where: {id: data.user.id}
+      where: { id: data.user.id }
     });
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
@@ -342,10 +335,10 @@ export class ChatRoomGateway
   ) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.room.id},
+      where: { id: data.room.id },
     });
     const userToUnban = await this.prismaService.user.findUnique({
-      where: {id: data.user.id}
+      where: { id: data.user.id }
     });
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
@@ -374,7 +367,7 @@ export class ChatRoomGateway
           members: { disconnect: { id: toKick.id } },
         }
       });
-      this.server.emit('kicked', {user: toKick, room: roomToFree});
+      this.server.emit('kicked', { user: toKick, room: roomToFree });
     }
   }
 
@@ -437,31 +430,32 @@ export class ChatRoomGateway
   async handleAddUser(client: Socket, data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: {id: data.room.id}
+      where: { id: data.room.id }
     })
     const userToAdd = await this.prismaService.user.findUnique({
       where: { pseudo: data.pseudo },
     });
+    console.log('userToAdd ==', userToAdd);
     if (!userToAdd) {
-      this.server.emit('UserAdded', {sucess: false, user:null})
-      return ;
+      this.server.emit('UserAdded', { sucess: false, userToAdd: null, user:user })
+      return;
     }
     else {
       await this.prismaService.chatRoom.update({
-        where: {id: data.room.id},
+        where: { id: data.room.id },
         data: {
-          members: {connect: {id:userToAdd.id}}
+          members: { connect: { id: userToAdd.id } }
         }
       });
-      if (await this.chatRoomService.isMember(userToAdd, chatRoom) === true){
-        this.server.emit('UserAdded', {sucess: false, user:userToAdd});
-        return ;
+      if (await this.chatRoomService.isMember(userToAdd, chatRoom) === true) {
+        this.server.emit('UserAdded', { sucess: false, userToAdd: userToAdd, user:user });
+        return;
       }
       else {
         const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a rejoind la room`,
-        { id: 0, pseudo: 'server' }, { id: data.id });
+          { id: 0, pseudo: 'server' }, { id: data.id });
         this.server.emit('newMessage', toSend);
-        this.server.emit('UserAdded', {sucess: true, user:userToAdd})
+        this.server.emit('UserAdded', { sucess: true, user: userToAdd })
       }
     }
   }
