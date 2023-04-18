@@ -63,19 +63,33 @@ export class BlockService {
 					username: usernameBlock,
 				}
 			});
-		const isBlocked = await this.existingBlock(user.id, userBlock.id);
+		const isBlocked = await this.existingBlock(pseudo, usernameBlock);
 		if (isBlocked == false)
 			return null;
 		await this.unblock(user.id, userBlock.id);
 		return;
     }
        
-    async existingBlock(userId: number, blockId: number): Promise<Boolean> {
-        const block = await this.prisma.block.findUnique({
+    async existingBlock(pseudo: string, usernameBlock: string): Promise<Boolean> {
+		const user = await this.prisma.user.findUnique({
+            where: {
+                pseudo: pseudo,
+            }
+        });
+        if (!user)
+            return false;
+        if (user.username === usernameBlock)
+            return false;
+		const userBlock = await this.prisma.user.findUnique({
+			where: {
+				username: usernameBlock,
+			}
+		});
+		const block = await this.prisma.block.findUnique({
             where: {
                 user_id_blocked_id: {
-                    user_id: userId,
-                    blocked_id: blockId
+                    user_id: user.id,
+                    blocked_id: userBlock.id
                 }
             }
         });
@@ -114,7 +128,7 @@ export class BlockService {
         });
         if (!userBlock)
             return null;
-        if (await this.existingBlock(user.id, userBlock.id))
+        if (await this.existingBlock(pseudo, usernameBlock))
             return null;
         await this.createBlock(user.id, userBlock.id);
         return user;

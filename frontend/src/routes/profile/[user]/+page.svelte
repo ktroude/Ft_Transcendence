@@ -117,10 +117,10 @@
 		<div class="main_box">
 			<div class="username_bloc">
 				<h1>{user?.username}</h1>
-				{#if user?.username != currentUser}
+				{#if user?.username != currentUser && is_blocked === false}
 					<button class="block_button" on:click={() => block(realUser, user.pseudo)}>X</button>
 				{/if}
-				{#if user?.username != currentUser}
+				{#if user?.username != currentUser && is_blocked === true}
 					<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>O</button>
 				{/if}
 			</div>
@@ -163,46 +163,41 @@
 		const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
 		imageURL = URL.createObjectURL(blob); // Create a URL for the blob
 	}
-
+	
 	async function block(realUser, blockerUser) {
 		await fetchData();
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-            const response = await fetch(`http://localhost:3000/users/${realUser}/block`, {
-                method: 'PUT',
+			const response = await fetch(`http://localhost:3000/users/${realUser}/block`, {
+				method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
+					'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
                 },
                 body: JSON.stringify({block: blockerUser})
             });
+			is_blocked = true;
         } else
 			console.log('Error: Could not delete friend');
-
-		// console.log(realUser, 'is blocking', user.pseudo);
     }
 	
-    // async function checkBlocked() {
-	// 	const accessToken = await fetchAccessToken();
-	// 	user = await fetchData();
-    //     if (accessToken) {
-    //         const response = await fetch(`http://localhost:3000/users/${user.pseudo}/deletefriend`, {
-    //             method: 'PUT',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': `Bearer ${accessToken}`
-    //             },
-    //             body: JSON.stringify({ block: user.pseudo })
-    //         });
-    //         if (response.ok)
-	// 			blockedusers = blockedusers.filter(friend => friend !== user.pseudo);
-    //         else
-    //             console.log('Error: Could not delete friend');
-    //     } else
-    //         console.log('Error: Could not delete friend');
-    // }
-
-
+	async function checkBlocked(realUser, blockerUser) {
+	console.log("zeubi", realUser, blockerUser);
+    const accessToken = await fetchAccessToken();
+    const url = `http://localhost:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+    if (response.ok) {
+        is_blocked = true;
+    } else {
+        is_blocked = false;
+    }
+    return is_blocked;
+}
 
 	async function unblock(realUser, blockerUser) {
 		await fetchData();
@@ -216,15 +211,16 @@
                 },
                 body: JSON.stringify({block: blockerUser})
             });
+			is_blocked = false;
         } else
 			console.log('Error: Could not delete friend');
 
 		// console.log(realUser, 'is blocking', user.pseudo);
     }
 
-
 	let realUser = ''; 
 	let currentUser = ''; 
+	let is_blocked: any;
 	
 	async function loadpage() {
 		user = await fetchData();
@@ -237,11 +233,11 @@
 		{
 			realUser = user.pseudo;
 			user = await fetchDataOfUser($page.params.user);
+			is_blocked = checkBlocked(realUser, user.pseudo);
 			getImageURL();
 		}
 	}
 	onMount(() => {
-		// let is_blocked = checkBlocked();
 		loadpage();
 	});
 

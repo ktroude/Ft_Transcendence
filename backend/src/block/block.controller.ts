@@ -2,6 +2,7 @@ import { Controller, Get, UseGuards, Request, Put, Param, Body } from '@nestjs/c
 import { JwtGuard } from 'src/auth/guard';
 import { User } from '@prisma/client';
 import { BlockService } from './block.service';
+import { Query } from '@nestjs/common';
 
 @UseGuards(JwtGuard)
 @Controller('users')
@@ -12,7 +13,6 @@ export class BlockController {
     @Put(':pseudo/block')
     async blockUser(@Param('pseudo') pseudo: string,@Body() body:{block: string}): Promise<User>
     {
-		console.log(pseudo, "is blockingoto", body.block);
         return this.blockService.blockUser(pseudo, body.block);
     }
 	
@@ -26,7 +26,13 @@ export class BlockController {
     @Put(':pseudo/deleteBlock')
     async deleteBlock(@Param('pseudo') pseudo: string, @Body() body:{block: string}): Promise<User>
     {
-		console.log(pseudo, "is DEBLOCKING", body.block);
         return this.blockService.deleteBlock(pseudo, body.block);
     }
+
+	@UseGuards(JwtGuard)
+	@Get(':pseudo/checkBlock')
+	async checkBlock(@Param('pseudo') pseudo: string, @Query('block') block: string): Promise<Boolean>
+	{
+		return this.blockService.existingBlock(pseudo, block);
+	}
 }   
