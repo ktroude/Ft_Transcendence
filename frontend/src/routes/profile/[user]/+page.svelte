@@ -88,7 +88,6 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		background:green;
 	}
 </style>
 
@@ -109,7 +108,7 @@
 			<div class="username_bloc">
 				<h1>{user?.username}</h1>
 				{#if user?.username != currentUser}
-					<button class="block_button" on:click={() => block()}>X</button>
+					<button class="block_button" on:click={() => block(realUser, user.pseudo)}>X</button>
 				{/if}
 			</div>
 		<h3>{user?.firstname} {user?.lastname}</h3>
@@ -151,9 +150,24 @@
 		imageURL = URL.createObjectURL(blob); // Create a URL for the blob
 	}
 
-	function block() {
-		console.log(realUser, 'is blocking', user.pseudo);
-	}
+	async function block(realUser, blockerUser) {
+		await fetchData();
+		const accessToken = await fetchAccessToken();
+		if (accessToken) {
+            const response = await fetch(`http://localhost:3000/users/${realUser}/block`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({blockerUser: blockerUser})
+            });
+        } else
+			console.log('Error: Could not delete friend');
+
+		// console.log(realUser, 'is blocking', user.pseudo);
+    }
+
 
 	let realUser = ''; 
 	let currentUser = ''; 
@@ -173,7 +187,6 @@
 		}
 	}
 	onMount(() => {
-
 		loadpage();
 	});
 

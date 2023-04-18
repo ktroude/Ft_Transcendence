@@ -333,7 +333,6 @@
     }
 
     const handleAddFriend = async () => {
-        await fetchData();
         if (!friendNameAdd)
             return;
         const accessToken = await fetchAccessToken();
@@ -344,7 +343,7 @@
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
                 },
-                body: JSON.stringify({ friend: friendNameAdd })
+                body: JSON.stringify({friend: friendNameAdd})
             });
             if (response.ok) {
                 friends = await fetchFriend(user.pseudo);

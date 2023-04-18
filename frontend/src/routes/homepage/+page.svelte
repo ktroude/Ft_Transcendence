@@ -50,8 +50,6 @@
 	<div class="container">
 		<h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
 	</div>
-  <button on:click={sendMessage}>Send message</button>
-
 </body>
 
 <script lang="ts">
