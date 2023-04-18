@@ -131,9 +131,9 @@
 		}
 	}
 
-	function updateChatRooms(newRoom: ChatRoom) {
+	async function updateChatRooms(newRoom: ChatRoom) {
 		const isRoomExist = chatRooms.some((room) => room.id === newRoom.id);
-		if (!isRoomExist) {
+		if (!isRoomExist) { //&& await fletchIsPvAndMember(newRoom) === true) {
 			chatRooms = [...chatRooms, newRoom];
 		}
 	}
@@ -207,6 +207,21 @@
 			// gerer data
 		}		
 	};
+
+	const fletchIsPvAndMember = async(room:ChatRoom) => {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(`http://localhost:3000/chat/IsPvAndMember?room=${room.id}`, {
+				headers
+			});
+			return await response.json();
+		}
+		return false;
+	}
 
 	const fletchMuteBanData = async () => {
 		const cookies = document.cookie.split(';');
@@ -467,6 +482,14 @@
 		isShown = false;
 	}
 
+	function isMember(){
+      const finded = membres?.find((obj:any) => obj?.id === currentUser.id);
+      if (finded)
+        return true;
+      else
+      return false;
+  }
+
 	onMount(async () => {
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
@@ -479,8 +502,9 @@
 		socket.on('connect', () => {
 			console.log('Connected to server');
 		});
-		socket.on('roomCreated', (newRoom: ChatRoom) => {
-			updateChatRooms(newRoom);
+		socket.on('roomCreated', async(newRoom: ChatRoom) => {
+			console.log('newRoom ==', newRoom)
+			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('returnMessage', (data: any) => {
 			if (currentUser.id === data.to) messages = data.msg;

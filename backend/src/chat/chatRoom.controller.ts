@@ -4,6 +4,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { JwtGuard } from "src/auth/guard";
 import { get } from "http";
+import { RouterModule } from "@nestjs/core";
 
 @Controller('chat')
 export class ChatRoomController {
@@ -17,21 +18,27 @@ export class ChatRoomController {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         let rooms = await this.chatRoomService.getAllChatRoom();
-        const array = [];
-        rooms.forEach(async elem => {
-            if (elem.private == false)
-            array.push(elem);
-            if (elem.private == true && await this.chatRoomService.isMember(user, elem) === true)
-            array.push(elem);
-        });
-        const ret = array.map(elem => ({
-            name: elem.name,
-            private: elem.private,
-            id: elem.id,
-            ownerId: elem.ownerId,
-        }));
-        return ret;
-    }
+        let array = [];
+        for (const elem of rooms) {
+            const isMember = await this.chatRoomService.isMember(user, elem);
+            console.log('ISMEMBER ===', isMember)
+            console.log('elem ==', elem);
+            if (elem.private == false) {
+                array.push(elem);
+            }
+            if (elem.private == true && isMember === true) {
+                array.push(elem);
+            }
+        }
+        await Promise.all(array);
+        // const ret = array.map(elem => ({
+        //     name: elem.name,
+        //     private: elem.private,
+        //     id: elem.id,
+        //     ownerId: elem.ownerId,
+            console.log('arrrrray =', array);
+            return array;
+        }
 
     @Get('getMuteBan')
     async handleGetMuted(@Headers('Authorization') cookie: string, @Query('code') id) {
@@ -162,4 +169,25 @@ export class ChatRoomController {
         });
         return room.members;
     }
+
+    @Get('IsPvAndMember')
+    async handleIsPvAndMember(@Headers('Authorization') cookie: string, @Query('room') roomId) {
+        const token = cookie.split(' ')[1];
+        const user = await this.userService.decodeToken(token);
+        const room = await this.prisma.chatRoom.findUnique({
+            where: {id: parseInt(roomId, 10)},
+            select: {members: true}
+        });
+        const check = room.members.forEach(elem => {
+            console.log('elem ==', elem.id)
+            console.log('user ==', user.id)
+            if (elem.id === user.id) {
+                console.log('je suis ici meme')    
+                return true;
+            }
+            return false;
+        });
+        return check;
+    }
+
 }

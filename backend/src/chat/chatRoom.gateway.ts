@@ -70,7 +70,6 @@ export class ChatRoomGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
     let newChatRoom = await this.prismaService.chatRoom.create({
       data: {
@@ -80,7 +79,7 @@ export class ChatRoomGateway
         ownerId: user.id,
       },
     });
-    newChatRoom = await this.prismaService.chatRoom.update({
+    await this.prismaService.chatRoom.update({
       where: { id: newChatRoom.id },
       data: {
         members: { connect: { id: user.id } },
