@@ -74,7 +74,7 @@
 	.friendlist_box{
 		padding:5px;
 		width:15%;
-		height:100vh;
+		height:50vh;
 		text-align: center;
 	}
 
@@ -181,6 +181,12 @@
 		align-items: center;
 
 	}
+	.search_profile{
+		padding:5px;
+		height:50vh;
+		text-align: center;
+		background:red;
+	}
 </style>
 
 <body>
@@ -221,6 +227,9 @@
 						</li>
 					  {/each}
 					</ul>
+				  </div>
+				  <div class="search_profile">
+					<h1>Test</h1>
 				  </div>
 			</div>
 	</div>
@@ -324,7 +333,6 @@
     }
 
     const handleAddFriend = async () => {
-        await fetchData();
         if (!friendNameAdd)
             return;
         const accessToken = await fetchAccessToken();
@@ -335,7 +343,7 @@
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
                 },
-                body: JSON.stringify({ friend: friendNameAdd })
+                body: JSON.stringify({friend: friendNameAdd})
             });
             if (response.ok) {
                 friends = await fetchFriend(user.pseudo);

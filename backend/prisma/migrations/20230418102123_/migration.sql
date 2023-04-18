@@ -12,9 +12,20 @@ CREATE TABLE "user" (
     "losses" INTEGER NOT NULL DEFAULT 0,
     "rank" INTEGER NOT NULL DEFAULT 0,
     "level" INTEGER NOT NULL DEFAULT 0,
-    "status" INTEGER NOT NULL DEFAULT 0,
+    "connected" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "block" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "blocked_id" INTEGER NOT NULL,
+
+    CONSTRAINT "block_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -93,6 +104,9 @@ CREATE UNIQUE INDEX "user_pseudo_key" ON "user"("pseudo");
 CREATE UNIQUE INDEX "user_username_key" ON "user"("username");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "block_user_id_blocked_id_key" ON "block"("user_id", "blocked_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "friend_user_id_friend_id_key" ON "friend"("user_id", "friend_id");
 
 -- CreateIndex
@@ -118,6 +132,12 @@ CREATE UNIQUE INDEX "_ChatRoomBanned_AB_unique" ON "_ChatRoomBanned"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_ChatRoomBanned_B_index" ON "_ChatRoomBanned"("B");
+
+-- AddForeignKey
+ALTER TABLE "block" ADD CONSTRAINT "block_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "block" ADD CONSTRAINT "block_blocked_id_fkey" FOREIGN KEY ("blocked_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "friend" ADD CONSTRAINT "friend_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
