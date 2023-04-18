@@ -776,7 +776,9 @@
 			{#each messages as msg}
 			<p>
 				{#if msg.senderPseudo == 'server'}
-				{msg.senderPseudo}: {msg.content}
+					<button class='server-message'>
+						{msg.senderPseudo}
+					</button>
 				{/if}
 				{#if msg.senderPseudo != 'server'}
 				<button
@@ -785,10 +787,10 @@
 				>
 				{msg.senderPseudo}
 			</button>
+			{/if}
 			<span class='message'> 
 				{msg.content}
 			</span>
-			{/if}
 		</p>
 			{/each}
 			{/if}

@@ -56,6 +56,8 @@ border-radius: 10px;
   font-size: 16px;
   border-radius: 4px;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pv-chatroom-button {
@@ -176,8 +178,10 @@ border-radius: 10px;
   max-height: 400px;
   overflow: hidden;
   display: inline-block;
-  width: calc(100% - 600px); /* ajustez la valeur en fonction de la largeur de vos autres éléments */
+  width: 800px; 
   white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-left: 50px;
 }
 
 .leave-chat {
@@ -246,7 +250,8 @@ border-radius: 10px;
   cursor: pointer;
 }
 
-.pseudo-button-message {
+.server-message {
+  margin-left: 5px;
   overflow: hidden;
   max-width: 100px;
   height: 25px;
@@ -256,7 +261,23 @@ border-radius: 10px;
   border: none;
   font-size: 16px;
   font-family: 'futura';
-  border-radius: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.pseudo-button-message {
+  margin-left: 5px;
+  overflow: hidden;
+  max-width: 100px;
+  height: 25px;
+  line-height: 25px;
+  background-color: #4d4d4d;
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  font-family: 'futura';
+  border-radius: 8px;
   cursor: pointer;
   text-align: center;
 }
