@@ -7,9 +7,10 @@ import { PictureModule } from './picture/picture.module';
 import { UserModule } from './user/user.module';
 import { FriendModule } from './friend/friend.module';
 import { WebsocketModule } from './websocket/websocket.module';
+import { BlockModule } from './block/block.module';
 
 @Module({
-  imports: [AuthModule, ChatRoomModule, UserModule, PictureModule, FriendModule, WebsocketModule],
+  imports: [AuthModule, ChatRoomModule, UserModule, PictureModule, FriendModule, WebsocketModule, BlockModule],
   controllers: [AppController],
   providers: [AppService],
 })

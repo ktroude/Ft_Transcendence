@@ -65,18 +65,18 @@ export class FriendService{
 
     // Adding friend
     async addFriend(pseudo: string, usernameFriend: string): Promise<User> {
-		const user = await this.prisma.user.findUnique({
-			where: {
-				pseudo: pseudo,
-			}
-		});
-		if (!user)
-			return null;
+        const user = await this.prisma.user.findUnique({
+            where: {
+                pseudo: pseudo,
+            }
+        });
+        if (!user)
+            return null;
         if (user.username == usernameFriend)
-			return null;
+            return null;
         const exist = await this.userExist(usernameFriend);
         if (!exist)
-		return null;
+            return null;
         const friend = await this.prisma.user.findUnique({
             where: {
                 username: usernameFriend,
