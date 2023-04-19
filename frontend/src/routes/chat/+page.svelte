@@ -34,6 +34,7 @@
 	let membres: any = [];
 	let blocked: any = [];
 	let alert:boolean = false;
+	let passwordInput:boolean = false;
 
 	// INTERFACES
 
@@ -47,6 +48,7 @@
 		private: boolean;
 		id: number;
 		ownerId: number;
+		password: boolean;
 	}
 
 	interface User {
@@ -104,6 +106,16 @@
 		}
 	}
 
+	function handlePasswordInputKeyDown(event: any, room:ChatRoom) {
+		if (event.key === 'Enter') {
+    		const value = event.target.value;
+			handleRoomButton(room, value);
+			passwordInput = false;
+		}
+	}
+
+	
+
 	function handleInvitUserInput() {
     	console.log('Valeur de l\'input :', userPseudoInput);
 	}
@@ -144,6 +156,10 @@
 		}
 	}
 
+	function displayInputPassword() {
+		passwordInput = true;
+	}
+
 	async function updateChatRooms(newRoom: ChatRoom) {
 		const isRoomExist = chatRooms.some((room) => room.id === newRoom.id);
 		if (!isRoomExist) {
@@ -152,7 +168,7 @@
 		}
 	}
 
-	async function handleRoomButton(room: ChatRoom) {
+	async function handleRoomButton(room: ChatRoom, pw: any) {
 		if ((await checkBan(room)) === true) {
 			messages = [];
 			messages = [
@@ -167,6 +183,7 @@
 		currentRoom = room;
 		if (room?.id) messages = await fletchMessageOfRoom(room.id);
 		else messages = [];
+
 		socket.emit('getMessage', room);
 		socket.emit('getUser', room);
 		socket.emit('joinRoom', room);
@@ -681,6 +698,7 @@
 		}
 		checkFormValidity();
 		loading = true;
+		console.log('chatroomz ==', chatRooms);
 	});
 </script>
 
@@ -698,10 +716,18 @@
 			<p>Chargement...</p>
 		{:else}
 			{#each chatRooms as chatRoom}
-				{#if chatRoom.private === false}
-					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom)}
+				{#if chatRoom.private === false && chatRoom.password == false}
+					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
 						>{chatRoom.name}</button
 					>
+				{/if}
+				{#if chatRoom.private === false && chatRoom.password == false}
+					<button class="chatroom-button" on:click={() => displayInputPassword()}
+						>{chatRoom.name}</button
+					>
+					{#if passwordInput == true}
+						<input type="text" on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}>
+					{/if}
 				{/if}
 			{/each}
 		{/if}
@@ -712,8 +738,8 @@
 		{#if loading === false}
 			<p>Chargement...</p>
 			{#each chatRooms as chatRoom}
-				{#if chatRoom.private === true}
-					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom)}
+			{#if chatRoom.private === true}
+					<button class="pv-chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
 						>{chatRoom.name}</button
 					>
 				{/if}

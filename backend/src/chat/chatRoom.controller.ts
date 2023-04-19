@@ -17,12 +17,14 @@ export class ChatRoomController {
         console.log("getAllChatRoom");
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
-        let rooms = await this.chatRoomService.getAllChatRoom();
+        let rooms:any = await this.chatRoomService.getAllChatRoom();
         let array = [];
-        for (const elem of rooms) {
+        for (let elem of rooms) {
             const isMember = await this.chatRoomService.isMember(user, elem);
-            console.log('ISMEMBER ===', isMember)
-            console.log('elem ==', elem);
+            if (elem.password.length > 0)
+                elem.password = true;
+            else
+                elem.password = false;
             if (elem.private == false) {
                 array.push(elem);
             }

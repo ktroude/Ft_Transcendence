@@ -53,7 +53,7 @@ export class ChatRoomService {
         return false;
   }
 
-  async isMember(user: User, chatRoom: ChatRoom): Promise<boolean> {
+  async isMember(user: User, chatRoom: any): Promise<boolean> {
     const isMember = await this.prisma.chatRoom
       .findUnique({ where: { id: chatRoom.id } })
       .members({ where: { id: user.id } })
