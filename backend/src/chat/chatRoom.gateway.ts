@@ -12,6 +12,8 @@ import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { ChatRoomService } from './chatRoom.service';
+import * as bcrypt from 'bcryptjs'
+
 
 @WebSocketGateway({
   cors: {
@@ -66,10 +68,11 @@ export class ChatRoomGateway
     @MessageBody() data: any,
   ) {
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
-    let newChatRoom = await this.prismaService.chatRoom.create({
+    const password = data.password.length ? bcrypt.hashSync(data.password) : '';
+      let newChatRoom = await this.prismaService.chatRoom.create({
       data: {
         name: data.name,
-        password: data.password,
+        password: password,
         private: data.private,
         ownerId: user.id,
       },
@@ -412,7 +415,10 @@ export class ChatRoomGateway
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const toCheck = await this.prismaService.chatRoom.findUnique({
       where: { id: data.id },
-      select: { members: true },
+      select: {
+        members: true,
+        password:true,   
+      },
     })
     const isMember = toCheck.members.some(member => member.id === user.id);
     await this.prismaService.chatRoom.update({
@@ -420,6 +426,12 @@ export class ChatRoomGateway
       data: { members: { connect: { id: user.id } } },
     });
     if (!isMember) {
+      if (toCheck.password.length) {
+        if (bcrypt.hashSync(data.password) !== toCheck.password) {
+          this.server.emit('wrongPW',{room: toCheck, user: user});
+          return ;
+        }
+      }
       const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a rejoind la room`,
         { id: 0, pseudo: 'server' }, { id: data.id });
       this.server.emit('newMessage', toSend);
