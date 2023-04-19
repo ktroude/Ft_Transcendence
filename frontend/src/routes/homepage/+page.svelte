@@ -37,20 +37,15 @@
         firstName: string;
         lastName: string;
     }
-    
-	async function getSocket()
-	{
+
+    onMount(async function() {
+		user = await fetchData();
 		const socket = io('http://localhost:3000');
 		socket.on('connect', async function() {
 			console.log('connected');
 			
 			socket.emit('userConnected', { userId: user.id });
 		});
-	}
-
-    onMount(async function() {
-		user = await fetchData();
-		await getSocket();
 	});
 
 </script>
