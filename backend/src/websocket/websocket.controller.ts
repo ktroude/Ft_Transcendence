@@ -18,7 +18,6 @@ export class WebsocketController {
 	@Get('getClient')
 	async get()
 	{
-		console.log("CONTROLLER:", this.websocketGateway.getClient());
 		return this.websocketGateway.getClient();
 	}
 }

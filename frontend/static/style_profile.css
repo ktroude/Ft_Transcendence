@@ -177,6 +177,7 @@ input[type="text"] {
 /* <!-- ****************************** -->
    <!-- ***********  GAME  *********** -->
    <!-- ****************************** --> */
+
 .main_game{
 	margin:0px;
 	padding:0px;
@@ -240,6 +241,8 @@ input[type="text"] {
 	align-items: center;
 	text-align: center;
 	list-style: none;
+	display: flex;
+	flex-direction: column;
 }
 .ul_friends:hover{
 	cursor: pointer;
@@ -268,7 +271,7 @@ input[type="text"] {
 .accept_invite{
 	background:black;
 	color:rgb(92, 255, 47);
-	width: 20px;
+	width: 10px;
 	height: 20px;
 	margin: 5px;
 	font-size: 16px;
@@ -277,6 +280,11 @@ input[type="text"] {
 	display: flex; 
 	justify-content: center;
 	align-items: center;
+}
+.accept_invite:hover{
+	color:green;
+	background: white;
+	outline:2px solid greenyellow;
 }
 .deny_invite{
 	color:red;
@@ -327,4 +335,25 @@ input[type="text"] {
 }
 .search_button:hover{
 	transform: rotate(-10deg)
+}
+.connected_users_bloc{
+	border-top: 1px solid black;
+	padding:5px;
+	height: auto;
+	text-align: center;
+	margin: 0;
+}
+.green_dot{
+	border-radius: 100%;
+	background-color: greenyellow;
+	width:8px;
+	height:8px;
+	margin: 4px;
+}
+.friend_line{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	text-align: center;
+	margin: 2px;
 }
