@@ -8,8 +8,10 @@
 	font-family: 'Roboto', sans-serif;
 	margin:0px;
 	padding:0px;
+	
 }
 body{
+	overflow: hidden;
 	margin:0px;
 	padding:0px;
 	width: 100vw;
@@ -187,7 +189,6 @@ input[type="text"] {
 	padding:5px;
 	height:100%;
 	width:15%;
-	background: red;
 	text-align: center;
 }
 .game_box{
@@ -201,7 +202,6 @@ input[type="text"] {
 	width:15%;
 	height:50%;
 	text-align: center;
-	background: blueviolet;
 }
 .game_navbar{
 	height:50px;
@@ -229,9 +229,11 @@ input[type="text"] {
 .input_friend{
 	background:rgb(174, 174, 174);
 	border:none;
+	margin: 0;
 	border-radius: 3px;
-	height:20px;
-	font-size: 20px;
+	height:10px;
+	padding: 0;
+	font-size: 0;
 	width:200px;
 }
 .ul_friends{
@@ -244,7 +246,7 @@ input[type="text"] {
 }
 .addfriend_button {
 	width: 20px;
-	height: 20px;
+	height: 30px;
 	margin: 5px;
 	font-size: 15px;
 	color:black;
@@ -294,25 +296,21 @@ input[type="text"] {
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
-	background: pink;
 }
 .search_profile{
 	border-top: 1px solid black;
 	padding:5px;
 	height: auto;
 	text-align: center;
-	background: blueviolet;
 	margin: 0;
 }
 .friend-list{
 	height:100%;
-	background: greenyellow;
 }
 .search_bloc{
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	background-color: blue;
 }
 .search_button{
 	width: 20px;
