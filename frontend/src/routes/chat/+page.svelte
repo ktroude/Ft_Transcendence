@@ -33,6 +33,8 @@
 	let banned: any = [];
 	let membres: any = [];
 	let blocked: any = [];
+	let alert:boolean = false;
+
 	// INTERFACES
 
 	interface Message {
@@ -177,6 +179,10 @@
 
 	function checkPrivate() {
 		chatRooms.forEach((elem) => {});
+	}
+
+	function closeAlert() {
+		alert = false;
 	}
 
 	function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
@@ -663,6 +669,11 @@
 				membres = [...membres, data.user];
 			}
 		});
+		socket.on('wrongPW', async(data) => {
+			if (currentUser.id == data.user.id) {
+				alert = true;
+			}
+		})
 		chatRooms = await fletchChatRoomsData();
 		currentUser = await fletchCurrentUserData();
 		if (currentUser.id < 0) {
@@ -756,6 +767,13 @@
 	<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
 </form>
 </div>
+
+{#if alert==true}
+<alert>
+	Mot de passe incorect
+	<button  on:click={closeAlert}> OK </button>
+</alert>
+{/if}
 
 {#if currentRoom}
 	<div class='room-bandeau'>
