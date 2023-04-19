@@ -1,220 +1,10 @@
-<style>
+<svelte:head>
+	<link rel="stylesheet" href="/style_profile.css" />
+</svelte:head>
 
-	*{
-		font-family: 'Roboto', sans-serif;
-		margin:0px;
-		padding:0px;
-	}
-
-	body {
-		margin: 0;
-		padding:0px;
-		height: 100vh;
-		width:100vw;
-		overflow: hidden;
-	}
-
-	button {
-		display: block;
-		margin: 0 auto;
-		padding: 10px 20px;
-		background-color: #000000;
-		color: #fff;
-		width:120px;
-		height:40px;
-		border-radius: 5px;
-		font-size: 16px;
-		cursor: pointer;
-		margin: auto;
-	}
-
-	.button_nav {
-		display: block;
-		margin: 0 auto;
-		padding: 10px 20px;
-		background-color: transparent;
-		border: white;
-		color:rgb(146, 146, 146);
-		border: none;
-		width:120px;
-		height:40px;
-		border-radius: 5px;
-		font-size: 20px;
-		cursor: pointer;
-		margin: auto;
-	}
-
-	.button_nav:hover {
-		color:white;
-		font-size: 22px;
-	}
-
-	.main_game{
-		margin:0px;
-		padding:0px;
-		height:100vh;
-		width:100vw;
-		display: flex;
-		flex-direction: row;
-	}
-
-	.historic_box{
-		padding:5px;
-		height:100vh;
-		width:15%;
-		text-align: center;
-	}
-
-	.game_box{
-		height:100vh;
-		background:rgb(56, 56, 56);
-		width:70%;
-	}
-
-	.friendlist_box{
-		padding:5px;
-		width:15%;
-		height:50vh;
-		text-align: center;
-	}
-
-	.game_navbar{
-		height:50px;
-		width:100%;
-		background:#201207;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-	}
-
-	.friend_button{
-		padding:0px;
-		width:100px;
-		height:30px;
-		align-items: center;
-		text-align: center;
-		font-size: 12px;
-	}
-
-	.friend-list{
-		padding:5px;
-		font-size: 20px;
-		display:flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-	}
-
-	.input_friend{
-		background:rgb(174, 174, 174);
-		border:none;
-		border-radius: 3px;
-		height:20px;
-		font-size: 20px;
-		width:200px;
-		margin:auto;
-	}
-
-	.ul_friends{
-		align-items: center;
-		text-align: center;
-		list-style: none;
-	}
-	.ul_friends:hover{
-		cursor: pointer;
-	}
-
-	.addfriend_button {
-		width: 20px;
-		height: 20px;
-		margin: 5px;
-		font-size: 15px;
-		color:black;
-		align-items: center;
-		text-align: center;
-		display: flex; 
-		justify-content: center;
-		align-items: center;
-		background:greenyellow;
-	}
-
-	.addfriend_button:hover {
-		background:rgb(215, 254, 206);
-	}
-
-	.addfriend_bloc{
-		text-align: center;
-		display: flex;
-		align-items: center;
-	}
-
-	.accept_invite{
-		background:black;
-		color:rgb(92, 255, 47);
-		width: 20px;
-		height: 20px;
-		margin: 5px;
-		font-size: 16px;
-		align-items: center;
-		text-align: center;
-		display: flex; 
-		justify-content: center;
-		align-items: center;
-	}
-
-	.deny_invite{
-		color:red;
-		width: 20px;
-		height: 20px;
-		margin: 5px;
-		font-size: 16px;
-		background-color: rgb(0, 0, 0);
-		align-items: center;
-		text-align: center;
-		display: flex; 
-		justify-content: center;
-		align-items: center;
-	}
-
-	.friendBloc{
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-
-	}
-	.search_profile{
-		background:green;
-		padding:5px;
-		height:100%;
-		text-align: center;
-	}
-	.friend-list{
-		height:100%;
-	}
-	.search_bloc{
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-	}
-	.search_button{
-		width: 20px;
-		height: 20px;
-		font-size: 15px;
-		color:black;
-		align-items: center;
-		text-align: center;
-		display: flex; 
-		justify-content: center;
-		align-items: center;
-		background: transparent;
-		border: none;
-	}
-	.search_button:hover{
-		transform: rotate(-10deg)
-	}
-	
-</style>
+<!-- ****************************** -->
+<!-- ********** HTML CODE ********* -->
+<!-- ****************************** -->
 
 <body>
 	<div class="game_navbar">
@@ -230,7 +20,7 @@
 			<div class="game_box">
 			</div>
 			<div class="friendlist_box">
-				<div class="friend-list add-friend">
+				<div class="friend-list">
 					<h2>Friendlist</h2>
 					<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
 						<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
@@ -265,6 +55,10 @@
 			</div>
 	</div>
 </body>
+
+<!-- ****************************** -->
+<!-- **********   SCRIPT  ********* -->
+<!-- ****************************** -->
 
 <script lang="ts">
     import { goto } from "$app/navigation";

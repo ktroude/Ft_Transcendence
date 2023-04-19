@@ -1,105 +1,10 @@
-<style>
-	*{
-		font-family: 'Roboto', sans-serif;
-	}
-	body{
-		margin:0px;
-		padding:0px;
-		width: 100vw;
-		height: 100vh;
-	}
-	.main_profile {
-		margin: 10px;
-		display: flex;
-		flex-direction: column;
-	}
-	.main_box {
-		margin: 50px auto;
-		max-width: 600px;
-		padding: 20px;
-		background-color: #f8f8f8;
-		border-radius: 5px;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		text-align: center;
-		align-items: center;
-	}
-	button {
-		display: block;
-		margin: 0 auto;
-		padding: 10px 20px;
-		background-color: #000000;
-		color: #fff;
-		border: none;
-		width:120px;
-		height:40px;
-		border-radius: 5px;
-		font-size: 16px;
-		cursor: pointer;
-		margin: auto;
-	}
-	.button_nav {
-		display: block;
-		margin: 0 auto;
-		padding: 10px 20px;
-		background-color: transparent;
-		border: white;
-		color:rgb(146, 146, 146);
-		border: none;
-		width:120px;
-		height:40px;
-		border-radius: 5px;
-		font-size: 20px;
-		cursor: pointer;
-		margin: auto;
-	}
-	.button_nav:hover {
-		color:white;
-		font-size: 22px;
-	}
-	img {
-		margin-top: 20px;
-		max-width: 300px;
-		max-height: 200px;
-		object-fit: cover;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-		align-items: center;
-	}
-	.game_navbar {
-		height:50px;
-		width:100%;
-		background:#201207;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-	}
-	.unblock_button {
-		background: rgb(255, 234, 0);
-		width:15px;
-		height:15px;
-		margin:auto;
-		color:black;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.block_button {
-		background: red;
-		width:15px;
-		height:15px;
-		margin:auto;
-		color:black;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.username_bloc {
-		align-items: center;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-	}
-</style>
+<svelte:head>
+	<link rel="stylesheet" href="/style_profile.css" />
+</svelte:head>
+
+<!-- ****************************** -->
+<!-- ********** HTML CODE ********* -->
+<!-- ****************************** -->
 
 <body>
 	<div class="game_navbar">
@@ -134,6 +39,10 @@
 		 {/if}
 	</div>
 </body>
+
+<!-- ****************************** -->
+<!-- **********   SCRIPT  ********* -->
+<!-- ****************************** -->
 
 <script lang="ts">
   	
