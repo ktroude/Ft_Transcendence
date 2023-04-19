@@ -91,7 +91,6 @@
     }
 	
 	async function checkBlocked(realUser, blockerUser) {
-	console.log("zeubi", realUser, blockerUser);
     const accessToken = await fetchAccessToken();
     const url = `http://localhost:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
     const response = await fetch(url, {

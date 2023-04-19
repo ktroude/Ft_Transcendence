@@ -10,16 +10,16 @@ import { Socket } from 'dgram';
 export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
   @WebSocketServer()
   server: Server;
-  clients: Map<number, string> = new Map();
+  clients: Map<string, string> = new Map();
 
   handleConnection(client: any, ...args: any[]) {
     client.on('userConnected', (payload) => {
-      const userId = payload.userId;
-      if (this.clients.has(userId)) {
-        this.clients.set(userId, client.id);
+      const pseudo = payload.pseudo;
+      if (this.clients.has(pseudo)) {
+        this.clients.set(pseudo, client.id);
         return;
       }
-      this.clients.set(userId, client.id);
+      this.clients.set(pseudo, client.id);
     });
   }
 
@@ -27,4 +27,16 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
   {
     this.clients.delete(client.id);
   }
+  
+  async getClient() {
+	const newmap = this.clients;
+	const vector = [];
+	console.log("GATEWAY:", newmap);
+	for (const [key, value] of newmap.entries()) {
+	  console.log("VALUE:", key);
+	  vector.push(key);
+	}
+	return vector;
+  }
+
 }

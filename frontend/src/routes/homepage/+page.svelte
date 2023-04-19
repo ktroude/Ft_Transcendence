@@ -44,7 +44,7 @@
 		socket.on('connect', async function() {
 			console.log('connected');
 			
-			socket.emit('userConnected', { userId: user.id });
+			socket.emit('userConnected', { pseudo: user.pseudo });
 		});
 	});
 
