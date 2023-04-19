@@ -15,54 +15,59 @@
 		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
 	</div>
 	<div class="main_game">
-			<div class="historic_box">
-				<h2>History</h2>
-			</div>
-			<div class="game_box">
-			</div>
-			<div class="friendlist_box">
-				<div class="friend-list">
-					<h2>Friendlist</h2>
-					<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
-						<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
+		<div class="historic_box">
+			<h2>History</h2>
+		</div>
+		<div class="game_box">
+		</div>
+		<div class="friendlist_box">
+			<div class="friend-list">
+				<h2>Friendlist</h2>
+				<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
+					<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
 					<ul class="ul_friends">
-					  {#each friends as friendName}
-					  <!-- svelte-ignore a11y-click-events-have-key-events -->
-					  <li class="friends_list" on:click={() => handleFriendClick(friendName)}>
-						{friendName}
-						<div class="friendBloc">
-							{#if invited === 1 }
+						{#each friends as friendName}
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
+							<div class="friendBloc">
+								{friendName}
+								{#if invited === 1 }
 								<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
 								<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
-							{/if}
-						</div>
+								{/if}
+							</div>
 							{#if clickedFriend === friendName && showButtons && invited === 2}
-								<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-								<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-								<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
-								<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
 							{/if}
 						</li>
-					  {/each}
+						{/each}
 					</ul>
-				  </div>
-				  <div class="search_profile">
-					<h1>Search profile</h1>
-					<div class="search_bloc">
-						<input class="input_friend" type="text" bind:value={searchProfile} />
-						<button class="search_button" on:click={() => handleSearchProfile(searchProfile)}>🔍</button>
-					</div>
-					<div class="connected_users_bloc">
-						<ul class="ul_friends">
-							{#each connectedUsers as connectedUsersName}
-							<li class="friends_list">
-								{connectedUsersName}
-								</li>
-							{/each}
-						</ul>
-					</div>
-				  </div>
 			</div>
+			<div class="search_profile">
+				<h1>Search profile</h1>
+				<div class="search_bloc">
+					<input class="input_friend" type="text" bind:value={searchProfile} />
+					<button class="search_button" on:click={() => handleSearchProfile(searchProfile)}>🔍</button>
+				</div>
+				<div class="connected_users_bloc">
+					<h2>Connected Users</h2>
+					<ul class="ul_friends">
+						{#each connectedUsers as connectedUsersName}
+							<li class="friends_list">
+								<div class="friend_line">
+
+									<div class="connectedUsersName">{connectedUsersName}</div>
+									<div class="green_dot"></div>
+								</div>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			</div>
+		</div>
 	</div>
 </body>
 
@@ -76,7 +81,6 @@
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser } from '../../API/api';
 	import { page } from '$app/stores';
-
 
     let previousFriend: string;
     let showButtons = false;
@@ -117,7 +121,6 @@
 		});
 		if (response.ok) {
 			connectedUsers =  await response.json();
-			console.log("FRONT:", connectedUsers);
 		}
 		else{
 			console.log("FRONT NOT WORKIGN HOHO")
@@ -127,37 +130,27 @@
 	}
 	}
 
-
-
-
-
-
-
-
 	async function handleSearchProfile(searchProfile: string) {
-	console.log("handleSearchProfile:", searchProfile);
-	if (!searchProfile) {
-		return;
+		console.log("handleSearchProfile:", searchProfile);
+		if (!searchProfile) {
+			return;
+		}
+		const accessToken = await fetchAccessToken();
+		const url = `http://localhost:3000/users/${searchProfile}/search`;
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			},
+		});
+		const userExists = await response.json(); // Parse response body as JSON
+		if (userExists) { // Check if user exists
+			goto(`/profile/${searchProfile}`);
+		} else {
+			console.log("user", searchProfile, "does not exist, reloading.......");
+			return;
+		}
 	}
-	const accessToken = await fetchAccessToken();
-	const url = `http://localhost:3000/users/${searchProfile}/search`;
-	const response = await fetch(url, {
-		method: 'GET',
-		headers: {
-		'Authorization': `Bearer ${accessToken}`,
-		},
-	});
-
-	const userExists = await response.json(); // Parse response body as JSON
-	if (userExists) { // Check if user exists
-		goto(`/profile/${searchProfile}`);
-	} else {
-		console.log("user", searchProfile, "does not exist, reloading.......");
-		return;
-	}
-	}
-
-
 
 	async function acceptInvitation() {
 		console.log("Accepted the invitation");
@@ -280,39 +273,23 @@
             } else {
                 console.log('Error: Could not update username');
             }
-        }
+	}
 
 	async function gotoprofile(friendName)
 	{
 		user = await fetchData(); // Get the user's picture
 		friends = await fetchFriend(user.pseudo);
-		console.log("IM GOING TO", `/profile/${user.pseudo}`);
 		goto(`/profile/${user.pseudo}`);
 	}
 
     onMount(async () => {
         await getImageURL();
         friends = await fetchFriend(user.pseudo);
-		console.log("BEcAUSE EVERYTIME WE TOUCH", friends);
 		getConnectedUsers();
     });
-
+	
 	let currentUser = '';
 	let realUser = '';
-	async function loadpage() {
-		user = await fetchData();
-		if ($page.params.user == user.pseudo)
-		{
-			getImageURL();
-			currentUser = user.username;
-		}
-		else
-		{
-			realUser = user.pseudo;
-			user = await fetchDataOfUser($page.params.user);
-			getImageURL();
-		}
-	}
 
     export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, imageURL, user, newUsername, handleUpdateUsername };
 </script>
