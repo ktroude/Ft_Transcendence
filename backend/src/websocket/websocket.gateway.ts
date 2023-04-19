@@ -10,21 +10,37 @@ import { Socket } from 'dgram';
 export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
   @WebSocketServer()
   server: Server;
-  clients: Map<number, string> = new Map();
+  clients: Map<string, string> = new Map();
 
   handleConnection(client: any, ...args: any[]) {
     client.on('userConnected', (payload) => {
-      const userId = payload.userId;
-      if (this.clients.has(userId)) {
-        this.clients.set(userId, client.id);
+		console.log("un truc comme ca on differencie", client.id);
+      const pseudo = payload.pseudo;
+      if (this.clients.has(pseudo)) {
+        this.clients.set(pseudo, client.id);
         return;
       }
-      this.clients.set(userId, client.id);
+      this.clients.set(pseudo, client.id);
     });
   }
 
-  handleDisconnect(client: any) 
-  {
-    this.clients.delete(client.id);
+	handleDisconnect(client: any) 
+	{
+		console.log("disconnected: ", client.id);
+		this.clients.forEach((value, key) => {
+			if (value === client.id) {
+			  this.clients.delete(key);
+			}
+		});
+	}
+  
+  async getClient() {
+	const newmap = this.clients;
+	const vector = [];
+	for (const [key, value] of newmap.entries()) {
+	  vector.push(key);
+	}
+	return vector;
   }
+
 }

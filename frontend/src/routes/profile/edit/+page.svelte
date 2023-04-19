@@ -1,107 +1,10 @@
- <style>
-	*{
-		font-family: 'Roboto', sans-serif;
-	}
-	.edit_main {
-		margin:10px;
-		display:flex;
-		flex-direction: column;
-		width:100vw;
-		height:100vh
-	}
-	.edit_box {
-		margin: 50px auto;
-		max-width: 600px;
-		padding: 20px;
-		background-color: #bdbdbd;
-		border-radius: 5px;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		text-align: center;
-	}
-	h1 {
-		font-size: 24px;
-		margin-bottom: 20px;
-	}
-	label {
-		display: block;
-		margin-bottom: 10px;
-		font-weight: bold;
-	}
-	input[type="text"] {
-		width: 80%;
-		padding: 10px;
-		margin-bottom: 20px;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-		margin: 5px;
-		font-size: 16px;
-	}
-	button {
-		display: block;
-		margin: 0 auto;
-		padding: 10px 20px;
-		background-color: #000000;
-		color: #fff;
-		border: none;
-		width:120px;
-		height:40px;
-		border-radius: 5px;
-		font-size: 16px;
-		cursor: pointer;
-		margin: auto;
-	}
-	img {
-		margin-top: 20px;
-		max-width: 300px;
-		max-height: 200px;
-		object-fit: cover;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-	}
-	.upload-button {
-		display: none;
-	}
-	.upload-button{
-		display: block;
-		margin-top: 10px;
-		padding: 10px 20px;
-		background-color: #000000;
-		color: #fff;
-		border: none;
-		border-radius: 5px;
-		font-size: 16px;
-		cursor: pointer;
-		width: max-content;
-		margin: 0 auto;
-	}
-	.button_nav {
-		display: block;
-		margin: 0 auto;
-		padding: 10px 20px;
-		background-color: transparent;
-		border: white;
-		color:rgb(146, 146, 146);
-		border: none;
-		width:120px;
-		height:40px;
-		border-radius: 5px;
-		font-size: 20px;
-		cursor: pointer;
-		margin: auto;
-	}
-	.button_nav:hover {
-		color:white;
-		font-size: 22px;
-	}
-	.game_navbar{
-		height:50px;
-		width:100%;
-		background:#201207;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-	}
-</style>
+<svelte:head>
+	<link rel="stylesheet" href="/style_profile.css" />
+</svelte:head>
+
+<!-- ****************************** -->
+<!-- ********** HTML CODE ********* -->
+<!-- ****************************** -->
 
 <main>
 	<div class="game_navbar">
@@ -122,6 +25,10 @@
 		</div>
 	</div>
 </main>
+
+<!-- ****************************** -->
+<!-- **********   SCRIPT  ********* -->
+<!-- ****************************** -->
 
 <script lang="ts">
   	
