@@ -396,8 +396,13 @@
 				const response = await fetch(`http://localhost:3000/chat/userInfo?code=${currentRoom.id}`, {
 					headers
 				});
-				const data = await response.json();
-				currentUser.status = parseInt(data, 10);
+				try {
+
+					const data = await response.json();
+					console.log(data);
+					currentUser.status = parseInt(data, 10);
+				}
+				catch {currentUser.status = 0}
 			}
 		}
 	};
@@ -562,10 +567,9 @@
 		});
 		socket.on('returnMessage', (data: any) => {
 			if (currentUser.id === data.to) {
-
+				messages = data.msg;
+				scrollToBottom();
 			}
-			 messages = data.msg;
-			 scrollToBottom();
 		});
 		socket.on('newMessage', (msg: any) => {
 			if (currentRoom && currentRoom?.id === msg.chatRoomId) {
@@ -586,12 +590,14 @@
 					id: -1
 				};
 				messages = [
-					...messages,
 					{
 						senderPseudo: 'server',
 						content: 'Vous avez été banni de la room par un administrateur'
 					}
 				];
+				membres = [];
+				banned = [];
+				muted = [];
 				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				await fletchMuteBanData();
@@ -605,6 +611,9 @@
 						content: 'La room a été détruite.'
 					}
 				];
+				membres = [];
+				banned = [];
+				muted = [];
 				scrollToBottom();
 			}
 			chatRooms = await fletchChatRoomsData();
@@ -623,6 +632,9 @@
 						content: 'Vous avez été kick de la room par un administrateur'
 					}
 				];
+				membres = [];
+				banned = [];
+				muted = [];
 				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				membres = await fletchMembres();
@@ -638,6 +650,9 @@
 						content: `Vous avez été débanni de la room ${data.room.name}`
 					}
 				];
+				membres = [];
+				banned = [];
+				muted = [];
 				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				await fletchMuteBanData();
@@ -962,8 +977,8 @@
 
 <div class="admin-panel">
 	{#if currentRoom?.id}
-		<div class="membre">
-			<p class="pannel-title">Membres</p>
+		<div class="public-room">
+			<h2 class="room-title">Membres</h2>
 			{#if membres && membres.length}
 				{#each membres as member}
 					<button
@@ -978,8 +993,8 @@
 	{/if}
 
 	{#if currentRoom?.id}
-		<div class="banned">
-			<p class="pannel-title">Banned</p>
+		<div class="public-room">
+			<h2 class="room-title">Baned</h2>
 			{#if banned?.length}
 				{#each banned as ban}
 					<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
@@ -989,15 +1004,14 @@
 			{/if}
 		</div>
 
-		<div class="muted">
+		<div class="public-room">
 			{#if currentRoom?.id}
-				<p class="pannel-title">Muted</p>
+				<h2 class="room-title">Muted</h2>
 				{#if muted?.length}
 					{#each muted as mute}
 						<button
 							class="pseudo-button"
-							on:click={(event) => handleClickPseudo(event, mute.pseudo)}
-						>
+							on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
 							{mute.pseudo}
 						</button>
 					{/each}

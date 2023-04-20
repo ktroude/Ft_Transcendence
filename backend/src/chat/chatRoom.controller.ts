@@ -38,7 +38,6 @@ export class ChatRoomController {
         //     private: elem.private,
         //     id: elem.id,
         //     ownerId: elem.ownerId,
-        console.log('arrrrray =', array);
         return array;
     }
 
@@ -138,36 +137,53 @@ export class ChatRoomController {
 
     @Get('getBan')
     async handleGetBanBoolean(@Headers('Authorization') cookie: string, @Query('code') id) {
-        const token = cookie.split(' ')[1];
-        const user = await this.userService.decodeToken(token);
-        const room = await this.prisma.chatRoom.findUnique({
-            where: { id: parseInt(id, 10) }
-        });
-        return await this.chatRoomService.isBanned(user, room);
+        try {
+
+            const token = cookie.split(' ')[1];
+            const user = await this.userService.decodeToken(token);
+            const room = await this.prisma.chatRoom.findUnique({
+                where: { id: parseInt(id, 10) }
+            });
+            return await this.chatRoomService.isBanned(user, room);
+        }
+        catch {
+            return []
+        }
     }
 
     @Get('getMembers')
     async handleGetMembers(@Headers('Authorization') cookie: string, @Query('code') id) {
-        const token = cookie.split(' ')[1];
-        const user = await this.userService.decodeToken(token);
-        const room = await this.prisma.chatRoom.findUnique({
-            where: { id: parseInt(id, 10) },
-            select: { members: true }
-        });
-        return room.members;
+        try {
+
+            const token = cookie.split(' ')[1];
+            const user = await this.userService.decodeToken(token);
+            const room = await this.prisma.chatRoom.findUnique({
+                where: { id: parseInt(id, 10) },
+                select: { members: true }
+            });
+            return room.members;
+        }
+        catch {
+            return [];
+        }
     }
 
     @Get('getBlock')
     async handleGetBlock(@Headers('Authorization') cookie: string, @Query('code') id) {
-        const token = cookie.split(' ')[1];
-        const user = await this.userService.decodeToken(token);
-        const room = await this.prisma.chatRoom.findUnique({
-            where: { id: parseInt(id, 10) },
-            select: { members: true }
-        });
-        return room.members;
-    }
-
+        try {
+            const token = cookie.split(' ')[1];
+            const user = await this.userService.decodeToken(token);
+            const room = await this.prisma.chatRoom.findUnique({
+                where: { id: parseInt(id, 10) },
+                select: { members: true }
+            });
+            return room.members;
+        }
+        catch {
+            return []
+        }
+        }
+        
     @Get('IsPvAndMember')
     async handleIsPvAndMember(@Headers('Authorization') cookie: string, @Query('room') roomId) {
         const token = cookie.split(' ')[1];

@@ -24,7 +24,6 @@ export class ChatRoomService {
       where: { id: chatRoom.id },
       select: { owner: { select: { id: true } } },
     });
-    console.log('isOwner ===', isOwner);
     if (isOwner.owner.id === user.id)
       return true;
     else
@@ -32,14 +31,20 @@ export class ChatRoomService {
   }
 
   async isMuted(user: User, chatRoom: ChatRoom): Promise<boolean> {
-    const isMuted = await this.prisma.chatRoom
+    try {
+
+      const isMuted = await this.prisma.chatRoom
       .findUnique({ where: { id: chatRoom.id } })
       .muted({ where: { id: user.id } })
-    const finded = isMuted.find((obj) => obj.id === user.id);
-    if (finded)
+      const finded = isMuted.find((obj) => obj.id === user.id);
+      if (finded)
       return true;
     else
       return false;
+    }
+    catch {
+      return false;
+    }
   }
 
   async isBanned(user: User, chatRoom: ChatRoom): Promise<boolean> {
