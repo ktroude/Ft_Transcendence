@@ -15,6 +15,7 @@
 	</div>
 	<div class="container">
 		<h1>Ceci est la homepage et tu es {user?.pseudo}</h1>
+		<button class="button_nav" on:click={() => goto('/testgame')}>Test_game</button>
 	</div>
 </body>
 
