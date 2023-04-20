@@ -6,34 +6,34 @@
   margin-left: 20px;
 }
 
-.public-room{
-flex: 1;
-background-color: #4d4d4d;
-margin-right: 10px;
-height: 210px;
-overflow-y: auto;
-border-radius: 10px;
+.public-room {
+  flex: 1;
+  background-color: #4d4d4d;
+  margin-right: 10px;
+  height: 210px;
+  overflow-y: auto;
+  border-radius: 10px;
   text-align: center;
 }
 
 .private-room {
-flex: 1;
-margin-right: 10px;
-margin-left: 10px;
-background-color: #4d4d4d;
-height: 210px;
-overflow-y: auto;
-border-radius: 10px;
+  flex: 1;
+  margin-right: 10px;
+  margin-left: 10px;
+  background-color: #4d4d4d;
+  height: 210px;
+  overflow-y: auto;
+  border-radius: 10px;
   text-align: center;
 }
 
 .direct-room {
-flex: 1;
-background-color: #4d4d4d;
-height: 210px;
-margin-left: 10px;
-overflow-y: auto;
-border-radius: 10px;
+  flex: 1;
+  background-color: #4d4d4d;
+  height: 210px;
+  margin-left: 10px;
+  overflow-y: auto;
+  border-radius: 10px;
   text-align: center;
 }
 
@@ -58,6 +58,7 @@ border-radius: 10px;
   cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 
 .pv-chatroom-button {
@@ -74,9 +75,32 @@ border-radius: 10px;
   overflow: hidden;
 }
 
+.buton-room-name {
+  text-align: center;
+}
 
+.lock-image {
+  background-image: url('./security-system.png');
+  background-size: cover;
+  height: 15px;
+  width: 15px;
+  display: inline-block;
+}
 
-
+.password-room-access-input {
+  display: inline-block;
+  background-color: #333333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  word-wrap: break-word;
+  height: 16px;
+  overflow: hidden;
+  font-size: 16px;
+  padding: 8px;
+  margin: 8px 0;
+}
 
 
 
@@ -92,7 +116,7 @@ border-radius: 10px;
   align-items: center;
 }
 
-.room-form-title{
+.room-form-title {
   padding: 5px;
   margin-bottom: 5px;
   margin-top: 10px;
@@ -127,8 +151,8 @@ border-radius: 10px;
 }
 
 .create-room {
-	display: flex;
-	flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 
@@ -145,6 +169,7 @@ border-radius: 10px;
 .room-bandeau {
   overflow: hidden;
   margin-top: 20px;
+  margin-bottom: 5px;
 }
 
 .room-bandeau-form-input {
@@ -178,7 +203,7 @@ border-radius: 10px;
   max-height: 400px;
   overflow: hidden;
   display: inline-block;
-  width: 800px; 
+  width: 800px;
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-left: 50px;
@@ -206,7 +231,7 @@ border-radius: 10px;
   display: flex;
   flex-direction: column;
   height: 500px;
-  
+  margin-top: -20px;
 }
 
 .chat-messages {
@@ -221,11 +246,12 @@ border-radius: 10px;
   background-color: #222;
   color: #ffffff;
   overflow: auto;
+  scroll-behavior:smooth;
 }
 
 .message-input-container {
   flex-grow: 1;
-
+  width: 100% - 100px;
 }
 
 .message-input {
@@ -361,34 +387,34 @@ button:hover {
   margin-left: 20px;
 }
 
-.membre{
-flex: 1;
-background-color: #4d4d4d;
-margin-right: 10px;
-max-height: 200px;
-overflow-y: auto;
-border-radius: 10px;
+.membre {
+  flex: 1;
+  background-color: #4d4d4d;
+  margin-right: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 10px;
   text-align: center;
 }
 
 .banned {
-flex: 1;
-margin-right: 10px;
-margin-left: 10px;
-background-color: #4d4d4d;
-max-height: 200px;
-overflow-y: auto;
-border-radius: 10px;
+  flex: 1;
+  margin-right: 10px;
+  margin-left: 10px;
+  background-color: #4d4d4d;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 10px;
   text-align: center;
 }
 
 .muted {
-flex: 1;
-background-color: #4d4d4d;
-max-height: 200px;
-margin-left: 10px;
-overflow-y: auto;
-border-radius: 10px;
+  flex: 1;
+  background-color: #4d4d4d;
+  max-height: 200px;
+  margin-left: 10px;
+  overflow-y: auto;
+  border-radius: 10px;
   text-align: center;
 }
 

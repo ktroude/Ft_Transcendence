@@ -109,6 +109,23 @@
 		}
 	}
 
+	function scrollToBottom() {
+		let chatDiv =  document.getElementById("chat-messages");
+		console.log("JE SUIS ICI =======", chatDiv);
+		chatDiv?.addEventListener("DOMSubtreeModified", function() {
+	  	scroll(chatDiv);
+	});
+	}
+
+	function scroll(chatDiv:any) {
+		if (chatDiv) {
+    const scrollHeight = chatDiv.scrollHeight;
+    const clientHeight = chatDiv.clientHeight;
+    const maxScrollTop = scrollHeight - clientHeight;
+    chatDiv.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+  }
+}
+
 	function handlePasswordInputKeyDown(event: any, room: ChatRoom) {
 		if (event.key === 'Enter') {
 			const value = event.target.value;
@@ -172,6 +189,7 @@
 	}
 
 	async function handleRoomButton(room: ChatRoom, pw: any) {
+		passwordInput.bool = false;
 		if ((await checkBan(room)) === true) {
 			messages = [];
 			messages = [
@@ -180,12 +198,17 @@
 					senderPseudo: 'server'
 				}
 			];
+			closeAlert();
 			return;
 		}
 		if (currentRoom && currentRoom.id === room.id) {
+			closeAlert();
 			return;
 		}
-		if (room?.id) messages = await fletchMessageOfRoom(room.id);
+		if (room?.id) {
+			messages = await fletchMessageOfRoom(room.id);
+			scrollToBottom();
+		}
 		else messages = [];
 		socket.emit('getMessage', room);
 		socket.emit('getUser', room);
@@ -197,11 +220,8 @@
 			await fletchMembres();
 			await fletchBlocked();
 			isShown = false;
+			closeAlert();
 		});
-	}
-
-	function checkPrivate() {
-		chatRooms.forEach((elem) => {});
 	}
 
 	function closeAlert() {
@@ -499,11 +519,13 @@
 	}
 
 	function kick(userToKick: User, room: any) {
-		if (currentRoom.id === room.id)
+		if (currentRoom.id === room.id) {
 			messages = [
 				...messages,
 				{ senderPseudo: 'server', content: `${userToKick.pseudo} a été kick de la room` }
 			];
+			scrollToBottom();
+		}
 		socket.emit('kick', userToKick);
 		isShown = false;
 	}
@@ -539,11 +561,16 @@
 			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('returnMessage', (data: any) => {
-			if (currentUser.id === data.to) messages = data.msg;
+			if (currentUser.id === data.to) {
+
+			}
+			 messages = data.msg;
+			 scrollToBottom();
 		});
 		socket.on('newMessage', (msg: any) => {
 			if (currentRoom && currentRoom?.id === msg.chatRoomId) {
 				messages = [...messages, msg];
+				scrollToBottom();
 			}
 		});
 		socket.on('returnUser', (data: any) => {
@@ -565,6 +592,7 @@
 						content: 'Vous avez été banni de la room par un administrateur'
 					}
 				];
+				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				await fletchMuteBanData();
 			}
@@ -577,6 +605,7 @@
 						content: 'La room a été détruite.'
 					}
 				];
+				scrollToBottom();
 			}
 			chatRooms = await fletchChatRoomsData();
 		});
@@ -594,6 +623,7 @@
 						content: 'Vous avez été kick de la room par un administrateur'
 					}
 				];
+				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				membres = await fletchMembres();
 			}
@@ -608,6 +638,7 @@
 						content: `Vous avez été débanni de la room ${data.room.name}`
 					}
 				];
+				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				await fletchMuteBanData();
 			}
@@ -629,6 +660,7 @@
 				if (currentRoom.id === data.room.id) {
 					currentUser.status = 1;
 				}
+				scrollToBottom();
 			}
 		});
 		socket.on('adminRemoved', async (data) => {
@@ -643,6 +675,7 @@
 				if (currentRoom.id === data.room.id) {
 					currentUser.status = 0;
 				}
+				scrollToBottom();
 			}
 		});
 		socket.on('muted', async (data) => {
@@ -655,12 +688,14 @@
 					{ content: `Vous avez été mute pour 120 sec'`, senderPseudo: 'server' }
 				];
 				currentUser.status = -1;
+				scrollToBottom();
 			}
 		});
 		socket.on('unMuted', async (data) => {
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [...messages, { content: `Vous n'etes plus mute'`, senderPseudo: 'server' }];
 				currentUser.status = 0;
+				scrollToBottom()
 			}
 			if (currentRoom.id === data.room.id) {
 				await fletchMuteBanData();
@@ -669,6 +704,7 @@
 		socket.on('stayMute', async (data) => {
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [...messages, data.message];
+				scrollToBottom();
 			}
 		});
 		socket.on('UserAdded', async (data) => {
@@ -679,6 +715,7 @@
 						...messages,
 						{ senderPseudo: 'server', content: "Cette utilisateur n'existe pas" }
 					];
+					scrollToBottom()
 				}
 			} else if (data.sucess === false && data.userToAdd) {
 				if (currentUser.id === data.user.id) {
@@ -697,6 +734,7 @@
 		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
 				alert = true;
+				currentRoom = null;
 			}
 		});
 		chatRooms = await fletchChatRoomsData();
@@ -719,25 +757,24 @@
 <!-- <h1>Chat</h1> -->
 {#if loading === false}
 	<p>Chargement...</p>
-{:else}
+	{:else}
 	<div class="room-list-bloc">
 		<div class="public-room">
 			<h2 class="room-title">Rooms publics</h2>
 			{#each chatRooms as chatRoom}
-				{#if chatRoom.private === false && chatRoom.password == false}
-					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
-						>{chatRoom.name}</button
-					>
-				{/if}
-				{#if chatRoom.private === false && chatRoom.password == true}
-					<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}
-						>{chatRoom.name}</button
-					>
+			{#if chatRoom.private === false && chatRoom.password == false}
+					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
+						{chatRoom.name}
+					</button>
+					{/if}
+					{#if chatRoom.private === false && chatRoom.password == true}
+					<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+						<div class='lock-image'> </div>
+					<span class='buton-room-name'> {chatRoom.name} </span>
+					</button>
 					{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
-						<input
-							type="text"
-							on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}
-						/>
+					<input class='password-room-access-input' type="password" placeholder="Mot de passe"
+					on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}/>
 					{/if}
 				{/if}
 			{/each}
@@ -746,11 +783,23 @@
 		<div class="public-room">
 			<h2 class="room-title">Rooms Privées</h2>
 			{#each chatRooms as chatRoom}
-				{#if chatRoom.private === true}
-					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
-						>{chatRoom.name}</button
-					>
-				{/if}
+			{#if chatRoom.private === true && chatRoom.password == false}
+			<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
+				{chatRoom.name}
+			</button>
+			{/if}
+			{#if chatRoom.private === true && chatRoom.password == true}
+			<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+				<div class='lock-image'> </div>
+				{chatRoom.name}
+			</button>
+			{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
+			<input
+			type="text"
+			on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}
+				/>
+			{/if}
+		{/if}
 			{/each}
 		</div>
 
@@ -823,7 +872,7 @@
 
 	{#if currentRoom?.id}
 		<div class="message-container">
-			<div class="chat-messages">
+			<div class="chat-messages" id="chat-messages">
 				{#if messages && messages.length}
 					{#each messages as msg}
 						<p>
