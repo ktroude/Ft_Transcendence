@@ -464,29 +464,27 @@ export class ChatRoomGateway
     const userToAdd = await this.prismaService.user.findUnique({
       where: { pseudo: data.pseudo },
     });
-    console.log('user data == ',data)
-    console.log('userToAdd ==', userToAdd);
+    console.log('userToAdd ==', userToAdd.pseudo);
     if (!userToAdd) {
       this.server.emit('UserAdded', { sucess: false, userToAdd: null, user: user })
       return;
     }
     else {
+      if (await this.chatRoomService.isMember(userToAdd, chatRoom) === true) {
+        this.server.emit('UserAdded', { sucess: false, userToAdd: userToAdd, user: user });
+        return;
+      }
       await this.prismaService.chatRoom.update({
         where: { id: data.room.id },
         data: {
           members: { connect: { id: userToAdd.id } }
         }
       });
-      if (await this.chatRoomService.isMember(userToAdd, chatRoom) === true) {
-        this.server.emit('UserAdded', { sucess: false, userToAdd: userToAdd, user: user });
-        return;
-      }
-      else {
-        const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a rejoind la room`,
-          { id: 0, pseudo: 'server' }, { id: data.id });
-        this.server.emit('newMessage', toSend);
-        this.server.emit('UserAdded', { sucess: true, user: userToAdd })
-      }
+        const toSend = await this.chatRoomService.createMessage(`${userToAdd.pseudo} a rejoind la room`,
+          { id: 0, pseudo: 'server' }, chatRoom);
+          this.server.emit('UserAdded', { sucess: true, user: userToAdd });
+          this.server.emit('sucess');
+          this.server.emit('newMessage', toSend);
     }
   }
 

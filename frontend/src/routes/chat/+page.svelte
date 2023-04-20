@@ -76,7 +76,7 @@
 
 	function handleInvitInput(event: any) {
 		formData.roomName = (event.target as HTMLInputElement).value;
-		socket.emit('addUser', { pseudo: formData.roomName, room: currentRoom });
+
 	}
 
 	function handlePasswordInput(event: any) {
@@ -126,17 +126,18 @@
   }
 }
 
-	function handlePasswordInputKeyDown(event: any, room: ChatRoom) {
+	async function handlePasswordInputKeyDown(event: any, room: ChatRoom) {
 		if (event.key === 'Enter') {
 			const value = event.target.value;
-			handleRoomButton(room, value);
+			await handleRoomButton(room, value);
 			passwordInput.bool = false;
 			passwordInput.roomId = 0;
 		}
 	}
 
 	function handleInvitUserInput() {
-		console.log("Valeur de l'input :", userPseudoInput);
+		socket.emit('addUser', { pseudo: userPseudoInput, room: currentRoom });
+		userPseudoInput = '';
 	}
 
 	function handleInvitKeyPress(event: any) {
@@ -252,17 +253,22 @@
 	}
 
 	const fletchBlocked = async () => {
-		const cookies = document.cookie.split(';');
-		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
-		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-		if (accessToken) {
-			const headers = new Headers();
-			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://localhost:3000/chat/getBlock?code=${currentRoom.id}`, {
-				headers
-			});
-			const data = await response.json();
-			// gerer data
+		try {
+			const cookies = document.cookie.split(';');
+			const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+			const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+			if (accessToken) {
+				const headers = new Headers();
+				headers.append('Authorization', `Bearer ${accessToken}`);
+				const response = await fetch(`http://localhost:3000/chat/getBlock?code=${currentRoom.id}`, {
+					headers
+				});
+				const data = await response.json();
+				return data;
+			}
+		}
+		catch{
+			return [];
 		}
 	};
 
@@ -298,17 +304,22 @@
 	};
 
 	const fletchMembres = async () => {
-		const cookies = document.cookie.split(';');
-		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
-		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-		if (accessToken) {
-			const headers = new Headers();
-			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://localhost:3000/chat/getMembers?code=${currentRoom.id}`, {
-				headers
-			});
-			const data = await response.json();
-			membres = await data;
+		try {
+			const cookies = document.cookie.split(';');
+			const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+			const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+			if (accessToken) {
+				const headers = new Headers();
+				headers.append('Authorization', `Bearer ${accessToken}`);
+				const response = await fetch(`http://localhost:3000/chat/getMembers?code=${currentRoom.id}`, {
+					headers
+				});
+				const data = await response.json();
+				membres = await data;
+			}
+		}
+		catch {
+			membres = [];
 		}
 	};
 
@@ -601,7 +612,9 @@
 				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				await fletchMuteBanData();
+				await fletchMembres();
 			}
+			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('deleteRoom', async (data) => {
 			if (currentRoom && currentRoom?.id === data) {
@@ -638,7 +651,10 @@
 				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				membres = await fletchMembres();
+				await fletchMuteBanData();
+				await fletchMembres();
 			}
+			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('newDeban', async (data) => {
 			if (data.user.id === currentUser.id) {
@@ -650,9 +666,6 @@
 						content: `Vous avez été débanni de la room ${data.room.name}`
 					}
 				];
-				membres = [];
-				banned = [];
-				muted = [];
 				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
 				await fletchMuteBanData();
@@ -740,11 +753,12 @@
 					];
 				}
 			} else if (data.sucess === true && data.userToAdd) {
-				if (data.user.id === currentUser.id) {
-					chatRooms = await fletchChatRoomsData();
-				}
-				membres = [...membres, data.user];
+				membres = [];
+				await fletchMembres();
+				await fletchMuteBanData();
+				chatRooms = await fletchChatRoomsData();
 			}
+			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
