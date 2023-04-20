@@ -179,7 +179,9 @@
 			];
 			return;
 		}
-		if (currentRoom && currentRoom.id === room.id) return;
+		if (currentRoom && currentRoom.id === room.id) {
+			return;
+		}
 		currentRoom = room;
 		if (room?.id) messages = await fletchMessageOfRoom(room.id);
 		else messages = [];
@@ -698,7 +700,7 @@
 		}
 		checkFormValidity();
 		loading = true;
-		console.log('chatroomz ==', chatRooms);
+		// console.log('chatroomz ==', chatRooms);
 	});
 </script>
 
@@ -709,19 +711,19 @@
 <!-- HTML CODE -->
 
 <!-- <h1>Chat</h1> -->
+{#if loading === false}
+<p>Chargement...</p>
+{:else}
 <div class='room-list-bloc'>
 	<div class='public-room'>
 		<h2 class='room-title'>Rooms publics</h2>
-		{#if loading === false}
-			<p>Chargement...</p>
-		{:else}
 			{#each chatRooms as chatRoom}
 				{#if chatRoom.private === false && chatRoom.password == false}
 					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
 						>{chatRoom.name}</button
 					>
 				{/if}
-				{#if chatRoom.private === false && chatRoom.password == false}
+				{#if chatRoom.private === false && chatRoom.password == true}
 					<button class="chatroom-button" on:click={() => displayInputPassword()}
 						>{chatRoom.name}</button
 					>
@@ -730,21 +732,17 @@
 					{/if}
 				{/if}
 			{/each}
-		{/if}
 		</div>
 
-	<div class='private-room'>
+	<div class='public-room'>
 		<h2 class='room-title'>Rooms Privées</h2>
-		{#if loading === false}
-			<p>Chargement...</p>
 			{#each chatRooms as chatRoom}
 			{#if chatRoom.private === true}
-					<button class="pv-chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
+					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
 						>{chatRoom.name}</button
 					>
 				{/if}
 			{/each}
-		{/if}
 	</div>
 
 	<div class='direct-room'>
@@ -753,7 +751,7 @@
 	</div>
 
 </div>
-
+{/if}
 
 
 <div class='create-room'>
