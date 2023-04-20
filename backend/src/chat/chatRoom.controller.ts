@@ -8,16 +8,16 @@ import { RouterModule } from "@nestjs/core";
 
 @Controller('chat')
 export class ChatRoomController {
-    constructor(private prisma:PrismaService ,
-                private chatRoomService: ChatRoomService,
-                private userService: UserService) {}
+    constructor(private prisma: PrismaService,
+        private chatRoomService: ChatRoomService,
+        private userService: UserService) { }
 
     @Get('getRoom')
     async getAllChatRoom(@Headers('Authorization') cookie: string) {
         console.log("getAllChatRoom");
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
-        let rooms:any = await this.chatRoomService.getAllChatRoom();
+        let rooms: any = await this.chatRoomService.getAllChatRoom();
         let array = [];
         for (let elem of rooms) {
             const isMember = await this.chatRoomService.isMember(user, elem);
@@ -38,17 +38,17 @@ export class ChatRoomController {
         //     private: elem.private,
         //     id: elem.id,
         //     ownerId: elem.ownerId,
-            console.log('arrrrray =', array);
-            return array;
-        }
+        console.log('arrrrray =', array);
+        return array;
+    }
 
     @Get('getMuteBan')
     async handleGetMuted(@Headers('Authorization') cookie: string, @Query('code') id) {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         const room = await this.prisma.chatRoom.findUnique({
-            where: {id: parseInt(id, 10)},
-            select: { 
+            where: { id: parseInt(id, 10) },
+            select: {
                 muted: true,
                 banned: true,
                 admin: true,
@@ -57,8 +57,8 @@ export class ChatRoomController {
         const admin = room.admin.find((obj) => obj.id === user.id);
         if (admin) {
             return {
-                muted : room.muted,
-                banned : room.banned,
+                muted: room.muted,
+                banned: room.banned,
             }
         }
         else
@@ -70,23 +70,23 @@ export class ChatRoomController {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         const room = await this.prisma.chatRoom.findUnique({
-            where: {id: parseInt(id, 10)}
+            where: { id: parseInt(id, 10) }
         });
-        if (await this.chatRoomService.isOwner(user, room) === true) {
+        if (room && await this.chatRoomService.isOwner(user, room) === true) {
             return 2;
-          }
-          else if (await this.chatRoomService.isAdmin(user, room) === true) {
+        }
+        else if (room && await this.chatRoomService.isAdmin(user, room) === true) {
             return 1;
-          }
-          else if (await this.chatRoomService.isMuted(user, room) === true) {
+        }
+        else if (room && await this.chatRoomService.isMuted(user, room) === true) {
             return -1
-          }
-          else if (await this.chatRoomService.isBanned(user, room) === true) {
+        }
+        else if (room && await this.chatRoomService.isBanned(user, room) === true) {
             return -2
-          }
-          else if (await this.chatRoomService.isMember(user,room) === true) {
+        }
+        else if (room && await this.chatRoomService.isMember(user, room) === true) {
             return 0;
-          }
+        }
     }
 
     @Get('getMessages')
@@ -94,8 +94,8 @@ export class ChatRoomController {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         const room = await this.prisma.chatRoom.findUnique({
-            where: {id: parseInt(id, 10)},
-            select: {messages:true}
+            where: { id: parseInt(id, 10) },
+            select: { messages: true }
         });
         return room.messages;
     }
@@ -108,15 +108,11 @@ export class ChatRoomController {
             status: -3,
             room: 0
         };
-        console.log('idroom ==', idRoom)
-        console.log('pseudo ==', pseudo)
-        // if (!userPseudo || !idRoom)
-        //     return toSend;
         const user = await this.prisma.user.findUnique({
-            where: {pseudo : pseudo},
+            where: { pseudo: pseudo },
         });
         const room = await this.prisma.chatRoom.findUnique({
-            where: {id: parseInt(idRoom, 10)},
+            where: { id: parseInt(idRoom, 10) },
         });
         toSend.room = room.id;
         toSend.id = user.id;
@@ -124,30 +120,30 @@ export class ChatRoomController {
 
         if (await this.chatRoomService.isOwner(user, room) === true) {
             toSend.status = 2;
-          }
-          else if (await this.chatRoomService.isAdmin(user, room) === true) {
+        }
+        else if (await this.chatRoomService.isAdmin(user, room) === true) {
             toSend.status = 1;
-          }
-          else if (await this.chatRoomService.isMuted(user, room) === true) {
+        }
+        else if (await this.chatRoomService.isMuted(user, room) === true) {
             toSend.status = -1
-          }
-          else if (await this.chatRoomService.isBanned(user, room) === true) {
+        }
+        else if (await this.chatRoomService.isBanned(user, room) === true) {
             toSend.status = -2
-          }
-          else if (await this.chatRoomService.isMember(user,room) === true) {
+        }
+        else if (await this.chatRoomService.isMember(user, room) === true) {
             toSend.status = 0;
-          }
+        }
         return toSend;
-    } 
+    }
 
     @Get('getBan')
     async handleGetBanBoolean(@Headers('Authorization') cookie: string, @Query('code') id) {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         const room = await this.prisma.chatRoom.findUnique({
-            where: {id: parseInt(id, 10)}
+            where: { id: parseInt(id, 10) }
         });
-        return await this.chatRoomService.isBanned(user,room);
+        return await this.chatRoomService.isBanned(user, room);
     }
 
     @Get('getMembers')
@@ -155,8 +151,8 @@ export class ChatRoomController {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         const room = await this.prisma.chatRoom.findUnique({
-            where: {id: parseInt(id, 10)},
-            select: {members: true}
+            where: { id: parseInt(id, 10) },
+            select: { members: true }
         });
         return room.members;
     }
@@ -166,8 +162,8 @@ export class ChatRoomController {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         const room = await this.prisma.chatRoom.findUnique({
-            where: {id: parseInt(id, 10)},
-            select: {members: true}
+            where: { id: parseInt(id, 10) },
+            select: { members: true }
         });
         return room.members;
     }
@@ -177,14 +173,14 @@ export class ChatRoomController {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         const room = await this.prisma.chatRoom.findUnique({
-            where: {id: parseInt(roomId, 10)},
-            select: {members: true}
+            where: { id: parseInt(roomId, 10) },
+            select: { members: true }
         });
         const check = room.members.forEach(elem => {
             console.log('elem ==', elem.id)
             console.log('user ==', user.id)
             if (elem.id === user.id) {
-                console.log('je suis ici meme')    
+                console.log('je suis ici meme')
                 return true;
             }
             return false;

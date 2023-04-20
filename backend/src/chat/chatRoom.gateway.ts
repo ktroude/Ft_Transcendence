@@ -69,7 +69,7 @@ export class ChatRoomGateway
   ) {
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
     const password = data.password.length ? bcrypt.hashSync(data.password) : '';
-      let newChatRoom = await this.prismaService.chatRoom.create({
+    let newChatRoom = await this.prismaService.chatRoom.create({
       data: {
         name: data.name,
         password: password,
@@ -414,28 +414,30 @@ export class ChatRoomGateway
   async handleJoinRoom(client: Socket, data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const toCheck = await this.prismaService.chatRoom.findUnique({
-      where: { id: data.id },
+      where: { id: data.room.id },
       select: {
         members: true,
-        password:true,   
+        password: true,
       },
     })
+    if (toCheck.password.length) {
+      const pwCheck = bcrypt.compareSync(data.password, toCheck.password);
+      if (pwCheck === false) {
+        this.server.emit('wrongPW', { room: toCheck, user: user });
+        return;
+      }
+    }
     const isMember = toCheck.members.some(member => member.id === user.id);
     await this.prismaService.chatRoom.update({
-      where: { id: data.id },
+      where: { id: data.room.id },
       data: { members: { connect: { id: user.id } } },
     });
     if (!isMember) {
-      if (toCheck.password.length) {
-        if (bcrypt.hashSync(data.password) !== toCheck.password) {
-          this.server.emit('wrongPW',{room: toCheck, user: user});
-          return ;
-        }
-      }
       const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a rejoind la room`,
-        { id: 0, pseudo: 'server' }, { id: data.id });
+        { id: 0, pseudo: 'server' }, { id: data.room.id });
       this.server.emit('newMessage', toSend);
     }
+    this.server.emit('sucess');
   }
 
   @SubscribeMessage('addUser')
@@ -449,7 +451,7 @@ export class ChatRoomGateway
     });
     console.log('userToAdd ==', userToAdd);
     if (!userToAdd) {
-      this.server.emit('UserAdded', { sucess: false, userToAdd: null, user:user })
+      this.server.emit('UserAdded', { sucess: false, userToAdd: null, user: user })
       return;
     }
     else {
@@ -460,7 +462,7 @@ export class ChatRoomGateway
         }
       });
       if (await this.chatRoomService.isMember(userToAdd, chatRoom) === true) {
-        this.server.emit('UserAdded', { sucess: false, userToAdd: userToAdd, user:user });
+        this.server.emit('UserAdded', { sucess: false, userToAdd: userToAdd, user: user });
         return;
       }
       else {

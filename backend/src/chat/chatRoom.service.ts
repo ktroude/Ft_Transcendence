@@ -6,12 +6,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChatRoomService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async isAdmin(user: User, chatRoom: ChatRoom): Promise<Boolean> {
     const isAdmin = await this.prisma.chatRoom
-    .findUnique({ where: { id: chatRoom.id } })
-    .admin({ where: { id: user.id } })
+      .findUnique({ where: { id: chatRoom.id } })
+      .admin({ where: { id: user.id } })
     const finded = isAdmin.find((obj) => obj.id === user.id);
     if (finded)
       return true;
@@ -25,20 +25,20 @@ export class ChatRoomService {
       select: { owner: { select: { id: true } } },
     });
     console.log('isOwner ===', isOwner);
-      if (isOwner.owner.id === user.id)
-        return true;
-      else
-        return false;
+    if (isOwner.owner.id === user.id)
+      return true;
+    else
+      return false;
   }
 
   async isMuted(user: User, chatRoom: ChatRoom): Promise<boolean> {
     const isMuted = await this.prisma.chatRoom
       .findUnique({ where: { id: chatRoom.id } })
       .muted({ where: { id: user.id } })
-      const finded = isMuted.find((obj) => obj.id === user.id);
-      if (finded)
-        return true;
-      else
+    const finded = isMuted.find((obj) => obj.id === user.id);
+    if (finded)
+      return true;
+    else
       return false;
   }
 
@@ -46,26 +46,26 @@ export class ChatRoomService {
     const isBanned = await this.prisma.chatRoom
       .findUnique({ where: { id: chatRoom.id } })
       .banned({ where: { id: user.id } })
-      const finded = isBanned.find((obj) => obj.id === user.id);
-      if (finded)
-        return true;
-      else
-        return false;
+    const finded = isBanned.find((obj) => obj.id === user.id);
+    if (finded)
+      return true;
+    else
+      return false;
   }
 
   async isMember(user: User, chatRoom: any): Promise<boolean> {
     const isMember = await this.prisma.chatRoom
       .findUnique({ where: { id: chatRoom.id } })
       .members({ where: { id: user.id } })
-      const finded = isMember.find((obj) => obj.id === user.id);
-      if (finded)
-        return true;
-      else
+    const finded = isMember.find((obj) => obj.id === user.id);
+    if (finded)
+      return true;
+    else
       return false;
   }
 
   async getAllChatRoom() {
-    const rooms = await this.prisma.chatRoom.findMany({ });
+    const rooms = await this.prisma.chatRoom.findMany({});
     return rooms;
   }
 
@@ -84,7 +84,7 @@ export class ChatRoomService {
   //   });
   // }
 
-  async createMessage(text: string, user:any, chatRoom:any) {
+  async createMessage(text: string, user: any, chatRoom: any) {
     const messageData: Prisma.MessageCreateInput = {
       content: text,
       senderId: user.id,

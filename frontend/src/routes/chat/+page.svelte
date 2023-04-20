@@ -14,7 +14,7 @@
 		roomName: '',
 		private: false
 	};
-	let userPseudoInput:any;
+	let userPseudoInput: any;
 	let messages: any[];
 	let currentRoom: any = {
 		id: 0,
@@ -33,8 +33,11 @@
 	let banned: any = [];
 	let membres: any = [];
 	let blocked: any = [];
-	let alert:boolean = false;
-	let passwordInput:boolean = false;
+	let alert: boolean = false;
+	let passwordInput = {
+		bool: false,
+		roomId: 0
+	};
 
 	// INTERFACES
 
@@ -106,25 +109,24 @@
 		}
 	}
 
-	function handlePasswordInputKeyDown(event: any, room:ChatRoom) {
+	function handlePasswordInputKeyDown(event: any, room: ChatRoom) {
 		if (event.key === 'Enter') {
-    		const value = event.target.value;
+			const value = event.target.value;
 			handleRoomButton(room, value);
-			passwordInput = false;
+			passwordInput.bool = false;
+			passwordInput.roomId = 0;
 		}
 	}
 
-	
-
 	function handleInvitUserInput() {
-    	console.log('Valeur de l\'input :', userPseudoInput);
+		console.log("Valeur de l'input :", userPseudoInput);
 	}
 
-  	function handleInvitKeyPress(event:any) {
-    	if (event.key === 'Enter') {
-      		handleInvitUserInput();
-    	}
-  	}
+	function handleInvitKeyPress(event: any) {
+		if (event.key === 'Enter') {
+			handleInvitUserInput();
+		}
+	}
 
 	async function checkBan(room: any) {
 		const cookies = document.cookie.split(';');
@@ -156,8 +158,9 @@
 		}
 	}
 
-	function displayInputPassword() {
-		passwordInput = true;
+	function displayInputPassword(id: number) {
+		passwordInput.bool = true;
+		passwordInput.roomId = id;
 	}
 
 	async function updateChatRooms(newRoom: ChatRoom) {
@@ -182,18 +185,19 @@
 		if (currentRoom && currentRoom.id === room.id) {
 			return;
 		}
-		currentRoom = room;
 		if (room?.id) messages = await fletchMessageOfRoom(room.id);
 		else messages = [];
-
 		socket.emit('getMessage', room);
 		socket.emit('getUser', room);
-		socket.emit('joinRoom', room);
-		await fletchUserData();
-		await fletchMuteBanData();
-		await fletchMembres();
-		await fletchBlocked();
-		isShown = false;
+		socket.emit('joinRoom', { room: room, password: pw });
+		socket.on('sucess', async () => {
+			currentRoom = room;
+			await fletchUserData();
+			await fletchMuteBanData();
+			await fletchMembres();
+			await fletchBlocked();
+			isShown = false;
+		});
 	}
 
 	function checkPrivate() {
@@ -372,8 +376,8 @@
 				const response = await fetch(`http://localhost:3000/chat/userInfo?code=${currentRoom.id}`, {
 					headers
 				});
-				const data = parseInt(await response.json(), 10);
-				currentUser.status = data;
+				const data = await response.json();
+				currentUser.status = parseInt(data, 10);
 			}
 		}
 	};
@@ -516,7 +520,9 @@
 
 	onMount(async () => {
 		const cookies = document?.cookie?.split(';');
-		const accessTokenCookie = cookies?.find((cookie) => cookie?.trim()?.startsWith('access_token='));
+		const accessTokenCookie = cookies?.find((cookie) =>
+			cookie?.trim()?.startsWith('access_token=')
+		);
 		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
 		socket = io('http://localhost:3000', {
 			extraHeaders: {
@@ -607,7 +613,7 @@
 			}
 		});
 		socket.on('roomLeaved', async (data) => {
-			if (currentRoom.id === data) {
+			if (currentRoom?.id === data) {
 				membres = await fletchMembres();
 			}
 		});
@@ -688,11 +694,11 @@
 				membres = [...membres, data.user];
 			}
 		});
-		socket.on('wrongPW', async(data) => {
+		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
 				alert = true;
 			}
-		})
+		});
 		chatRooms = await fletchChatRoomsData();
 		currentUser = await fletchCurrentUserData();
 		if (currentUser.id < 0) {
@@ -712,11 +718,11 @@
 
 <!-- <h1>Chat</h1> -->
 {#if loading === false}
-<p>Chargement...</p>
+	<p>Chargement...</p>
 {:else}
-<div class='room-list-bloc'>
-	<div class='public-room'>
-		<h2 class='room-title'>Rooms publics</h2>
+	<div class="room-list-bloc">
+		<div class="public-room">
+			<h2 class="room-title">Rooms publics</h2>
 			{#each chatRooms as chatRoom}
 				{#if chatRoom.private === false && chatRoom.password == false}
 					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
@@ -724,152 +730,152 @@
 					>
 				{/if}
 				{#if chatRoom.private === false && chatRoom.password == true}
-					<button class="chatroom-button" on:click={() => displayInputPassword()}
+					<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}
 						>{chatRoom.name}</button
 					>
-					{#if passwordInput == true}
-						<input type="text" on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}>
+					{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
+						<input
+							type="text"
+							on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}
+						/>
 					{/if}
 				{/if}
 			{/each}
 		</div>
 
-	<div class='public-room'>
-		<h2 class='room-title'>Rooms Privées</h2>
+		<div class="public-room">
+			<h2 class="room-title">Rooms Privées</h2>
 			{#each chatRooms as chatRoom}
-			{#if chatRoom.private === true}
+				{#if chatRoom.private === true}
 					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}
 						>{chatRoom.name}</button
 					>
 				{/if}
 			{/each}
+		</div>
+
+		<div class="direct-room">
+			<h2 class="room-title">Messages Directs</h2>
+		</div>
 	</div>
-
-	<div class='direct-room'>
-		<h2 class='room-title'>Messages Directs</h2>
-
-	</div>
-
-</div>
 {/if}
 
-
-<div class='create-room'>
-	<h2 class='room-form-title'>Creer une room:</h2>
+<div class="create-room">
+	<h2 class="room-form-title">Creer une room:</h2>
 	<form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
-	<label for="roomName"></label>
-	<input
-	class="form-input"
-	type="text"
-	id="roomName"
-	name="roomName"
-	placeholder="Nom de la salle *"
-	on:input={handleNameInput}
-	required
-	/>
-	
-	<label for="password"></label>
-	<input
-	class="form-input"
-		type="password"
-		id="password"
-		name="password"
-		placeholder="Mot de passe"
-		on:input={handlePasswordInput}
-		/>
-		
-		<label>
+		<label for="roomName" />
 		<input
-		class="form-input"
-		type="checkbox"
-		id="private"
-			name="private"
-			on:change={handlePrivateOption}
+			class="form-input"
+			type="text"
+			id="roomName"
+			name="roomName"
+			placeholder="Nom de la salle *"
+			on:input={handleNameInput}
+			required
 		/>
-		Salle privée
-	</label>
-	<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
-</form>
+
+		<label for="password" />
+		<input
+			class="form-input"
+			type="password"
+			id="password"
+			name="password"
+			placeholder="Mot de passe"
+			on:input={handlePasswordInput}
+		/>
+
+		<label>
+			<input
+				class="form-input"
+				type="checkbox"
+				id="private"
+				name="private"
+				on:change={handlePrivateOption}
+			/>
+			Salle privée
+		</label>
+		<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
+	</form>
 </div>
 
-{#if alert==true}
-<alert>
-	Mot de passe incorect
-	<button  on:click={closeAlert}> OK </button>
-</alert>
+{#if alert == true}
+	<alert>
+		Mot de passe incorect
+		<button on:click={closeAlert}> OK </button>
+	</alert>
 {/if}
 
 {#if currentRoom}
-	<div class='room-bandeau'>
+	<div class="room-bandeau">
 		{#if currentRoom.name.length}
-		<input class="room-bandeau-form-input" on:keypress={handleInvitKeyPress} bind:value={userPseudoInput} />
-		<button class= "room-bandeau-button" on:click={handleInvitInput}>Ajouter un utilisateur </button>
-		<h3 class='room-name'>{currentRoom.name}</h3>
-		<button class='leave-chat' on:click={leaveRoom}>Quitter la room</button>
+			<input
+				class="room-bandeau-form-input"
+				on:keypress={handleInvitKeyPress}
+				bind:value={userPseudoInput}
+			/>
+			<button class="room-bandeau-button" on:click={handleInvitInput}
+				>Ajouter un utilisateur
+			</button>
+			<h3 class="room-name">{currentRoom.name}</h3>
+			<button class="leave-chat" on:click={leaveRoom}>Quitter la room</button>
 		{/if}
 	</div>
 
-
-
 	{#if currentRoom?.id}
-	<div class='message-container'>
-		<div class="chat-messages">
-			{#if messages && messages.length}
-			{#each messages as msg}
-			<p>
-				{#if msg.senderPseudo == 'server'}
-					<button class='server-message'>
-						{msg.senderPseudo}
-					</button>
+		<div class="message-container">
+			<div class="chat-messages">
+				{#if messages && messages.length}
+					{#each messages as msg}
+						<p>
+							{#if msg.senderPseudo == 'server'}
+								<button class="server-message">
+									{msg.senderPseudo}
+								</button>
+							{/if}
+							{#if msg.senderPseudo != 'server'}
+								<button
+									class="pseudo-button-message"
+									on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
+								>
+									{msg.senderPseudo}
+								</button>
+							{/if}
+							<span class="message">
+								{msg.content}
+							</span>
+						</p>
+					{/each}
 				{/if}
-				{#if msg.senderPseudo != 'server'}
-				<button
-				class="pseudo-button-message"
-				on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
-				>
-				{msg.senderPseudo}
-			</button>
-			{/if}
-			<span class='message'> 
-				{msg.content}
-			</span>
-		</p>
-			{/each}
-			{/if}
-		</div>
-		{#if currentRoom.name.length}
-		<div class='message-input-container'>
-			<input
-			on:input={handleMessageInput}
-			on:keypress={handleMessageKeyPress}
-					class="message-input"
-					type="text"
-					id="message"
-					name="message"
+			</div>
+			{#if currentRoom.name.length}
+				<div class="message-input-container">
+					<input
+						on:input={handleMessageInput}
+						on:keypress={handleMessageKeyPress}
+						class="message-input"
+						type="text"
+						id="message"
+						name="message"
 					/>
-				<button
-				class='send-message-button'
-				id="sendMessageButton"
-				type="submit"
-				disabled
-				on:click={(event) => {
-					const messageInput = document.getElementById('message');
-					if (messageInput instanceof HTMLInputElement) {
-						sendMessage(event, messageInput, currentRoom);
-						messageInput.value = '';
-					}
-				}}>Envoyer</button
-			>
-		</div>
+					<button
+						class="send-message-button"
+						id="sendMessageButton"
+						type="submit"
+						disabled
+						on:click={(event) => {
+							const messageInput = document.getElementById('message');
+							if (messageInput instanceof HTMLInputElement) {
+								sendMessage(event, messageInput, currentRoom);
+								messageInput.value = '';
+							}
+						}}>Envoyer</button
+					>
+				</div>
 			{/if}
 		</div>
-			{/if}
+	{/if}
 
-
-
-
-
-			{#if isShown === true}
+	{#if isShown === true}
 		<div class="menu">
 			{#if showOptionsPseudo.length}
 				<select id="pseudo-menu" on:change={handleSelect}>
@@ -906,46 +912,48 @@
 {/if}
 
 <div class="admin-panel">
-
+	{#if currentRoom?.id}
+		<div class="membre">
+			<p class="pannel-title">Membres</p>
+			{#if membres && membres.length}
+				{#each membres as member}
+					<button
+						class="pseudo-button"
+						on:click={(event) => handleClickPseudo(event, member.pseudo)}
+					>
+						{member.pseudo}
+					</button>
+				{/each}
+			{/if}
+		</div>
+	{/if}
 
 	{#if currentRoom?.id}
-	<div class="membre">
-		<p class='pannel-title'>Membres</p>
-		{#if membres && membres.length}
-		{#each membres as member}
-		<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, member.pseudo)}>
-			{member.pseudo}
-		</button>
-		{/each}
-		{/if}
-	</div>
-	{/if}
+		<div class="banned">
+			<p class="pannel-title">Banned</p>
+			{#if banned?.length}
+				{#each banned as ban}
+					<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
+						{ban.pseudo}
+					</button>
+				{/each}
+			{/if}
+		</div>
 
-
-	{#if currentRoom?.id}
-	<div class="banned">
-		<p class='pannel-title'>Banned</p>
-		{#if banned?.length}
-		{#each banned as ban}
-		<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
-			{ban.pseudo}
-		</button>
-		{/each}
-		{/if}
-	</div>
-
-<div class= "muted">
-	{#if currentRoom?.id}
-	<p class='pannel-title'>Muted</p>
-	{#if muted?.length}
-	{#each muted as mute}
-	<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
-		{mute.pseudo}
-	</button>
-	{/each}
+		<div class="muted">
+			{#if currentRoom?.id}
+				<p class="pannel-title">Muted</p>
+				{#if muted?.length}
+					{#each muted as mute}
+						<button
+							class="pseudo-button"
+							on:click={(event) => handleClickPseudo(event, mute.pseudo)}
+						>
+							{mute.pseudo}
+						</button>
+					{/each}
+				{/if}
+			{/if}
+		</div>
 	{/if}
-	{/if}
-</div>
-	{/if}
-
 </div>
