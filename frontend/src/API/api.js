@@ -5,13 +5,6 @@
     return accessToken;
  }
 
-//  const setSocketId = async (userId) => {
-//     const accessToken = await fetchAccessToken();
-//     if (accessToken) {
-//         const response = await fetch(`http://localhost:3000/websocket/setSocket/${userId}`, {
-//     }
-//     }
-
  const fetchDataOfUser = async (user) => {
     const accessToken = await fetchAccessToken();
     console.log(user);

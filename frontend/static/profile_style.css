@@ -61,7 +61,15 @@
 	-2px 1px 30px #00b309;
 }
 
-
+.send_message{
+	color: white;
+	width:40px;
+	height:40px;
+	font-size: 22px;
+	background-color: transparent;
+	cursor: pointer;
+	border: none;
+}
 
 /* .edit_button {
 	display: block;
