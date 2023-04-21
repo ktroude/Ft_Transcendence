@@ -464,7 +464,6 @@ export class ChatRoomGateway
     const userToAdd = await this.prismaService.user.findUnique({
       where: { pseudo: data.pseudo },
     });
-    console.log('userToAdd ==', userToAdd.pseudo);
     if (!userToAdd) {
       this.server.emit('UserAdded', { sucess: false, userToAdd: null, user: user })
       return;

@@ -891,7 +891,7 @@
 				on:keypress={handleInvitKeyPress}
 				bind:value={userPseudoInput}
 			/>
-			<button class="room-bandeau-button" on:click={handleInvitInput}
+			<button class="room-bandeau-button" on:click={handleInvitUserInput}
 				>Ajouter un utilisateur
 			</button>
 			<h3 class="room-name">{currentRoom.name}</h3>

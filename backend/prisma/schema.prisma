@@ -45,6 +45,9 @@ model User {
   adminOf  ChatRoom[] @relation("ChatRoomAdmin")
   ownerOf  ChatRoom[] @relation("ChatRoomOwned")
 
+  ownerOneOf DirectMessageRoom[] @relation("ownerOne")
+  ownerTwoOf DirectMessageRoom[] @relation("ownerTwo")
+
   @@map("user") // indique que le nom de la table est "user" plutôt que "User"
 }
 
@@ -99,6 +102,22 @@ model ChatRoom {
   @@map("chat_room")
 }
 
+model DirectMessageRoom {
+  id  Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownerOneId  Int
+  ownerTwoId  Int
+
+  ownerOne  User @relation("ownerOne", fields: [ownerOneId], references: [id])
+  ownerTwo  User @relation("ownerTwo", fields: [ownerTwoId], references: [id])
+
+  messages DirectMessage[] @relation("directMessages")
+
+  @@map("direct_message")
+}
+
 // table intermediaire, permettra de checker qu'un user est dans une room qu'une seule fois 
 // (qu'il ne se co pas 50 fois a la meme room, ca peut etre chiant)
 model ChatRoomMembers {
@@ -121,4 +140,15 @@ model Message {
   chatRoom     ChatRoom @relation("ChatRoomMessages", fields: [chatRoomId], references: [id])
 
   @@map("message")
+}
+
+model DirectMessage {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  content String
+  senderId Int
+  senderPseudo String
+  directMessageRoomId Int
+  directMessageRoom DirectMessageRoom @relation("directMessages", fields: [directMessageRoomId], references: [id])
 }
