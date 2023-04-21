@@ -42,7 +42,7 @@
 	<div class="welcome_box">
 		<h1 class="welcome_h1">
             <span class="Bienvenue">Bienvenue,</span>
-            <span class="typewriter">ple-berr</span>
+            <span class="typewriter">{user?.username}</span>
         </h1>
         <img class="boune" src="/img/Bounejump.gif" alt="">
 	</div>
@@ -87,6 +87,7 @@
         pseudo: string;
         firstName: string;
         lastName: string;
+        username: string;
     }
 
     onMount(async function() {

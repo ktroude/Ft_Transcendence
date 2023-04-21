@@ -9,7 +9,6 @@
 <body>
 	<div class="game_navbar">
 		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
-		<!-- <button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button> -->
 		<button class="button_nav" on:click={() => gotoprofile()}>Profile</button>
 		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
 		<button class="button_nav" on:click={() => goto('/game')}>Game</button>

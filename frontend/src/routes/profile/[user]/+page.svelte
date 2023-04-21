@@ -44,21 +44,6 @@
 
     </div>
 
-	
-	<!-- <div class="game_navbar">
-		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
-		<button on:click={() => goto('/profile/edit')}>Edit profile</button> 
-		{#if user?.username === currentUser}
-			<button class="button_nav">Profile</button>
-		{:else}
-			<button class="button_nav" on:click={() => goto(`/profile/${realUser}`) && loadpage()}>Profile</button>
-		{/if}
-		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
-		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
-	</div> -->
-
-
-
 	<div class="main_profile">
 		<div class="main_box">
 			<div class="username_bloc">
@@ -77,6 +62,10 @@
 		<img class=".profile_img" src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
 		 {#if user?.username === currentUser} 
 		 <button class="edit_button" on:click={() => goto('/profile/edit')}>Edit profile</button>
+     {:else}
+     <button class="send_message" on:click={() => sendMessage()}>
+      <img class="button_picture" src="/img/chat_icone.png" alt="Image button"/>
+    </button>
 		 {/if}
 	</div>
 </body>
@@ -114,6 +103,15 @@
 		imageURL = URL.createObjectURL(blob); // Create a URL for the blob
 	}
 	
+  async function sendMessage()
+  {
+    const accessToken = await fetchAccessToken();
+    if (accessToken)
+      goto(`/chat/dm/${user.username}`);
+    else
+      console.log('Error: Could not send message');
+  }
+
 	async function block(realUser, blockerUser) {
 		await fetchData();
 		const accessToken = await fetchAccessToken();
