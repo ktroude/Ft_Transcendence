@@ -1,0 +1,125 @@
+*{
+	user-select: none;
+	margin:0px;
+	padding:0px;
+	font-family: 'Bebas Neue', cursive;
+	font-weight: 700; /* Add this line */
+	box-sizing: border-box;
+  }
+  body{
+	font-family: 'Roboto', sans-serif;
+	overflow: hidden;
+	color: white;
+	margin:0px;
+	padding:0px;
+	width: 100vw;
+	height: 100vh;    
+	background-image:  url("/img/bg1.jpg");
+	background-position: center;
+	background-size: cover;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+  }
+  
+  /* <!-- ****************************** -->
+	 <!-- ********** HOMEPAGE ********** -->
+	 <!-- ****************************** --> */
+  
+  .Ft-Transcendence {
+	  font-size: 180px;  
+	  position: relative;
+	  font-weight: 700;
+	  margin-top: 5rem;
+	  z-index: 1;
+	  background-image: url("https://e0.pxfuel.com/wallpapers/879/348/desktop-wallpaper-dofus.jpg");
+	  background-size: 110% auto;
+	  background-position: center;
+	  color: transparent;
+	  -webkit-background-clip: text;
+	  background-clip: text;
+	  background-size:50%;
+	  text-shadow: 6px 6px 0px rgba(0,0,0,0.2);
+  }
+  
+  .welcome_box{
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-radius: 3px;
+	width: 400px;
+	height: 400px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	margin: auto;
+	margin-bottom: 150px;
+	justify-content: top;
+	font-family: 'Bebas Neue', cursive;
+	box-shadow: 10px 10px 50px black;
+  }
+  .boune{
+	width: 120px;
+	height: auto;
+	position: absolute
+  }
+  .Bienvenue{
+	margin-top: 10px;
+	font-size: 40px;
+	font-family: 'Bebas Neue', cursive;
+	color: rgb(255, 255, 255);
+  }
+  .welcome_h1{
+	margin-top: 120px;
+	margin-bottom: 20px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	text-align: center;
+	letter-spacing: .12rem;
+  }
+  .typewriter{
+	height: 40px;
+	letter-spacing: .05rem;
+	font-family: 'Bebas Neue', cursive;
+	padding-left: 10px;
+	color: greenyellow;
+	font-size: 40px;
+	text-align: center;
+	text-decoration: underline;
+	overflow: hidden; /* Ensures the content is not revealed until the animation */
+	border-right: 0.1em solid greenyellow; /* The typewriter cursor */
+	white-space: nowrap; /* Keeps the content on a single line */
+	margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+	animation: typing 0.5s steps(40, end), blink 1.5s step-end infinite;
+	display: inline-block; /* Make the element inline-block to adjust its width */
+	box-sizing: border-box; /* Include the border in the element's total width */
+  }
+  @keyframes typing {
+	from { width: 0 }
+	to { width: 40%;}
+  }
+  @keyframes blink {
+	from, to { border-color: transparent }
+	50% { border-color: white; }
+  }
+  
+  .footer_name{
+	font-size: 20px;
+	color: greenyellow;
+  }
+  
+  
+  @media screen and (max-width: 1200px) {
+	  .Ft-Transcendence {
+		  font-size: 120px;  
+		  animation: reduce 1s ease-in-out;
+	  }
+	  @keyframes reduce {
+		  from, to { 		font-size: 160px;  
+		  }
+		  100% {		font-size: 120px;  
+			  ; }
+		}
+  }
