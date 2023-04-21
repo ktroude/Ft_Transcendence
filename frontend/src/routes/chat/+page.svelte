@@ -825,7 +825,7 @@
 
 		<div class="create-room">
 			<h2 class="room-form-title">Creer une room:</h2>
-			<form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
+			<form class="create_room_form" on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
 				<label for="roomName" />
 				<input
 					class="form-input"
@@ -847,7 +847,7 @@
 					on:input={handlePasswordInput}
 				/>
 
-				<label>
+				<label class="private_room">
 					<input
 						class="form-input"
 						type="checkbox"
@@ -855,9 +855,9 @@
 						name="private"
 						on:change={handlePrivateOption}
 					/>
-					Salle privée
+					Salle privée 🔒
 				</label>
-				<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
+				<button class="form_button" type="submit" disabled={!isFormValid}>Créer la salle</button>
 			</form>
 		</div>
 			<div class="public_room_list">
@@ -869,9 +869,10 @@
 						</button>
 						{/if}
 						{#if chatRoom.private === false && chatRoom.password == true}
+				
 						<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
-							<div class='lock-image'> </div>
-						<span class='buton-room-name'> {chatRoom.name} </span>
+							<!-- <div class='lock-image'> </div> -->
+							{chatRoom.name}
 						</button>
 						{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
 						<input class='password-room-access-input' type="password" placeholder="Mot de passe"
@@ -921,108 +922,97 @@
 			</div>
 			{/if}
 		</div>
-	{/if}
 
-{#if alert == true}
+<!-- {#if alert == true}
 	<alert>
 		Mot de passe incorect
 		<button on:click={closeAlert}> OK </button>
 	</alert>
-{/if}
+{/if} -->
 
-<div class="message-container">
+
+
+
+
+
+<div class="message_container">
 {#if currentRoom}
-	{#if currentRoom?.id}
-		<div class="chat-messages" id="chat-messages">
-			{#if messages && messages.length}
-				{#each messages as msg}
-					<p>
-						{#if msg.senderPseudo == 'server'}
-							<button class="server-message">
-								{msg.senderPseudo}
-							</button>
-						{/if}
-						{#if msg.senderPseudo != 'server'}
-							<button
-								class="pseudo-button-message"
-								on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
-							>
-								{msg.senderPseudo}
-							</button>
-						{/if}
-						<span class="message">
-							{msg.content}
-						</span>
-					</p>
-				{/each}
-			{/if}
-		</div>
+
+	<!-- <div class="room-bandeau">
 		{#if currentRoom.name.length}
-			<div class="message-input-container">
-				<input
-					on:input={handleMessageInput}
-					on:keypress={handleMessageKeyPress}
-					class="message-input"
-					type="text"
-					id="message"
-					name="message"
-				/>
-				<button
-					class="send-message-button"
-					id="sendMessageButton"
-					type="submit"
-					disabled
-					on:click={(event) => {
-						const messageInput = document.getElementById('message');
-						if (messageInput instanceof HTMLInputElement) {
-							sendMessage(event, messageInput, currentRoom);
-							messageInput.value = '';
-						}
-					}}>Envoyer</button>
+			<input
+				class="room-bandeau-form-input"
+				on:keypress={handleInvitKeyPress}
+				bind:value={userPseudoInput}
+			/>
+			<button class="room-bandeau-button" on:click={handleInvitUserInput}
+				>Ajouter un utilisateur
+			</button>
+			<h3 class="room-name">{currentRoom.name}</h3>
+			<button class="leave-chat" on:click={leaveRoom}>Quitter la room</button>
+		{/if}
+	</div> -->
+
+	{#if currentRoom?.id}
+			<div class="chat-messages" id="chat-messages">
+				{#if messages && messages.length}
+					{#each messages as msg}
+						<p>
+							{#if msg.senderPseudo == 'server'}
+								<button class="server-message">
+									{msg.senderPseudo}
+								</button>
+							{/if}
+							{#if msg.senderPseudo != 'server'}
+								<button
+									class="pseudo-button-message"
+									on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
+								>
+									{msg.senderPseudo}
+								</button>
+							{/if}
+							<span class="message">
+								{msg.content}
+							</span>
+						</p>
+					{/each}
+				{/if}
 			</div>
-		{/if}
-		{/if}
-		{/if}
-</div>
+			{#if currentRoom.name.length}
+				<div class="message-input-container">
+					<input
+						on:input={handleMessageInput}
+						on:keypress={handleMessageKeyPress}
+						class="message-input"
+						type="text"
+						id="message"
+						name="message"
+					/>
+					<button
+						class="send-message-button"
+						id="sendMessageButton"
+						type="submit"
+						disabled
+						on:click={(event) => {
+							const messageInput = document.getElementById('message');
+							if (messageInput instanceof HTMLInputElement) {
+								sendMessage(event, messageInput, currentRoom);
+								messageInput.value = '';
+							}
+						}}>Envoyer</button
+					>
+				</div>
+			{/if}
+	{/if}
 
 	<!-- <div class="right_bloc"> -->
-	{#if isShown === true}
-		<div class="menu">
-			{#if showOptionsPseudo.length}
-				<select id="pseudo-menu" on:change={handleSelect}>
-					<option>Options</option>
-					{#if find(showOptionsPseudo, 'profile') === true}
-						<option value="profile">Voir le profil</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'ban') === true}
-						<option value="ban">Bannir</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'mute') === true}
-						<option value="mute">Muter</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'kick') === true}
-						<option value="kick">Expulser</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'unBan') === true}
-						<option value="unBan">Débannir</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'unMute') === true}
-						<option value="unMute">Démute</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'upAdmin') === true}
-						<option value="upAdmin">Passer admin</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'unAdmin') === true}
-						<option value="unAdmin">Retirer admin</option>
-					{/if}
-				</select>
-				<button on:click={delMenu}>X</button>
-			{/if}
-		</div>
-	{/if}
+	
 {/if}
+</div>
 
-<div class="admin-panel">
+
+<div class="right_bloc">
+<div class="user_list">
 	{#if currentRoom?.id}
 		<div class="public-room">
 			<h2 class="room-title">Membres</h2>
@@ -1067,5 +1057,40 @@
 		</div>
 		{/if}
 	</div>
+	<div class="menu">
+	{#if isShown === true}
+			{#if showOptionsPseudo.length}
+				<select id="pseudo-menu" on:change={handleSelect}>
+					<option>Options</option>
+					{#if find(showOptionsPseudo, 'profile') === true}
+						<option value="profile">Voir le profil</option>
+					{/if}
+					{#if find(showOptionsPseudo, 'ban') === true}
+						<option value="ban">Bannir</option>
+					{/if}
+					{#if find(showOptionsPseudo, 'mute') === true}
+						<option value="mute">Muter</option>
+					{/if}
+					{#if find(showOptionsPseudo, 'kick') === true}
+						<option value="kick">Expulser</option>
+					{/if}
+					{#if find(showOptionsPseudo, 'unBan') === true}
+						<option value="unBan">Débannir</option>
+					{/if}
+					{#if find(showOptionsPseudo, 'unMute') === true}
+						<option value="unMute">Démute</option>
+					{/if}
+					{#if find(showOptionsPseudo, 'upAdmin') === true}
+						<option value="upAdmin">Passer admin</option>
+					{/if}
+					{#if find(showOptionsPseudo, 'unAdmin') === true}
+						<option value="unAdmin">Retirer admin</option>
+					{/if}
+				</select>
+				<button on:click={delMenu}>X</button>
+			{/if}
+			{/if}
+	</div>
 </div>
+{/if}
 </body>
