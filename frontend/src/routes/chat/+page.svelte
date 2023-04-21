@@ -873,7 +873,6 @@
 							<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
 								<span>🔒 </span>
 								{ chatRoom.name}
-							<!-- <div class='lock-image'> </div> -->
 						</button></div>
 						{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
 						<input class='password-room-access-input' type="password" placeholder="Mot de passe"
@@ -898,8 +897,6 @@
 				<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
 					<span>🔒</span>
 					<span class="lock"> {chatRoom.name}</span>
-					
-					<div class='lock-image'> </div>
 				</button></div>
 				{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
 				<input
@@ -1047,7 +1044,7 @@
 			{#if banned?.length}
 				{#each banned as ban}
 					<button class="pseudo-button-message" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
-						{ban.pseudo}
+						💀 {ban.pseudo}
 					</button>
 				{/each}
 			{/if}
@@ -1061,7 +1058,7 @@
 						<button
 							class="pseudo-button-message"
 							on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
-							{mute.pseudo}
+							🔕 {mute.pseudo}
 						</button>
 					{/each}
 				{/if}
@@ -1072,33 +1069,41 @@
 	<div class="menu">
 	{#if isShown === true}
 			{#if showOptionsPseudo.length}
-				<select id="pseudo-menu" on:change={handleSelect}>
-					<option>Options</option>
+				<!-- <select id="pseudo-menu" on:change={handleSelect}> -->
+					<!-- <option>Options</option> -->
 					{#if find(showOptionsPseudo, 'profile') === true}
-						<option value="profile">Voir le profil</option>
+						<button class="button_show_profile" value="profile">Voir le profil</button>
+						<!-- <option value="profile">Voir le profil</option> -->
+						{/if}
+						{#if find(showOptionsPseudo, 'ban') === true}
+						<button class="button_show_profile" value="ban">Bannir</button>
+						<!-- <option value="ban">Bannir</option> -->
+						{/if}
+						{#if find(showOptionsPseudo, 'mute') === true}
+						<button class="button_show_profile" value="profile">Mute</button>
+						<!-- <option value="mute">Muter</option> -->
+						{/if}
+						{#if find(showOptionsPseudo, 'kick') === true}
+						<button class="button_show_profile" value="profile">Expulser</button>
+						<!-- <option value="kick">Expulser</option> -->
+						{/if}
+						{#if find(showOptionsPseudo, 'unBan') === true}
+						<button class="button_show_profile" value="profile">Débannir</button>
+						<!-- <option value="unBan">Débannir</option> -->
+						{/if}
+						{#if find(showOptionsPseudo, 'unMute') === true}
+						<button class="button_show_profile" value="profile">Démute</button>
+						<!-- <option value="unMute">Démute</option> -->
+						{/if}
+						{#if find(showOptionsPseudo, 'upAdmin') === true}
+						<button class="button_show_profile" value="profile">OP</button>
+						<!-- <option value="upAdmin">Passer admin</option> -->
+						{/if}
+						{#if find(showOptionsPseudo, 'unAdmin') === true}
+						<button class="button_show_profile" value="profile">DE-OP</button>
+						<!-- <option value="unAdmin">Retirer admin</option> -->
 					{/if}
-					{#if find(showOptionsPseudo, 'ban') === true}
-						<option value="ban">Bannir</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'mute') === true}
-						<option value="mute">Muter</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'kick') === true}
-						<option value="kick">Expulser</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'unBan') === true}
-						<option value="unBan">Débannir</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'unMute') === true}
-						<option value="unMute">Démute</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'upAdmin') === true}
-						<option value="upAdmin">Passer admin</option>
-					{/if}
-					{#if find(showOptionsPseudo, 'unAdmin') === true}
-						<option value="unAdmin">Retirer admin</option>
-					{/if}
-				</select>
+				<!-- </select> -->
 				<button on:click={delMenu}>X</button>
 			{/if}
 			{/if}

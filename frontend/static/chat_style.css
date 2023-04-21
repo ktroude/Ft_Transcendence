@@ -115,7 +115,7 @@
     padding: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
+}
 .chatroom-button:hover{
     cursor: pointer;
     color: greenyellow;
@@ -132,8 +132,6 @@
 	align-items: center;
 }
 
-
-
 .private_room_list{
 	border-bottom: 1px solid white;
 	height:30vh;
@@ -145,7 +143,6 @@
 	padding: 10px;
 	overflow-x: scroll;
 }
-
 
 .room_settings{
 	display: flex;
@@ -195,16 +192,6 @@
 	text-shadow: 3px 3px 20px #b30000,
 	-2px 1px 30px #b30000;
 }
-
-
-
-
-
-
-
-
-
-
 
 .message_container{
 	width: 60vw;
@@ -369,6 +356,8 @@
 	width: 20vw;
 	/* background-color: rgba(122, 122, 122, 0.084); */
 	backdrop-filter: blur(5px);
+	display: flex;
+	flex-direction: column;
 }
 
 .public_room{
@@ -397,4 +386,20 @@
 	border: none;
 	color: red;
 	font-size: 20px;
+}
+
+
+.button_show_profile{
+	background-color: transparent;
+	color: yellow;
+	border: none;
+	font-size: 18px;
+}
+
+.button_show_profile:hover{
+	cursor: pointer;
+	background-color: transparent;
+	color: yellow;
+	text-shadow: 3px 3px 10px rgba(255, 255, 0, 0.353),
+	-2px 1px 10px rgba(255, 255, 0, 0.357);
 }
