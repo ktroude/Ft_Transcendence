@@ -1,5 +1,13 @@
 <svelte:head>
-	<link rel="stylesheet" href="/style_profile.css" />
+	<!-- <link rel="stylesheet" href="/style_profile.css" /> -->
+	<link rel="stylesheet" href="/edit_style.css" />
+	<link rel="stylesheet" href="/profile_style.css" />
+	<link rel="stylesheet" href="/homepage_style.css" />
+	<link rel="stylesheet" href="/navbar.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 </svelte:head>
 
 <!-- ****************************** -->
@@ -7,21 +15,38 @@
 <!-- ****************************** -->
 
 <main>
-	<div class="game_navbar">
-		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
-		<button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button>
-		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
-		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
-	</div>
+    <div class="game_navbar">
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/home_icone.png">
+            <button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+        </div>
+
+		<div class="button_box">
+			<img class="button_picture" src="/img/profile_icone.png">
+			<button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`) && loadpage()}>Profile</button>
+		</div>
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/game_icone.png">
+            <button class="button_nav" on:click={() => goto('/game')}>Game</button>
+        </div>
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/chat_icone.png">
+            <button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
+        </div>
+
+    </div>
 	<div class="edit_main">
 		<div class="edit_box">
 			<h1>{user?.pseudo}</h1>
 			<label for="username-input">New Username:</label>
 			<input type="text" id="username-input" bind:value={newUsername} />
-			<button on:click={handleUpdateUsername}>Update</button>
+			<button  class="update_button" on:click={handleUpdateUsername}>Update</button>
 			<!-- svelte-ignore a11y-img-redundant-alt -->
 			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
-			<input type="file" class="upload-button" on:change={handleFileUpload} />
+			<input type="file" on:change={handleFileUpload} />
 		</div>
 	</div>
 </main>

@@ -1,0 +1,113 @@
+
+/* <!-- ****************************** -->
+   <!-- *********** PROFILE ********** -->
+   <!-- ****************************** --> */
+
+.main_profile {
+	margin: 10px;
+	display: flex;
+	flex-direction: column;
+	color: greenyellow;
+	margin:auto;
+}
+.main_box {
+	margin:auto;
+	max-width: 600px;
+	padding: 20px;
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-radius: 3px;
+	width: 400px;
+	height: 400px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	margin: auto;
+	justify-content: top;
+	font-family: 'Bebas Neue', cursive;
+	box-shadow: 10px 10px 50px black;
+}
+.username_bloc {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.update_button{
+	color: white;
+	width:120px;
+	height:40px;
+	font-size: 22px;
+	background-color: transparent;
+	border: 1px solid white;
+	cursor: pointer;
+	border: none;
+}
+.edit_button{
+	color: white;
+	width:120px;
+	height:40px;
+	font-size: 22px;
+	background-color: transparent;
+	cursor: pointer;
+	border: none;
+}
+.edit_button:hover{
+	color: greenyellow;
+	animation: squeeze_text 0.4s ease-in-out;
+	text-shadow: 3px 3px 20px #00b309,
+	-2px 1px 30px #00b309;
+}
+
+
+
+/* .edit_button {
+	display: block;
+	margin: 0 auto;
+	padding: 10px 20px;
+	background-color: #000000;
+	color: #fff;
+	border: none;
+	width:120px;
+	height:40px;
+	border-radius: 5px;
+	font-size: 16px;
+	cursor: pointer;
+	margin-top: 5px;
+} */
+
+.unblock_button {
+	background: rgb(255, 234, 0);
+	width:15px;
+	height:15px;
+	margin:auto;
+	color:black;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.block_button {
+	background: red;
+	width:15px;
+	height:15px;
+	margin:auto;
+	color:black;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+img {
+	margin-top: 20px;
+	max-width: 300px;
+	max-height: 200px;
+	object-fit: cover;
+	border-radius: 5px;
+	align-items: center;
+}
+
+.profile_img{
+	border: 10px solid rgba(204, 204, 204, 0.298);
+
+}

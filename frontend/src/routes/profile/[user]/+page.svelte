@@ -1,5 +1,11 @@
 <svelte:head>
-	<link rel="stylesheet" href="/style_profile.css" />
+	<link rel="stylesheet" href="/profile_style.css" />
+	<link rel="stylesheet" href="/homepage_style.css" />
+	<link rel="stylesheet" href="/navbar.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 </svelte:head>
 
 <!-- ****************************** -->
@@ -7,9 +13,41 @@
 <!-- ****************************** -->
 
 <body>
-	<div class="game_navbar">
+
+    <div class="game_navbar">
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/home_icone.png">
+            <button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+        </div>
+
+		{#if user?.username === currentUser}
+			<div class="button_box">
+				<img class="button_picture" src="/img/profile_icone.png">
+				<button class="button_nav">Profile</button>
+			</div>
+			{:else}
+			<div class="button_box">
+				<img class="button_picture" src="/img/profile_icone.png">
+				<button class="button_nav" on:click={() => goto(`/profile/${realUser}`) && loadpage()}>Profile</button>
+			</div>
+		{/if}
+        <div class="button_box">
+            <img class="button_picture" src="/img/game_icone.png">
+            <button class="button_nav" on:click={() => goto('/game')}>Game</button>
+        </div>
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/chat_icone.png">
+            <button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
+        </div>
+
+    </div>
+
+	
+	<!-- <div class="game_navbar">
 		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
-		<!-- <button on:click={() => goto('/profile/edit')}>Edit profile</button> -->
+		<button on:click={() => goto('/profile/edit')}>Edit profile</button> 
 		{#if user?.username === currentUser}
 			<button class="button_nav">Profile</button>
 		{:else}
@@ -17,7 +55,10 @@
 		{/if}
 		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
 		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
-	</div>
+	</div> -->
+
+
+
 	<div class="main_profile">
 		<div class="main_box">
 			<div class="username_bloc">
@@ -33,9 +74,9 @@
 		<h3>Level: {user?.level}</h3>
 		<h3>Created: {new Date(user?.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</h3>
 		<!-- svelte-ignore a11y-img-redundant-alt -->
-		<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
+		<img class=".profile_img" src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
 		 {#if user?.username === currentUser} 
-		 <button on:click={() => goto('/profile/edit')}>Edit profile</button>
+		 <button class="edit_button" on:click={() => goto('/profile/edit')}>Edit profile</button>
 		 {/if}
 	</div>
 </body>
