@@ -2,8 +2,20 @@
 	import { onMount } from 'svelte';
 	import { io, Socket } from 'socket.io-client';
 	import { goto } from '$app/navigation';
+	import { fetchDataOfUserPseudo} from "../../API/api";
 
 	// VARIABLES
+
+	// Je crée un user pour pouvoir le passer en paramètre de la fonction \
+    // de redirection + check si il a pas rename Fonction -> showProfile
+    let redirectUser: UserRedirect;
+    interface UserRedirect {
+        id: number;
+        firstname: string;
+        lastname: string;
+        pseudo: string;
+        username: string;
+    }
 
 	let socket: Socket;
 	let isFormValid = false;
@@ -510,9 +522,11 @@
 		}
 	}
 
-	function showProfile() {
-		goto(`/profile/${selectedUser.pseudo}`);
-	}
+	async function showProfile() {
+        //Je recup les données et je le redirige
+        redirectUser = await fetchDataOfUserPseudo(selectedUser.pseudo);
+        goto(`/profile/${redirectUser.username}`);
+    }
 
 	function ban(userToBan: any, room: any) {
 		socket.emit('newBan', { user: userToBan, room: room });
