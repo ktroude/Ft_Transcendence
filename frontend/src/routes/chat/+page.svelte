@@ -772,109 +772,156 @@
 			window.location.pathname = '/';
 		}
 		checkFormValidity();
+		// sleep(2);
 		loading = true;
 		// console.log('chatroomz ==', chatRooms);
 	});
 </script>
 
 <svelte:head>
-	<link rel="stylesheet" href="/style.css" />
+	<!-- <link rel="stylesheet" href="/style.css" /> -->
+	<link rel="stylesheet" href="/homepage_style.css" />
+	<link rel="stylesheet" href="/navbar.css" />
+	<link rel="stylesheet" href="/chat_style.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 </svelte:head>
 
 <!-- HTML CODE -->
 
 <!-- <h1>Chat</h1> -->
+<body>
+
+<div class="game_navbar">
+
+	<div class="button_box">
+		<img class="button_picture" src="/img/home_icone.png">
+		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+	</div>
+
+	<div class="button_box">
+		<img class="button_picture" src="/img/profile_icone.png">
+		<button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button>
+	</div>
+
+	<div class="button_box">
+		<img class="button_picture" src="/img/game_icone.png">
+		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
+	</div>
+
+	<div class="button_box">
+		<img class="button_picture" src="/img/chat_icone.png">
+		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
+	</div>
+
+</div>
+<div class="chat_body">
 {#if loading === false}
 	<p>Chargement...</p>
 	{:else}
-	<div class="room-list-bloc">
-		<div class="public-room">
-			<h2 class="room-title">Rooms publics</h2>
-			{#each chatRooms as chatRoom}
-			{#if chatRoom.private === false && chatRoom.password == false}
-					<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
-						{chatRoom.name}
-					</button>
-					{/if}
-					{#if chatRoom.private === false && chatRoom.password == true}
-					<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
-						<div class='lock-image'> </div>
-					<span class='buton-room-name'> {chatRoom.name} </span>
-					</button>
-					{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
-					<input class='password-room-access-input' type="password" placeholder="Mot de passe"
-					on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}/>
-					{/if}
-				{/if}
-			{/each}
-		</div>
+		<div class="left_bloc">
 
-		<div class="public-room">
-			<h2 class="room-title">Rooms Privées</h2>
-			{#each chatRooms as chatRoom}
-			{#if chatRoom.private === true && chatRoom.password == false}
-			<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
-				{chatRoom.name}
-			</button>
-			{/if}
-			{#if chatRoom.private === true && chatRoom.password == true}
-			<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
-				<div class='lock-image'> </div>
-				{chatRoom.name}
-			</button>
-			{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
-			<input
-			type="text"
-			on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}
+		<div class="create-room">
+			<h2 class="room-form-title">Creer une room:</h2>
+			<form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
+				<label for="roomName" />
+				<input
+					class="form-input"
+					type="text"
+					id="roomName"
+					name="roomName"
+					placeholder="Nom de la salle *"
+					on:input={handleNameInput}
+					required
 				/>
+
+				<label for="password" />
+				<input
+					class="form-input"
+					type="password"
+					id="password"
+					name="password"
+					placeholder="Mot de passe"
+					on:input={handlePasswordInput}
+				/>
+
+				<label>
+					<input
+						class="form-input"
+						type="checkbox"
+						id="private"
+						name="private"
+						on:change={handlePrivateOption}
+					/>
+					Salle privée
+				</label>
+				<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
+			</form>
+		</div>
+			<div class="public_room_list">
+				<h2 class="room-title">Rooms publics</h2>
+				{#each chatRooms as chatRoom}
+				{#if chatRoom.private === false && chatRoom.password == false}
+						<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
+							{chatRoom.name}
+						</button>
+						{/if}
+						{#if chatRoom.private === false && chatRoom.password == true}
+						<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+							<div class='lock-image'> </div>
+						<span class='buton-room-name'> {chatRoom.name} </span>
+						</button>
+						{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
+						<input class='password-room-access-input' type="password" placeholder="Mot de passe"
+						on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}/>
+						{/if}
+					{/if}
+				{/each}
+			</div>
+
+			<div class="private_room_list">
+				<h2 class="room-title">Rooms Privées</h2>
+				{#each chatRooms as chatRoom}
+				{#if chatRoom.private === true && chatRoom.password == false}
+				<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
+					{chatRoom.name}
+				</button>
+				{/if}
+				{#if chatRoom.private === true && chatRoom.password == true}
+				<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+					<div class='lock-image'> </div>
+					{chatRoom.name}
+				</button>
+				{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
+				<input
+				type="text"
+				on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}
+					/>
+				{/if}
 			{/if}
-		{/if}
-			{/each}
+				{/each}
+			</div>
+			{#if currentRoom}
+
+			<div class="room_settings">
+				{#if currentRoom.name.length}
+					<input
+						class="room-bandeau-form-input"
+						on:keypress={handleInvitKeyPress}
+						bind:value={userPseudoInput}
+					/>
+					<button class="room-bandeau-button" on:click={handleInvitUserInput}
+						>Ajouter un utilisateur
+					</button>
+					<h3 class="room-name">{currentRoom.name}</h3>
+					<button class="leave-chat" on:click={leaveRoom}>Quitter la room</button>
+				{/if}
+			</div>
+			{/if}
 		</div>
-
-		<div class="direct-room">
-			<h2 class="room-title">Messages Directs</h2>
-		</div>
-	</div>
-{/if}
-
-<div class="create-room">
-	<h2 class="room-form-title">Creer une room:</h2>
-	<form on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
-		<label for="roomName" />
-		<input
-			class="form-input"
-			type="text"
-			id="roomName"
-			name="roomName"
-			placeholder="Nom de la salle *"
-			on:input={handleNameInput}
-			required
-		/>
-
-		<label for="password" />
-		<input
-			class="form-input"
-			type="password"
-			id="password"
-			name="password"
-			placeholder="Mot de passe"
-			on:input={handlePasswordInput}
-		/>
-
-		<label>
-			<input
-				class="form-input"
-				type="checkbox"
-				id="private"
-				name="private"
-				on:change={handlePrivateOption}
-			/>
-			Salle privée
-		</label>
-		<button class="form-button" type="submit" disabled={!isFormValid}>Créer la salle</button>
-	</form>
-</div>
+	{/if}
 
 {#if alert == true}
 	<alert>
@@ -883,76 +930,62 @@
 	</alert>
 {/if}
 
+<div class="message-container">
 {#if currentRoom}
-	<div class="room-bandeau">
-		{#if currentRoom.name.length}
-			<input
-				class="room-bandeau-form-input"
-				on:keypress={handleInvitKeyPress}
-				bind:value={userPseudoInput}
-			/>
-			<button class="room-bandeau-button" on:click={handleInvitUserInput}
-				>Ajouter un utilisateur
-			</button>
-			<h3 class="room-name">{currentRoom.name}</h3>
-			<button class="leave-chat" on:click={leaveRoom}>Quitter la room</button>
-		{/if}
-	</div>
-
 	{#if currentRoom?.id}
-		<div class="message-container">
-			<div class="chat-messages" id="chat-messages">
-				{#if messages && messages.length}
-					{#each messages as msg}
-						<p>
-							{#if msg.senderPseudo == 'server'}
-								<button class="server-message">
-									{msg.senderPseudo}
-								</button>
-							{/if}
-							{#if msg.senderPseudo != 'server'}
-								<button
-									class="pseudo-button-message"
-									on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
-								>
-									{msg.senderPseudo}
-								</button>
-							{/if}
-							<span class="message">
-								{msg.content}
-							</span>
-						</p>
-					{/each}
-				{/if}
-			</div>
-			{#if currentRoom.name.length}
-				<div class="message-input-container">
-					<input
-						on:input={handleMessageInput}
-						on:keypress={handleMessageKeyPress}
-						class="message-input"
-						type="text"
-						id="message"
-						name="message"
-					/>
-					<button
-						class="send-message-button"
-						id="sendMessageButton"
-						type="submit"
-						disabled
-						on:click={(event) => {
-							const messageInput = document.getElementById('message');
-							if (messageInput instanceof HTMLInputElement) {
-								sendMessage(event, messageInput, currentRoom);
-								messageInput.value = '';
-							}
-						}}>Envoyer</button
-					>
-				</div>
+		<div class="chat-messages" id="chat-messages">
+			{#if messages && messages.length}
+				{#each messages as msg}
+					<p>
+						{#if msg.senderPseudo == 'server'}
+							<button class="server-message">
+								{msg.senderPseudo}
+							</button>
+						{/if}
+						{#if msg.senderPseudo != 'server'}
+							<button
+								class="pseudo-button-message"
+								on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
+							>
+								{msg.senderPseudo}
+							</button>
+						{/if}
+						<span class="message">
+							{msg.content}
+						</span>
+					</p>
+				{/each}
 			{/if}
 		</div>
-	{/if}
+		{#if currentRoom.name.length}
+			<div class="message-input-container">
+				<input
+					on:input={handleMessageInput}
+					on:keypress={handleMessageKeyPress}
+					class="message-input"
+					type="text"
+					id="message"
+					name="message"
+				/>
+				<button
+					class="send-message-button"
+					id="sendMessageButton"
+					type="submit"
+					disabled
+					on:click={(event) => {
+						const messageInput = document.getElementById('message');
+						if (messageInput instanceof HTMLInputElement) {
+							sendMessage(event, messageInput, currentRoom);
+							messageInput.value = '';
+						}
+					}}>Envoyer</button>
+			</div>
+		{/if}
+		{/if}
+		{/if}
+</div>
 
+	<!-- <div class="right_bloc"> -->
 	{#if isShown === true}
 		<div class="menu">
 			{#if showOptionsPseudo.length}
@@ -1032,5 +1065,7 @@
 				{/if}
 			{/if}
 		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
+</body>
