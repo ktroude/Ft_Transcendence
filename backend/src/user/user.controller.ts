@@ -28,6 +28,11 @@ export class UserController {
         return await this.userService.findUserByUsername(user);
     }
 
+    @Get(':user/getUserbyPseudo')
+    async getUserInfoPseudo(@Param('user') user: string): Promise<User> {
+        return await this.userService.findUserByPseudo(user);
+    }
+
     @UseGuards(JwtGuard)
     @Put(':pseudo/newPseudo')
     async updatePseudo(@Param('pseudo') pseudo: string, @Body() body: { user: User, newPseudo: string }): Promise<User> {
