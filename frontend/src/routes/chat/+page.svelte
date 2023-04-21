@@ -869,11 +869,11 @@
 						</button>
 						{/if}
 						{#if chatRoom.private === false && chatRoom.password == true}
-				
+						<div class="wrap_button">
+							<span>🔒 </span>{ chatRoom.name}
 						<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
 							<!-- <div class='lock-image'> </div> -->
-							{chatRoom.name}
-						</button>
+						</button></div>
 						{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
 						<input class='password-room-access-input' type="password" placeholder="Mot de passe"
 						on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}/>
@@ -887,14 +887,18 @@
 				{#each chatRooms as chatRoom}
 				{#if chatRoom.private === true && chatRoom.password == false}
 				<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
+					<span>  </span>
 					{chatRoom.name}
 				</button>
 				{/if}
 				{#if chatRoom.private === true && chatRoom.password == true}
+				<div class="wrap_button">
+					
+					<span>🔒 </span>
 				<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
-					<div class='lock-image'> </div>
 					{chatRoom.name}
-				</button>
+					<div class='lock-image'> </div>
+				</button></div>
 				{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
 				<input
 				type="text"
@@ -908,16 +912,19 @@
 
 			<div class="room_settings">
 				{#if currentRoom.name.length}
+				<h3 class="room_name">{currentRoom.name}</h3>
+					<div class="input_box_settings">
 					<input
 						class="room-bandeau-form-input"
 						on:keypress={handleInvitKeyPress}
 						bind:value={userPseudoInput}
 					/>
-					<button class="room-bandeau-button" on:click={handleInvitUserInput}
+					
+					<button class="settings_button" on:click={handleInvitUserInput}
 						>Ajouter un utilisateur
 					</button>
-					<h3 class="room-name">{currentRoom.name}</h3>
-					<button class="leave-chat" on:click={leaveRoom}>Quitter la room</button>
+				</div>
+					<button class="leave_chat" on:click={leaveRoom}>Quitter❌</button>
 				{/if}
 			</div>
 			{/if}

@@ -1,7 +1,10 @@
 
+.game_navbar{
+	height:50px;
+}
+
 .chat_body{
-	height:100vh;
-	width: 100vw;
+	width: 100%;
 	display: flex;
 	flex-direction: row;
 	background-color: rgba(0, 0, 0, 0.267);
@@ -12,13 +15,13 @@
 	width: 20vw;
 }
 .create-room{
-	height:15vh;
+	height:20vh;
 	width: 20vw;
 	background-color: rgba(122, 122, 122, 0.084);
 	backdrop-filter: blur(5px);
 	display: flex;
 	flex-direction: column;
-	border-bottom: 1px solid greenyellow;
+	border-bottom: 1px solid white;
 	align-items: center;
 	padding: 10px;
 }
@@ -81,17 +84,23 @@
 
 
 .public_room_list{
-	height:35vh;
+	height:30vh;
 	width: 20vw;
 	display: flex;
 	background-color: rgba(122, 122, 122, 0.084);
 	backdrop-filter: blur(5px);
 	flex-direction: column;
-	border-bottom: 1px solid greenyellow;
+	border-bottom: 1px solid white;
 	align-items: center;
 	padding: 10px;
 	overflow-x: scroll;
 }
+/* 
+.public_room_list .chatroom-button{
+	overflow: hidden;
+	height:20000px;
+} */
+
 .room-title{
 	color: greenyellow;
 	margin-bottom: 15px;
@@ -103,13 +112,12 @@
 	border: 1px solid rgba(255, 255, 255, 0.447);
 	background: transparent;
 	color: white;
-	
 	text-align: center;
 	align-items: center;
 	/* overflow: hidden; */
+	white-space: nowrap;
+	text-overflow: ellipsis;
 	padding: 1px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 .chatroom-button:hover{
 	cursor: pointer;
@@ -118,33 +126,79 @@
 	-2px 1px 30px #00b309;
 	font-size: 16px;
 }
-
-.private_room_list{
-	border-bottom: 1px solid greenyellow;
-	height:35vh;
-	width: 20vw;
-	display: flex;
-	background-color: transparent;
-	flex-direction: column;
+.wrap_button{
+	
+	overflow-y: hidden;
 }
 
 
 
 
-
-
-
-
-
-
+.private_room_list{
+	border-bottom: 1px solid white;
+	height:30vh;
+	width: 20vw;
+	display: flex;
+	background-color: rgba(122, 122, 122, 0.084);
+	flex-direction: column;
+	align-items: center;
+	padding: 10px;
+	overflow-x: scroll;
+}
 
 
 .room_settings{
 	display: flex;
+	background-color: rgba(122, 122, 122, 0.084);
 	flex-direction: column;
-	background-color: transparent;
-	height:15vh;
+	align-items: center;
+	padding: 10px;
+	overflow-x: scroll;
+	height:20vh;
 }
+
+.settings_button{
+	color: white;
+	width:120px;
+	height:40px;
+	font-size: 15px;
+	background-color: transparent;
+	cursor: pointer;
+	border: none;
+}
+.settings_button:hover{
+	color: greenyellow;
+	text-shadow: 3px 3px 20px #00b309,
+	-2px 1px 30px #00b309;
+}
+
+.room_name{
+	color: rgb(255, 238, 47);
+	font-size: 22px;
+}
+
+.input_box_settings{
+	display: flex;
+	flex-direction: column;
+	width: 116px;
+
+}
+.leave_chat{
+	background-color: transparent;
+	cursor: pointer;
+	border: none;
+	color: white;
+	font-size: 15px;
+}
+.leave_chat:hover{
+	color: rgb(255, 47, 47);
+	text-shadow: 3px 3px 20px #b30000,
+	-2px 1px 30px #b30000;
+}
+
+
+
+
 
 .message_container{
 	width: 60vw;
