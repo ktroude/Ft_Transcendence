@@ -824,7 +824,7 @@
 		<div class="left_bloc">
 
 		<div class="create-room">
-			<h2 class="room-form-title">Creer une room:</h2>
+			<h2 class="room-form-title">Créer une room:</h2>
 			<form class="create_room_form" on:submit={(event) => handleSubmit(event, socket)} bind:this={form}>
 				<label for="roomName" />
 				<input
@@ -870,8 +870,9 @@
 						{/if}
 						{#if chatRoom.private === false && chatRoom.password == true}
 						<div class="wrap_button">
-							<span>🔒 </span>{ chatRoom.name}
-						<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+							<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+								<span>🔒 </span>
+								{ chatRoom.name}
 							<!-- <div class='lock-image'> </div> -->
 						</button></div>
 						{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
@@ -894,9 +895,10 @@
 				{#if chatRoom.private === true && chatRoom.password == true}
 				<div class="wrap_button">
 					
-					<span>🔒 </span>
 				<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
-					{chatRoom.name}
+					<span>🔒</span>
+					<span class="lock"> {chatRoom.name}</span>
+					
 					<div class='lock-image'> </div>
 				</button></div>
 				{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
@@ -964,9 +966,9 @@
 			<div class="chat-messages" id="chat-messages">
 				{#if messages && messages.length}
 					{#each messages as msg}
-						<p>
+						<p class="message_text">
 							{#if msg.senderPseudo == 'server'}
-								<button class="server-message">
+								<button class="server_message">
 									{msg.senderPseudo}
 								</button>
 							{/if}
@@ -979,38 +981,40 @@
 								</button>
 							{/if}
 							<span class="message">
-								{msg.content}
+								: {msg.content}
 							</span>
 						</p>
 					{/each}
 				{/if}
 			</div>
-			{#if currentRoom.name.length}
-				<div class="message-input-container">
-					<input
-						on:input={handleMessageInput}
-						on:keypress={handleMessageKeyPress}
-						class="message-input"
-						type="text"
-						id="message"
-						name="message"
-					/>
-					<button
-						class="send-message-button"
-						id="sendMessageButton"
-						type="submit"
-						disabled
-						on:click={(event) => {
-							const messageInput = document.getElementById('message');
-							if (messageInput instanceof HTMLInputElement) {
-								sendMessage(event, messageInput, currentRoom);
-								messageInput.value = '';
-							}
-						}}>Envoyer</button
-					>
-				</div>
 			{/if}
-	{/if}
+			{#if currentRoom.name.length}
+				<div class="message_input_container">
+					<form class="send_message_form">
+						<input
+							on:input={handleMessageInput}
+							on:keypress={handleMessageKeyPress}
+							class="message_input"
+							type="text"
+							id="message"
+							name="message"
+						/>
+						<button
+							class="send-message-button"
+							id="sendMessageButton"
+							type="submit"
+							disabled
+							on:click={(event) => {
+								const messageInput = document.getElementById('message');
+								if (messageInput instanceof HTMLInputElement) {
+									sendMessage(event, messageInput, currentRoom);
+									messageInput.value = '';
+								}
+							}}><img class="sent_icone" src="/img/edit_profile.png"></button>
+					</form>
+				</div>
+
+			{/if}
 
 	<!-- <div class="right_bloc"> -->
 	
@@ -1018,15 +1022,16 @@
 </div>
 
 
+{#if currentRoom?.id}
 <div class="right_bloc">
 <div class="user_list">
 	{#if currentRoom?.id}
-		<div class="public-room">
+		<div class="member_list">
 			<h2 class="room-title">Membres</h2>
 			{#if membres && membres.length}
 				{#each membres as member}
 					<button
-						class="pseudo-button"
+						class="pseudo-button-message"
 						on:click={(event) => handleClickPseudo(event, member.pseudo)}
 					>
 						{member.pseudo}
@@ -1037,24 +1042,24 @@
 	{/if}
 
 	{#if currentRoom?.id}
-		<div class="public-room">
-			<h2 class="room-title">Baned</h2>
+		<div class="public_room">
+			<h2 class="room-title">Banned</h2>
 			{#if banned?.length}
 				{#each banned as ban}
-					<button class="pseudo-button" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
+					<button class="pseudo-button-message" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
 						{ban.pseudo}
 					</button>
 				{/each}
 			{/if}
 		</div>
 
-		<div class="public-room">
+		<div class="public_room">
 			{#if currentRoom?.id}
 				<h2 class="room-title">Muted</h2>
 				{#if muted?.length}
 					{#each muted as mute}
 						<button
-							class="pseudo-button"
+							class="pseudo-button-message"
 							on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
 							{mute.pseudo}
 						</button>
@@ -1099,5 +1104,6 @@
 			{/if}
 	</div>
 </div>
+{/if}
 {/if}
 </body>

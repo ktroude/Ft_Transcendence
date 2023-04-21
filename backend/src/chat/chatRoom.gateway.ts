@@ -448,7 +448,7 @@ export class ChatRoomGateway
       data: { members: { connect: { id: user.id } } },
     });
     if (!isMember) {
-      const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a rejoind la room`,
+      const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a rejoint la room`,
         { id: 0, pseudo: 'server' }, { id: data.room.id });
       this.server.emit('newMessage', toSend);
     }
