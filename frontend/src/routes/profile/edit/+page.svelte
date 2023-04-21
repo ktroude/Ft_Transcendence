@@ -87,6 +87,10 @@
           console.log('New username not set');
           return;
         }
+        if (newUsername.length > 8) {
+          console.log('New username too long');
+          return;
+        }
         const accessToken = await fetchAccessToken();
         if (accessToken)
         {
