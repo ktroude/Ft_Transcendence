@@ -81,11 +81,15 @@ function collide(player) {
       if (player == game.player){
         game.computer.score++;
         document.querySelector('#computer-score').textContent = game.computer.score;
+        game.ball.speed.x = 2;
+        game.ball.speed.y = 2;
       } else {
         game.player.score++;
         document.querySelector('#player-score').textContent = game.player.score;
+        game.ball.speed.x = 2;
+        game.ball.speed.y = 2;
       }
-  } else {
+    } else {
       // augmente la vitesse et bouge la direction
       game.ball.speed.x *= -1.1;
       changeDirection(player.y);

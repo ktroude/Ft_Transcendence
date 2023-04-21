@@ -43,6 +43,13 @@
 	  text-shadow: 6px 6px 0px rgba(0,0,0,0.2);
   }
   
+  .homepage_redirect_pointer:hover {
+	cursor: pointer;
+	color: greenyellow;
+	text-decoration: underline;
+
+  }
+
   .welcome_box{
 	background-color: rgba(0, 0, 0, 0.267);
 	backdrop-filter: blur(5px);
