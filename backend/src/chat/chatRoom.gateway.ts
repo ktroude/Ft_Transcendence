@@ -13,6 +13,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { ChatRoomService } from './chatRoom.service';
 import * as bcrypt from 'bcryptjs'
+import { RouterModule } from '@nestjs/core';
 
 
 @WebSocketGateway({
@@ -493,8 +494,15 @@ export class ChatRoomGateway
         { id: 0, pseudo: 'server' }, { id: data.room.id });
       this.server.emit('newMessage', toSend);
     }
+    const dataRoomToSend = {
+      name: sucessData.name,
+      private: sucessData.private,
+      id: sucessData.id,
+      password: sucessData.password.length? true : false,
+
+    }
     this.server.emit('sucess', {
-      room: sucessData,
+      room: dataRoomToSend,
       banned: toCheck.banned,
       membres: toCheck.members,
       muted: toCheck.muted,
@@ -534,6 +542,49 @@ export class ChatRoomGateway
     }
   }
 
+  @SubscribeMessage('changePassword')
+  async handleChangePassword(client:Socket, data:any) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const room = await this.prismaService.chatRoom.findUnique({
+      where: {id: parseInt(data.room.id, 10)}
+    });
+    if (await this.chatRoomService.isOwner(user, room) === false)
+      return ;
+    console.log('ancien mdp ==', room.password);
+    await this.prismaService.chatRoom.update({
+      where: {id: room.id},
+      data: {
+        password: bcrypt.hashSync(data.newPassword),
+      }
+    });
+    const wroom = await this.prismaService.chatRoom.findUnique({
+      where: {id: parseInt(data.room.id, 10)}
+    });
+    console.log('new mdp ==', wroom.password);
+    this.server.emit('passwordChanged');
+  }
 
+  @SubscribeMessage('deletePassword')
+  async handleDeletePassword(client:Socket, data:any) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const room = await this.prismaService.chatRoom.findUnique({
+      where: {id: parseInt(data.room.id, 10)}
+    });
+    if (await this.chatRoomService.isOwner(user, room) === false) {
+      return ;
+    }
+    console.log('ancien mdp ==', room.password);
+    await this.prismaService.chatRoom.update({
+      where: {id: room.id},
+      data: {
+        password: '',
+      }
+    });
+    const wroom = await this.prismaService.chatRoom.findUnique({
+      where: {id: parseInt(data.room.id, 10)}
+    });
+    console.log('new mdp ==', wroom.password);
+    this.server.emit('passwordChanged');
+  }
 
 }

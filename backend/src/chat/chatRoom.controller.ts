@@ -161,12 +161,24 @@ export class ChatRoomController {
             const user = await this.userService.decodeToken(token);
             const room = await this.prisma.chatRoom.findUnique({
                 where: { id: parseInt(id, 10) },
-                select: { members: true }
+                select: {
+                    members: true,
+                    banned:true,
+                    muted:true,
+                }
             });
-            return room.members;
+            return {
+                membres: room.members,
+                muted: room.muted,
+                banned: room.banned,
+            };
         }
         catch {
-            return [];
+            return {
+                membres: [],
+                muted: [],
+                banned: [],
+            };
         }
     }
 
