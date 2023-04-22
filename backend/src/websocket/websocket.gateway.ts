@@ -14,12 +14,14 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 
   handleConnection(client: any, ...args: any[]) {
     client.on('userConnected', (payload) => {
-		console.log("un truc comme ca on differencie", client.id);
+	  console.log("connected: ", client.id);
       const pseudo = payload.pseudo;
       if (this.clients.has(pseudo)) {
         this.clients.set(pseudo, client.id);
+		console.log("JLE RELOG LE MEC");
         return;
-      }
+	}
+		console.log("JLE CO NORMAL; TA VU");
       this.clients.set(pseudo, client.id);
     });
   }
@@ -28,9 +30,8 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 	{
 		console.log("disconnected: ", client.id);
 		this.clients.forEach((value, key) => {
-			if (value === client.id) {
+			if (value === client.id)
 			  this.clients.delete(key);
-			}
 		});
 	}
   

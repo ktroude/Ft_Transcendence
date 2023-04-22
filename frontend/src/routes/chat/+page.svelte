@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { io, Socket } from 'socket.io-client';
 	import { goto } from '$app/navigation';
-	import { fetchDataOfUserPseudo} from "../../API/api";
+	import { fetchDataOfUserPseudo, fetchData} from "../../API/api";
 
 	// VARIABLES
 
@@ -584,8 +584,10 @@
 		if (!access_token) {
 			window.location.pathname = '/';
 		}
-		socket.on('connect', () => {
+		socket.on('connect', async function() {	
 			console.log('Connected to server');
+			redirectUser = await fetchData();
+			socket.emit('userConnected', { pseudo: redirectUser.pseudo });
 		});
 		socket.on('roomCreated', async (newRoom: ChatRoom) => {
 			chatRooms = await fletchChatRoomsData();
@@ -817,7 +819,7 @@
 
 	<div class="button_box">
 		<img class="button_picture" src="/img/profile_icone.png">
-		<button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button>
+		<button class="button_nav" on:click={() => goto(`/profile/${currentUser.pseudo}`)}>Profile</button>
 	</div>
 
 	<div class="button_box">

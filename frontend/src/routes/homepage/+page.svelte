@@ -65,8 +65,8 @@
   import { onMount } from 'svelte';
   import { goto } from "$app/navigation";
   import {fetchData} from "../../API/api";
-  import {io, Socket} from 'socket.io-client';
 	import { redirect } from '@sveltejs/kit';
+  import {io, Socket} from 'socket.io-client';
 
   let socket: Socket;
 
@@ -86,9 +86,7 @@
     onMount(async function() {
 		user = await fetchData();
 		const socket = io('http://localhost:3000');
-		socket.on('connect', async function() {
-			console.log('connected');
-			
+		socket.on('connect', async function() {			
 			socket.emit('userConnected', { pseudo: user.pseudo });
 		});
 	});

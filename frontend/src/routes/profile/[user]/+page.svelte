@@ -76,12 +76,14 @@
 
 <script lang="ts">
   	
+	import {io, Socket} from 'socket.io-client';
 	import { page } from '$app/stores';
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchDataOfUser } from '../../../API/api';
-
+	
+	let socket: Socket;
     interface User {
 		id: number;
 		pseudo: string;
@@ -171,6 +173,8 @@
 	
 	async function loadpage() {
 		user = await fetchData();
+		if (!user)
+			goto('/');
 		if ($page.params.user == user.pseudo)
 		{
 			getImageURL();
@@ -184,8 +188,12 @@
 			getImageURL();
 		}
 	}
-	onMount(() => {
-		loadpage();
+	onMount(async function() {
+		await loadpage();
+		const socket = io('http://localhost:3000');
+		socket.on('connect', async function() {			
+			socket.emit('userConnected', { pseudo: user.pseudo });
+		});
 	});
 
 </script>
