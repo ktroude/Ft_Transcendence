@@ -45,7 +45,6 @@
 	let banned: any = [];
 	let membres: any = [];
 	let blocked: any = [];
-	let alert: boolean = false;
 	let passwordInput = {
 		bool: false,
 		roomId: 0
@@ -101,7 +100,7 @@
 	}
 
 	function checkFormValidity() {
-		isFormValid = formData.roomName.length > 0 && formData.private !== undefined;
+		isFormValid = formData.roomName.length > 0; // && formData.private !== undefined;
 	}
 
 	function handleMessageInput(event: any) {
@@ -123,7 +122,6 @@
 
 	function scrollToBottom() {
 		let chatDiv =  document.getElementById("chat-messages");
-		console.log("JE SUIS ICI =======", chatDiv);
 		chatDiv?.addEventListener("DOMSubtreeModified", function() {
 	  	scroll(chatDiv);
 	});
@@ -181,9 +179,13 @@
 				password: formData.password,
 				private: formData.private
 			};
-			if (data.password === undefined) data.password = '';
+			if (data.password === undefined) {
+				data.password = '';
+			}
 			socket.emit('createRoom', data);
 			formData.roomName = '';
+			formData.private = false;
+			formData.password = '';
 			form.reset();
 		}
 	}
@@ -196,7 +198,6 @@
 	async function updateChatRooms(newRoom: ChatRoom) {
 		const isRoomExist = chatRooms.some((room) => room.id === newRoom.id);
 		if (!isRoomExist) {
-			//&& await fletchIsPvAndMember(newRoom) === true) {
 			chatRooms = [...chatRooms, newRoom];
 		}
 	}
@@ -204,6 +205,7 @@
 	async function handleRoomButton(room: ChatRoom, pw: any) {
 		passwordInput.bool = false;
 		if ((await checkBan(room)) === true) {
+			currentRoom = room;
 			messages = [];
 			messages = [
 				{
@@ -211,35 +213,29 @@
 					senderPseudo: 'server'
 				}
 			];
-			closeAlert();
+			membres = [];
+			muted = [];
+			banned = [];
 			return;
 		}
-		if (currentRoom && currentRoom.id === room.id) {
-			closeAlert();
-			return;
-		}
-		if (room?.id) {
-			messages = await fletchMessageOfRoom(room.id);
-			scrollToBottom();
-		}
-		else messages = [];
-		socket.emit('getMessage', room);
-		socket.emit('getUser', room);
+		if (currentRoom?.id === room.id) return;
 		socket.emit('joinRoom', { room: room, password: pw });
-		socket.on('sucess', async () => {
+		socket.on('failed', () => {
 			currentRoom = room;
-			await fletchUserData();
+			messages = [];
+			messages = [{senderPseudo:'server', content:'Mauvais mot de passe'}];
+		});
+		socket.on('sucess', async() => {
+			socket.emit('getMessage', room);
+			socket.emit('getUser', room);
 			await fletchMuteBanData();
 			await fletchMembres();
 			await fletchBlocked();
-			isShown = false;
-			closeAlert();
+			currentRoom = room;
 		});
 	}
 
-	function closeAlert() {
-		alert = false;
-	}
+
 
 	function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
 		event.preventDefault();
@@ -300,8 +296,10 @@
 	};
 
 	const fletchMuteBanData = async () => {
-		const cookies = document.cookie.split(';');
-		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		try {
+
+			const cookies = document.cookie.split(';');
+			const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
 		if (accessToken) {
 			const headers = new Headers();
@@ -313,6 +311,12 @@
 			muted = data.muted;
 			banned = data.banned;
 		}
+	}
+	catch {
+
+		muted = [];
+		banned = [];
+	}
 	};
 
 	const fletchMembres = async () => {
@@ -500,26 +504,6 @@
 		banned = [];
 		membres = [];
 		currentRoom = null;
-	}
-
-	function handleSelect(event: any) {
-		if (event.target.value === 'kick') {
-			kick(selectedUser, currentRoom);
-		} else if (event.target.value === 'ban') {
-			ban(selectedUser, currentRoom);
-		} else if (event.target.value === 'unBan') {
-			deban(selectedUser, currentRoom);
-		} else if (event.target.value === 'mute') {
-			mute(selectedUser, currentRoom);
-		} else if (event.target.value === 'unMute') {
-			unmute(selectedUser, currentRoom);
-		} else if (event.target.value === 'upAdmin') {
-			upadmin(selectedUser, currentRoom);
-		} else if (event.target.value === 'unAdmin') {
-			deUpadmin(selectedUser, currentRoom);
-		} else if (event.target.value === 'profile') {
-			showProfile();
-		}
 	}
 
 	async function showProfile() {
@@ -945,14 +929,6 @@
 			{/if}
 		</div>
 
-<!-- {#if alert == true}
-	<alert>
-		Mot de passe incorect
-		<button on:click={closeAlert}> OK </button>
-	</alert>
-{/if} -->
-
-
 
 
 
@@ -960,20 +936,6 @@
 <div class="message_container">
 {#if currentRoom}
 
-	<!-- <div class="room-bandeau">
-		{#if currentRoom.name.length}
-			<input
-				class="room-bandeau-form-input"
-				on:keypress={handleInvitKeyPress}
-				bind:value={userPseudoInput}
-			/>
-			<button class="room-bandeau-button" on:click={handleInvitUserInput}
-				>Ajouter un utilisateur
-			</button>
-			<h3 class="room-name">{currentRoom.name}</h3>
-			<button class="leave-chat" on:click={leaveRoom}>Quitter la room</button>
-		{/if}
-	</div> -->
 
 	{#if currentRoom?.id}
 			<div class="chat-messages" id="chat-messages">
@@ -1088,35 +1050,35 @@
 				<!-- <select id="pseudo-menu" on:change={handleSelect}> -->
 					<!-- <option>Options</option> -->
 					{#if find(showOptionsPseudo, 'profile') === true}
-						<button class="button_show_profile" value="profile">Voir le profil</button>
+						<button class="button_show_profile" on:click={showProfile}>Voir le profil</button>
 						<!-- <option value="profile">Voir le profil</option> -->
 						{/if}
 						{#if find(showOptionsPseudo, 'ban') === true}
-						<button class="button_show_profile" value="ban">Bannir</button>
+						<button class="button_show_profile" on:click={() => ban(selectedUser, currentRoom)}>Bannir</button>
 						<!-- <option value="ban">Bannir</option> -->
 						{/if}
 						{#if find(showOptionsPseudo, 'mute') === true}
-						<button class="button_show_profile" value="profile">Mute</button>
+						<button class="button_show_profile" on:click={() => mute(selectedUser, currentRoom)}>Mute</button>
 						<!-- <option value="mute">Muter</option> -->
 						{/if}
 						{#if find(showOptionsPseudo, 'kick') === true}
-						<button class="button_show_profile" value="profile">Expulser</button>
+						<button class="button_show_profile" on:click={() => kick(selectedUser, currentRoom)}>Expulser</button>
 						<!-- <option value="kick">Expulser</option> -->
 						{/if}
 						{#if find(showOptionsPseudo, 'unBan') === true}
-						<button class="button_show_profile" value="profile">Débannir</button>
+						<button class="button_show_profile" on:click={() => deban(selectedUser, currentRoom)}>Débannir</button>
 						<!-- <option value="unBan">Débannir</option> -->
 						{/if}
 						{#if find(showOptionsPseudo, 'unMute') === true}
-						<button class="button_show_profile" value="profile">Démute</button>
+						<button class="button_show_profile" on:click={() => unmute(selectedUser, currentRoom)}>Démute</button>
 						<!-- <option value="unMute">Démute</option> -->
 						{/if}
 						{#if find(showOptionsPseudo, 'upAdmin') === true}
-						<button class="button_show_profile" value="profile">OP</button>
+						<button class="button_show_profile" on:click={() => upadmin(selectedUser, currentRoom)}>OP</button>
 						<!-- <option value="upAdmin">Passer admin</option> -->
 						{/if}
 						{#if find(showOptionsPseudo, 'unAdmin') === true}
-						<button class="button_show_profile" value="profile">DE-OP</button>
+						<button class="button_show_profile" on:click={() => deUpadmin(selectedUser, currentRoom)}>DE-OP</button>
 						<!-- <option value="unAdmin">Retirer admin</option> -->
 					{/if}
 				<!-- </select> -->
@@ -1128,3 +1090,4 @@
 {/if}
 {/if}
 </body>
+
