@@ -42,9 +42,7 @@ export class UserController {
 
     @UseGuards(JwtGuard)
     @Get(':user/search')
-    async searchUser(@Param('user') searchProfile: string): Promise<Boolean> {
-		let toto = await(this.userService.findUserByUsernameBool(searchProfile));
-		console.log("searchUser ->", searchProfile, "bool value ->", toto);
-        return toto;
+    async searchUser(@Param('user') searchProfile: string): Promise<User> {
+        return await this.userService.findUserByUsername(searchProfile);
 	}
 }
