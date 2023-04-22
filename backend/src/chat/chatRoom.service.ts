@@ -90,15 +90,11 @@ export class ChatRoomService {
   // }
 
   async createMessage(text: string, user: any, chatRoom: any) {
-    console.log('text ==', text)
-    console.log('user ==', user)
-    console.log('chatRoom ==',chatRoom )
-    
     const createdMessage = await this.prisma.message.create({
       data: {
         content: text,
         senderId: user.id,
-        senderPseudo: user.pseudo,
+        senderPseudo: user.username,
         chatRoom: { connect: { id: chatRoom.id } },
       },
     });

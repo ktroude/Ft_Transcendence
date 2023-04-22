@@ -204,8 +204,8 @@
 
 	async function handleRoomButton(room: ChatRoom, pw: any) {
 		passwordInput.bool = false;
+		currentRoom = room;
 		if ((await checkBan(room)) === true) {
-			currentRoom = room;
 			messages = [];
 			messages = [
 				{
@@ -218,10 +218,9 @@
 			banned = [];
 			return;
 		}
-		if (currentRoom?.id === room.id) return;
+		// if (currentRoom?.id === room.id) return;
 		socket.emit('joinRoom', { room: room, password: pw });
 		socket.on('failed', () => {
-			currentRoom = room;
 			messages = [];
 			messages = [{senderPseudo:'server', content:'Mauvais mot de passe'}];
 		});
@@ -231,7 +230,6 @@
 			await fletchMuteBanData();
 			await fletchMembres();
 			await fletchBlocked();
-			currentRoom = room;
 		});
 	}
 
@@ -508,8 +506,9 @@
 
 	async function showProfile() {
         //Je recup les données et je le redirige
+		console.log('SU =====', selectedUser);
         redirectUser = await fetchDataOfUserPseudo(selectedUser.pseudo);
-        goto(`/profile/${redirectUser.username}`);
+        goto(`/profile/${redirectUser.pseudo}`);
     }
 
 	function ban(userToBan: any, room: any) {
@@ -741,7 +740,7 @@
 				if (currentUser.id === data.user.id) {
 					messages = [
 						...messages,
-						{ senderPseudo: 'server', content: "Cette utilisateur n'existe pas" }
+						{ senderPseudo: 'server', content: "Cet utilisateur n'existe pas" }
 					];
 					scrollToBottom()
 				}
@@ -749,7 +748,7 @@
 				if (currentUser.id === data.user.id) {
 					messages = [
 						...messages,
-						{ senderPseudo: 'server', content: 'Cette utilisateur est deja membre' }
+						{ senderPseudo: 'server', content: 'Cet utilisateur est deja membre' }
 					];
 				}
 			} else if (data.sucess === true && data.userToAdd) {
@@ -762,7 +761,7 @@
 		});
 		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
-				alert = true;
+				// alert = true;
 				currentRoom = null;
 			}
 		});
@@ -950,7 +949,7 @@
 							{#if msg.senderPseudo != 'server'}
 								<button
 									class="pseudo-button-message"
-									on:click={(event) => handleClickPseudo(event, msg.senderPseudo)}
+									on:click={(event) => handleClickPseudo(event, msg.senderId)}
 								>
 									{msg.senderPseudo}
 								</button>
@@ -1009,7 +1008,7 @@
 						class="pseudo-button-message"
 						on:click={(event) => handleClickPseudo(event, member.pseudo)}
 					>
-						{member.pseudo}
+						{member.username}
 					</button>
 				{/each}
 			{/if}
@@ -1022,7 +1021,7 @@
 			{#if banned?.length}
 				{#each banned as ban}
 					<button class="pseudo-button-message" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
-						💀 {ban.pseudo}
+						💀 {ban.username}
 					</button>
 				{/each}
 			{/if}
@@ -1036,7 +1035,7 @@
 						<button
 							class="pseudo-button-message"
 							on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
-							🔕 {mute.pseudo}
+							🔕 {mute.username}
 						</button>
 					{/each}
 				{/if}

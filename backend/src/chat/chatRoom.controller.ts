@@ -112,15 +112,17 @@ export class ChatRoomController {
             status: -3,
             room: 0
         };
+        console.log('pseudo ==', pseudo);
         const user = await this.prisma.user.findUnique({
-            where: { pseudo: pseudo },
+            where: { id: parseInt(pseudo,10) },
         });
+        console.log('user == ', user)
         const room = await this.prisma.chatRoom.findUnique({
             where: { id: parseInt(idRoom, 10) },
         });
         toSend.room = room.id;
         toSend.id = user.id;
-        toSend.pseudo = user.pseudo;
+        toSend.pseudo = user.username;
 
         if (await this.chatRoomService.isOwner(user, room) === true) {
             toSend.status = 2;
@@ -198,10 +200,7 @@ export class ChatRoomController {
             select: { members: true }
         });
         const check = room.members.forEach(elem => {
-            console.log('elem ==', elem.id)
-            console.log('user ==', user.id)
             if (elem.id === user.id) {
-                console.log('je suis ici meme')
                 return true;
             }
             return false;
