@@ -85,10 +85,15 @@
 
     onMount(async function() {
 		user = await fetchData();
-		const socket = io('http://localhost:3000');
-		socket.on('connect', async function() {			
-			socket.emit('userConnected', { pseudo: user.pseudo });
-		});
+    if (!user)
+      await goto('/');
+    else
+    {
+      const socket = io('http://localhost:3000');
+      socket.on('connect', async function() {			
+        socket.emit('userConnected', { pseudo: user.pseudo });
+      });
+    }
 	});
 
 </script>

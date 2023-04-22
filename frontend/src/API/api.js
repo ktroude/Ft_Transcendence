@@ -1,7 +1,15 @@
+import { goto } from "$app/navigation";
+
  const fetchAccessToken = async () => {
     const cookies = document.cookie.split(';');
+    if (cookies.length === 0)
+        return null;
     const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
+    if (!accessTokenCookie)
+        return null;
     const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+    if (!accessToken)
+        return null;
     return accessToken;
  }
 
@@ -47,6 +55,8 @@ const fetchDataOfUserPseudo = async (user) => {
         return data;
     } else {
         console.log('Access token not found');
+        goto('/');
+        return null;
     }
 }
 
