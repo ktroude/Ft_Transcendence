@@ -79,9 +79,12 @@
         const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
         const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
         imageURL = URL.createObjectURL(blob); // Create a URL for the blob
+
+        // A Blob is typically used to store data that is too large to be stored in a traditional database column or in memory
+        // or when the data needs to be streamed or transmitted over a network.
       }
     
-      async function handleUpdateUsername()
+      async function handleUpdateUsername() // Update the username
       {
         if (!newUsername) {
           console.log('New username not set');
@@ -113,7 +116,7 @@
         newUsername = '';
       }
 
-      async function handleFileUpload(event) {
+      async function handleFileUpload(event) { // Upload a new profile picture
       // Get the file from the input
       const file = event.target.files[0];
 

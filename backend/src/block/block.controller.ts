@@ -4,33 +4,35 @@ import { User } from '@prisma/client';
 import { BlockService } from './block.service';
 import { Query } from '@nestjs/common';
 
+//Controller for the block system
+
 @UseGuards(JwtGuard)
 @Controller('users')
 export class BlockController {
     constructor (private blockService: BlockService) {}
 
     @UseGuards(JwtGuard)
-    @Put(':pseudo/block')
+    @Put(':pseudo/block') // Block a user
     async blockUser(@Param('pseudo') pseudo: string,@Body() body:{block: string}): Promise<User>
     {
         return this.blockService.blockUser(pseudo, body.block);
     }
 	
     @UseGuards(JwtGuard)
-    @Get(':pseudo/getBlock')
+    @Get(':pseudo/getBlock') // Get all blocked users
     async getBlock(@Param('pseudo') pseudo: string): Promise<string[]> {
 		return this.blockService.getAllBlock(pseudo);
     }
 	
     @UseGuards(JwtGuard)
-    @Put(':pseudo/deleteBlock')
+    @Put(':pseudo/deleteBlock') // Delete a block
     async deleteBlock(@Param('pseudo') pseudo: string, @Body() body:{block: string}): Promise<User>
     {
         return this.blockService.deleteBlock(pseudo, body.block);
     }
 
 	@UseGuards(JwtGuard)
-	@Get(':pseudo/checkBlock')
+	@Get(':pseudo/checkBlock') // Check if a user is blocked
 	async checkBlock(@Param('pseudo') pseudo: string, @Query('block') block: string): Promise<Boolean>
 	{
 		return this.blockService.existingBlock(pseudo, block);

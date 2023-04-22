@@ -3,13 +3,15 @@ import { UserService } from 'src/user/user.service';
 import { JwtGuard } from 'src/auth/guard';
 import { User } from '@prisma/client';
 
+// Controller for the picture system
+
 @UseGuards(JwtGuard)
 @Controller()
 export class PictureController {
     constructor(private userService: UserService) {}
 
     @UseGuards(JwtGuard)
-    @Get('get-image-url')
+    @Get('get-image-url') // Get the image url
     async getImageUrl(@Request() req): Promise<string> {
       const user = await this.userService.findUserByPseudo(req.user.pseudo);
       const imageUrl = user.picture;
@@ -17,7 +19,7 @@ export class PictureController {
     }
 
     @UseGuards(JwtGuard)
-    @Put('users/:pseudo/picture')
+    @Put('users/:pseudo/picture') // Update the profile picture
     async updateProfilePicture(@Param('pseudo') pseudo: string,@Body('picture') picture: string): Promise<User> {
         return this.userService.changeNewProfilePicture(pseudo, picture);
     }

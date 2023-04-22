@@ -14,18 +14,25 @@ import { goto } from "$app/navigation";
  }
 
  const fetchDataOfUser = async (user) => {
-    const accessToken = await fetchAccessToken();
-    console.log(user);
-    if (accessToken) {
-        const headers = new Headers();
-        headers.append('Authorization', `Bearer ${accessToken}`);
-        const response = await fetch(`http://localhost:3000/users/${user}/getUser`, { headers });
-        const data = await response.json();
-        if (!data)
-            return null;
-        return data;
-    } else {
-        console.log('Access token not found');
+    try 
+    {
+        const accessToken = await fetchAccessToken();
+        if (accessToken) {
+            const headers = new Headers();
+            headers.append('Authorization', `Bearer ${accessToken}`);
+            const response = await fetch(`http://localhost:3000/users/${user}/getUser`, { headers });
+            if (response.status === 404)
+                return null;
+            const data = await response.json();
+            if (!data)
+                return null;
+            return data;
+        } else
+            console.log('Access token not found');
+    }
+    catch
+    {
+        return null;
     }
 }
 

@@ -5,11 +5,13 @@ import { PrismaClient } from '@prisma/client';
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 
+// Service for the block system
+
 @Injectable()
 export class BlockService {
   constructor(private prisma: PrismaService) {}
 
-    async createBlock(userId: number, blockId: number) {
+    async createBlock(userId: number, blockId: number) { // Create a block relation
         const block = await this.prisma.block.create({
             data: {
                 user: {
@@ -25,7 +27,7 @@ export class BlockService {
         return block;
     }
 
-    async unblock(userId: number, blockId: number)
+    async unblock(userId: number, blockId: number) // Find the block relation and delete it
     {
         const deleteFriend = this.prisma.block.findUnique({
 			where: {
@@ -48,7 +50,7 @@ export class BlockService {
         return deleteFriend;
     }
 
-    async deleteBlock(pseudo: string, usernameBlock: string) {
+    async deleteBlock(pseudo: string, usernameBlock: string) { // Take users looks if they are blocked and delete the block relation
         const user = await this.prisma.user.findUnique({
             where: {
                 pseudo: pseudo,
@@ -70,7 +72,7 @@ export class BlockService {
 		return;
     }
        
-    async existingBlock(pseudo: string, usernameBlock: string): Promise<Boolean> {
+    async existingBlock(pseudo: string, usernameBlock: string): Promise<Boolean> { // Check if the user is blocked
 		const user = await this.prisma.user.findUnique({
             where: {
                 pseudo: pseudo,
@@ -99,7 +101,7 @@ export class BlockService {
         return true;
     }
 
-    async userExist(usernameBlock: string): Promise<Boolean> {
+    async userExist(usernameBlock: string): Promise<Boolean> { // Check if the user exist
         const user = await this.prisma.user.findUnique({
             where: {
                 username: usernameBlock,
@@ -110,7 +112,7 @@ export class BlockService {
         return true;
     }
 
-    async blockUser(pseudo: string, usernameBlock: string): Promise<User> {
+    async blockUser(pseudo: string, usernameBlock: string): Promise<User> { // Search for the users and create the block relation
         if (await this.userExist(usernameBlock) == false)
             return null;
         const user = await this.prisma.user.findUnique({
@@ -135,7 +137,7 @@ export class BlockService {
         return user;
     }
 
-    async getAllBlock(pseudo: string): Promise<string[]> {
+    async getAllBlock(pseudo: string): Promise<string[]> { // Get all the blocked users of a User
         const user = await this.prisma.user.findUnique({
             where: {
                 pseudo: pseudo,
