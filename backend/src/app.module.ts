@@ -8,10 +8,20 @@ import { UserModule } from './user/user.module';
 import { FriendModule } from './friend/friend.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { BlockModule } from './block/block.module';
+import { DirectMessagesModule } from './directMessages/dm.module';
 
 @Module({
-  imports: [AuthModule, ChatRoomModule, UserModule, PictureModule, FriendModule, WebsocketModule, BlockModule],
+  imports: [
+    AuthModule,
+    ChatRoomModule,
+    UserModule,
+    PictureModule,
+    FriendModule,
+    WebsocketModule,
+    BlockModule,
+    DirectMessagesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

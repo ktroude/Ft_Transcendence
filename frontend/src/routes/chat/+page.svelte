@@ -413,7 +413,7 @@
 				Authorization: 'Bearer ' + access_token
 			}
 		});
-		if (!access_token) {
+		if (!access_token || !socket) {
 			window.location.pathname = '/';
 		}
 		socket.on('connect', async function () {
