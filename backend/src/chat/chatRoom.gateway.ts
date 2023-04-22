@@ -332,7 +332,10 @@ export class ChatRoomGateway
     });
     await this.prismaService.chatRoom.update({
       where: { id: chatRoom.id },
-      data: { banned: { connect: { id: userToBan.id } } },
+      data: {
+        banned: { connect: { id: userToBan.id } },
+        members: { disconnect: {id: userToBan.id}},
+       },
     });
     const newMsg = {
       sender: 'server',
