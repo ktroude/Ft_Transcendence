@@ -24,7 +24,7 @@
 
 		<div class="button_box">
 			<img class="button_picture" src="/img/profile_icone.png">
-			<button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`) && loadpage()}>Profile</button>
+			<button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button>
 		</div>
 
         <div class="button_box">
@@ -87,7 +87,7 @@
           console.log('New username not set');
           return;
         }
-        if (newUsername.length > 8) {
+        if (newUsername.length > 13) {
           console.log('New username too long');
           return;
         }
@@ -155,10 +155,11 @@
     };
   }
 
-    onMount(() => {
-        fetchData();
-    });
-    onMount(() => {
-      getImageURL()
+    onMount(async function() {
+        user = await fetchData();
+        if (!user)
+          await goto('/');
+        else
+          getImageURL()
     });
 </script>

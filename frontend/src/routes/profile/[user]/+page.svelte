@@ -172,7 +172,6 @@
 	let is_blocked: any;
 	
 	async function loadpage() {
-		user = await fetchData();
 		if (!user)
 			goto('/');
 		if ($page.params.user == user.pseudo)
@@ -189,11 +188,17 @@
 		}
 	}
 	onMount(async function() {
-		await loadpage();
-		const socket = io('http://localhost:3000');
-		socket.on('connect', async function() {			
-			socket.emit('userConnected', { pseudo: user.pseudo });
-		});
+		user = await fetchData();
+		if (!user)
+			await goto('/');
+		else
+		{
+			await loadpage();
+			const socket = io('http://localhost:3000');
+			socket.on('connect', async function() {			
+				socket.emit('userConnected', { pseudo: user.pseudo });
+			});
+		}
 	});
 
 </script>
