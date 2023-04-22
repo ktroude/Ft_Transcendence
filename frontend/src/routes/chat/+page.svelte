@@ -203,8 +203,9 @@
 	}
 
 	async function handleRoomButton(room: ChatRoom, pw: any) {
-		passwordInput.bool = false;
-		currentRoom = room;
+		//passwordInput.bool = false;
+		messages = [];
+		//currentRoom = room;
 		if ((await checkBan(room)) === true) {
 			messages = [];
 			messages = [
@@ -218,13 +219,14 @@
 			banned = [];
 			return;
 		}
-		// if (currentRoom?.id === room.id) return;
+		//if (currentRoom?.id === room.id) return;
 		socket.emit('joinRoom', { room: room, password: pw });
 		socket.on('failed', () => {
 			messages = [];
 			messages = [{senderPseudo:'server', content:'Mauvais mot de passe'}];
 		});
 		socket.on('sucess', async() => {
+			currentRoom = room;
 			socket.emit('getMessage', room);
 			socket.emit('getUser', room);
 			await fletchMuteBanData();
@@ -311,7 +313,6 @@
 		}
 	}
 	catch {
-
 		muted = [];
 		banned = [];
 	}
@@ -368,6 +369,7 @@
 	};
 
 	const fletchUserByRoom = async (pseudo: string) => {
+		console.log('pseudo == ', pseudo);
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -507,8 +509,8 @@
 	async function showProfile() {
         //Je recup les données et je le redirige
 		console.log('SU =====', selectedUser);
-        redirectUser = await fetchDataOfUserPseudo(selectedUser.pseudo);
-        goto(`/profile/${redirectUser.pseudo}`);
+        // redirectUsparseInt(user, 10)er = await fetchDataOfUserPseudo(selectedUser.pseudo);
+        goto(`/profile/${selectedUser.id}`);
     }
 
 	function ban(userToBan: any, room: any) {
@@ -592,9 +594,9 @@
 				currentUser = data.user;
 			}
 		});
-		socket.on('newBan', async (data) => {
+		socket.on('banned', async (data) => {
 			if (currentUser.id === data.user.id && currentRoom.id === data.room.id) {
-				chatRooms = await fletchChatRoomsData();
+				//chatRooms = await fletchChatRoomsData();
 				currentRoom = {
 					name: '',
 					id: -1
@@ -712,15 +714,17 @@
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [
 					...messages,
-					{ content: `Vous avez été mute pour 120 sec'`, senderPseudo: 'server' }
+					{ content: `Vous avez été mute pour 12 sec`, senderPseudo: 'server' }
 				];
 				currentUser.status = -1;
 				scrollToBottom();
+				muted = [...muted, currentUser.pseudo];
+				// await fletchMuteBanData();
 			}
 		});
 		socket.on('unMuted', async (data) => {
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
-				messages = [...messages, { content: `Vous n'etes plus mute'`, senderPseudo: 'server' }];
+				messages = [...messages, { content: `Vous n'etes plus mute`, senderPseudo: 'server' }];
 				currentUser.status = 0;
 				scrollToBottom()
 			}
@@ -802,7 +806,7 @@
 
 	<div class="button_box">
 		<img class="button_picture" src="/img/profile_icone.png">
-		<button class="button_nav" on:click={() => goto(`/profile/${currentUser.pseudo}`)}>Profile</button>
+		<button class="button_nav" on:click={() => goto(`/profile/${currentUser.id}`)}>Profile</button>
 	</div>
 
 	<div class="button_box">

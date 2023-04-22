@@ -54,15 +54,10 @@ export class ChatRoomController {
                 admin: true,
             }
         });
-        const admin = room.admin.find((obj) => obj.id === user.id);
-        if (admin) {
             return {
                 muted: room.muted,
                 banned: room.banned,
             }
-        }
-        else
-        return [];
         }
         catch {
             return [];
@@ -114,7 +109,7 @@ export class ChatRoomController {
         };
         console.log('pseudo ==', pseudo);
         const user = await this.prisma.user.findUnique({
-            where: { id: parseInt(pseudo,10) },
+            where: { id: parseInt(pseudo, 10)},
         });
         console.log('user == ', user)
         const room = await this.prisma.chatRoom.findUnique({

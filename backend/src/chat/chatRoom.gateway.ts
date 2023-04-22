@@ -114,6 +114,9 @@ export class ChatRoomGateway
     if ((await this.chatRoomService.isMuted(user, chatRoom)) === true) {
       return;
     }
+    else if ((await this.chatRoomService.isBanned(user, chatRoom)) === true) {
+      return ;
+    }
     else {
       const newMessage = await this.chatRoomService.createMessage(data.content, user, chatRoom);
       this.server.emit('newMessage', newMessage);
@@ -346,7 +349,7 @@ export class ChatRoomGateway
       room: chatRoom
     }
     this.server.emit('newMessage', newMsg);
-    this.server.emit('newBan', toSend);
+    this.server.emit('banned ', toSend);
   }
 
   @SubscribeMessage('unBan')

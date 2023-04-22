@@ -137,7 +137,7 @@ export class BlockService {
         return user;
     }
 
-    async getAllBlock(pseudo: string): Promise<string[]> { // Get all the blocked users of a User
+    async getAllBlock(pseudo: string): Promise<string[]> { // Get all the blocked users of
         const user = await this.prisma.user.findUnique({
             where: {
                 pseudo: pseudo,

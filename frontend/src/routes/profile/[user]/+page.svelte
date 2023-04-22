@@ -166,32 +166,31 @@
 			is_blocked = false;
         } else
 			console.log('Error: Could not delete friend');
-
-		// console.log(realUser, 'is blocking', user.pseudo);
     }
 
-	let realUser = ''; 
+	let realUser: number; 
 	let currentUser = ''; 
 	let is_blocked: any;
 	
 	async function loadpage() {
 		if (!user)
 			goto('/');
-		if ($page.params.user == user.pseudo) // If the user is on his own profile
+		if ($page.params.user == user.id.toString()) // If the user is on his own profile
 		{
-			getImageURL();
+			user = await fetchData();
 			currentUser = user.username;
+			await getImageURL();
 		}
 		else // If the user is on another profile
 		{
-			realUser = user.pseudo;
+			realUser = user.id;
 			user = await fetchDataOfUser($page.params.user);
 			if (!user)
 			{
 				user = await fetchData();
 				return await goto(`/homepage`);
 			}
-			is_blocked = checkBlocked(realUser, user.pseudo);
+			// is_blocked = checkBlocked(realUser, user.id);
 			getImageURL();
 		}
 	}

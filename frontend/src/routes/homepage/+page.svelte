@@ -22,7 +22,7 @@
 
         <div class="button_box">
             <img class="button_picture" src="/img/profile_icone.png">
-            <button class="button_nav" on:click={() => goto(`/profile/${user.pseudo}`)}>Profile</button>
+            <button class="button_nav" on:click={() => goto(`/profile/${user.id}`)}>Profile</button>
         </div>
 
         <div class="button_box">
