@@ -25,6 +25,7 @@
 				<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
 					<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
 					<ul class="ul_friends">
+						{#if friends}
 						{#each friends as friendName}
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
@@ -43,6 +44,7 @@
 							{/if}
 						</li>
 						{/each}
+						{/if}
 					</ul>
 			</div>
 			<div class="search_profile">
@@ -75,11 +77,14 @@
 <!-- ****************************** -->
 
 <script lang="ts">
+	import {io, Socket} from 'socket.io-client';
     import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser } from '../../API/api';
 	import { page } from '$app/stores';
+
+	let socket: Socket;
 
     let previousFriend: string;
     let showButtons = false;
@@ -227,8 +232,10 @@
                 friends = friends.filter(friend => friend !== friendName);
             else
                 console.log('Error: Could not delete friend');
-        } else
+        } 
+		else
             console.log('Error: Could not delete friend');
+			goto('/');
     }
 
     function handleInviteFriend(friendName) {
@@ -290,16 +297,17 @@
     onMount(async () => {
         user = await fetchData();
 		if (!user)
-			await goto('/');
+			await goto('/'); 
 		else
 		{
-		    friends = await fetchFriend(user.pseudo);
+			const socket = io('http://localhost:3000');
+			socket.on('connect', async function() {			
+				socket.emit('userConnected', { pseudo: user.pseudo });
+			});
+			friends = await fetchFriend(user.pseudo);
 			getConnectedUsers();
 		}
     });
-	
-	let currentUser = '';
-	let realUser = '';
 
     export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, imageURL, user, newUsername, handleUpdateUsername };
 </script>

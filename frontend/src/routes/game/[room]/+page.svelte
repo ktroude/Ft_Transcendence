@@ -97,7 +97,7 @@
 		const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
 		const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
 		imageURL = URL.createObjectURL(blob); // Create a URL for the blob
-	}
+	} 
 
 	let realUser = ''; 
 	let currentUser = ''; 
