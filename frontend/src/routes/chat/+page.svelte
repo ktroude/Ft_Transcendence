@@ -45,7 +45,6 @@
 	let banned: any = [];
 	let membres: any = [];
 	let blocked: any = [];
-	let alert: boolean = false;
 	let passwordInput = {
 		bool: false,
 		roomId: 0
@@ -123,7 +122,6 @@
 
 	function scrollToBottom() {
 		let chatDiv =  document.getElementById("chat-messages");
-		console.log("JE SUIS ICI =======", chatDiv);
 		chatDiv?.addEventListener("DOMSubtreeModified", function() {
 	  	scroll(chatDiv);
 	});
@@ -200,7 +198,6 @@
 	async function updateChatRooms(newRoom: ChatRoom) {
 		const isRoomExist = chatRooms.some((room) => room.id === newRoom.id);
 		if (!isRoomExist) {
-			//&& await fletchIsPvAndMember(newRoom) === true) {
 			chatRooms = [...chatRooms, newRoom];
 		}
 	}
@@ -208,6 +205,7 @@
 	async function handleRoomButton(room: ChatRoom, pw: any) {
 		passwordInput.bool = false;
 		if ((await checkBan(room)) === true) {
+			currentRoom = room;
 			messages = [];
 			messages = [
 				{
@@ -218,35 +216,26 @@
 			membres = [];
 			muted = [];
 			banned = [];
-			// closeAlert();
 			return;
 		}
-		// else if (currentRoom && currentRoom.id === room.id) {
-		// 	// closeAlert();
-		// 	return;
-		// }
-		// else if (room?.id) {
-		// 	messages = await fletchMessageOfRoom(room.id);
-		// 	scrollToBottom();
-		// }
-		else messages = [];
-		socket.emit('getMessage', room);
-		socket.emit('getUser', room);
+		if (currentRoom?.id === room.id) return;
 		socket.emit('joinRoom', { room: room, password: pw });
-		currentRoom = room;
-		await fletchMuteBanData();
-		await fletchMembres();
-		await fletchBlocked();
-			// await fletchUserData();
-		// socket.on('sucess', async () => {
-		// 	isShown = false;
-		// 	// closeAlert();
-		// });
+		socket.on('failed', () => {
+			currentRoom = room;
+			messages = [];
+			messages = [{senderPseudo:'server', content:'Mauvais mot de passe'}];
+		});
+		socket.on('sucess', async() => {
+			socket.emit('getMessage', room);
+			socket.emit('getUser', room);
+			await fletchMuteBanData();
+			await fletchMembres();
+			await fletchBlocked();
+			currentRoom = room;
+		});
 	}
 
-	function closeAlert() {
-		alert = false;
-	}
+
 
 	function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
 		event.preventDefault();
@@ -307,8 +296,10 @@
 	};
 
 	const fletchMuteBanData = async () => {
-		const cookies = document.cookie.split(';');
-		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		try {
+
+			const cookies = document.cookie.split(';');
+			const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
 		if (accessToken) {
 			const headers = new Headers();
@@ -320,6 +311,12 @@
 			muted = data.muted;
 			banned = data.banned;
 		}
+	}
+	catch {
+
+		muted = [];
+		banned = [];
+	}
 	};
 
 	const fletchMembres = async () => {
@@ -932,14 +929,6 @@
 			{/if}
 		</div>
 
-<!-- {#if alert == true}
-	<alert>
-		Mot de passe incorect
-		<button on:click={closeAlert}> OK </button>
-	</alert>
-{/if} -->
-
-
 
 
 
@@ -947,20 +936,6 @@
 <div class="message_container">
 {#if currentRoom}
 
-	<!-- <div class="room-bandeau">
-		{#if currentRoom.name.length}
-			<input
-				class="room-bandeau-form-input"
-				on:keypress={handleInvitKeyPress}
-				bind:value={userPseudoInput}
-			/>
-			<button class="room-bandeau-button" on:click={handleInvitUserInput}
-				>Ajouter un utilisateur
-			</button>
-			<h3 class="room-name">{currentRoom.name}</h3>
-			<button class="leave-chat" on:click={leaveRoom}>Quitter la room</button>
-		{/if}
-	</div> -->
 
 	{#if currentRoom?.id}
 			<div class="chat-messages" id="chat-messages">
