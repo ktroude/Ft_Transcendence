@@ -22,7 +22,7 @@ export class UserController {
       return user;
     }
 
-    // @UseGuards(JwtGuard)
+    @UseGuards(JwtGuard)
     @Get(':user/getUser')
     async getUserInfo(@Param('user') user: string): Promise<User> {
         return await this.userService.findUserByUsername(user);

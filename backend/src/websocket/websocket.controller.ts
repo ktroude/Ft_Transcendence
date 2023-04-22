@@ -9,11 +9,6 @@ import { WebsocketGateway } from "./websocket.gateway";
 export class WebsocketController {
     constructor(private websocketService: WebsocketService, private websocketGateway: WebsocketGateway) {}
 
-    // @UseGuards(JwtGuard)
-    // @Put('setSocket/:id')
-    // async setSocket(@Body() body: { user: User, socket: any }): Promise<User> {
-    //     return this.websocketService.setSocket(body.user, body.socket);
-    // }
 	@UseGuards(JwtGuard)
 	@Get('getClient')
 	async get()

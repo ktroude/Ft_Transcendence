@@ -12,10 +12,10 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
   server: Server;
   clients: Map<string, string> = new Map();
 
-  handleConnection(client: any, ...args: any[]) {
+  handleConnection(client: any, ...args: any[]) { // When a client is connected, we add it to the map
     client.on('userConnected', (payload) => {
       const pseudo = payload.pseudo;
-      if (this.clients.has(pseudo)) {
+      if (this.clients.has(pseudo)) { // If user already in map, we update his socket id
         this.clients.set(pseudo, client.id);
         return;
 	}
@@ -23,7 +23,7 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
     });
   }
 
-	handleDisconnect(client: any) 
+	handleDisconnect(client: any) // When a client is disconnected, we remove it from the map
 	{
 		this.clients.forEach((value, key) => {
 			if (value === client.id)

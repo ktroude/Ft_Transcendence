@@ -9,6 +9,7 @@ const upload = multer({ dest: 'uploads/' });
 export class UserService {
     constructor(private prisma: PrismaService) {}
     
+    // Update the prisma with the new picture
     async changeNewProfilePicture(pseudo: string, newProfilePicture: string): Promise<User>
     {
         const updatedProfilePicture = await this.prisma.user.update({
@@ -24,6 +25,8 @@ export class UserService {
                 id: id,
             }
         });
+        if (!user)
+            return null;
         return user;
     }
 
@@ -33,6 +36,8 @@ export class UserService {
                 username: username,
             }
         });
+        if (!user)
+            return null;
         return user;
     }
 
@@ -53,8 +58,11 @@ export class UserService {
                 pseudo: pseudo,
             }
         });
+        if (!user)
+            return null;
         return user;
     }
+
     async updatePseudo(user: User, newPseudo: string): Promise<User> {
         if (await this.checkNewPseudo(user, newPseudo) === false)
             return user
@@ -79,6 +87,7 @@ export class UserService {
             return true // nouveau pseudo valide
     }
     
+    // decode le token et retourne l'utilisateur
     async decodeToken(token: string) {
         const ret = jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
             if (err) {

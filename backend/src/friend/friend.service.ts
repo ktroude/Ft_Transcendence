@@ -63,7 +63,6 @@ export class FriendService{
         return true;
     }
 
-    // Adding friend
     async addFriend(pseudo: string, usernameFriend: string): Promise<User> {
         const user = await this.prisma.user.findUnique({
             where: {
@@ -107,6 +106,7 @@ export class FriendService{
           return newFriend;
     }
     
+    // Deleting friendship
     async deleteFriendShip(userId: number, friendId: number)
     {
         const deleteFriend = await this.prisma.friend.delete({
@@ -120,6 +120,7 @@ export class FriendService{
         return deleteFriend;
     }
 
+    // Find 2 users and delete the friendship
     async deleteFriend(pseudo: string, usernameFriend: string): Promise<User> {
         if (pseudo == usernameFriend)
             return null;

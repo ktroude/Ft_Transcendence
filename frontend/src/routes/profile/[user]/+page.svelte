@@ -103,9 +103,12 @@
 		const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
 		const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
 		imageURL = URL.createObjectURL(blob); // Create a URL for the blob
+		
+		//A Blob is typically used to store data that is too large to be stored in a traditional database column or in memory
+		//or when the data needs to be streamed or transmitted over a network.
 	}
 	
-  async function sendMessage()
+  async function sendMessage() // Redirect to chat with user
   {
     const accessToken = await fetchAccessToken();
     if (accessToken)
@@ -114,7 +117,7 @@
       console.log('Error: Could not send message');
   }
 
-	async function block(realUser, blockerUser) {
+	async function block(realUser, blockerUser) { // block user
 		await fetchData();
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
@@ -131,7 +134,7 @@
 			console.log('Error: Could not delete friend');
     }
 	
-	async function checkBlocked(realUser, blockerUser) {
+	async function checkBlocked(realUser, blockerUser) { // check if user is blocked
     const accessToken = await fetchAccessToken();
     const url = `http://localhost:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
     const response = await fetch(url, {
@@ -148,7 +151,7 @@
     return is_blocked;
 }
 
-	async function unblock(realUser, blockerUser) {
+	async function unblock(realUser, blockerUser) { // unblock user
 		await fetchData();
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
@@ -174,29 +177,34 @@
 	async function loadpage() {
 		if (!user)
 			goto('/');
-		if ($page.params.user == user.pseudo)
+		if ($page.params.user == user.pseudo) // If the user is on his own profile
 		{
 			getImageURL();
 			currentUser = user.username;
 		}
-		else
+		else // If the user is on another profile
 		{
 			realUser = user.pseudo;
 			user = await fetchDataOfUser($page.params.user);
+			if (!user)
+			{
+				user = await fetchData();
+				return await goto(`/homepage`);
+			}
 			is_blocked = checkBlocked(realUser, user.pseudo);
 			getImageURL();
 		}
 	}
 	onMount(async function() {
-		user = await fetchData();
+		user = await fetchData(); // Catch the user
 		if (!user)
-			await goto('/');
+			await goto('/'); // If no user redirect
 		else
 		{
 			await loadpage();
-			const socket = io('http://localhost:3000');
+			const socket = io('http://localhost:3000'); // Connect to the server
 			socket.on('connect', async function() {			
-				socket.emit('userConnected', { pseudo: user.pseudo });
+				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
 			});
 		}
 	});
