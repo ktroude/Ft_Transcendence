@@ -112,7 +112,7 @@
   {
     const accessToken = await fetchAccessToken();
     if (accessToken)
-      goto(`/chat/dm/${user.username}`);
+      goto(`/chat/dm/${user.id}`);
     else
       console.log('Error: Could not send message');
   }
@@ -168,7 +168,7 @@
 			console.log('Error: Could not delete friend');
     }
 
-	let realUser: number; 
+	let realUser: string; 
 	let currentUser = ''; 
 	let is_blocked: any;
 	
@@ -183,14 +183,14 @@
 		}
 		else // If the user is on another profile
 		{
-			realUser = user.id;
+			realUser = user.username;
 			user = await fetchDataOfUser($page.params.user);
 			if (!user)
 			{
 				user = await fetchData();
 				return await goto(`/homepage`);
 			}
-			// is_blocked = checkBlocked(realUser, user.id);
+			is_blocked = checkBlocked(realUser, user.username);
 			getImageURL();
 		}
 	}

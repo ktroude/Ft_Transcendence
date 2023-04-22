@@ -9,7 +9,7 @@
 <body>
 	<div class="game_navbar">
 		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
-		<button class="button_nav" on:click={() => gotoprofile()}>Profile</button>
+		<button class="button_nav" on:click={() => goto(`/profile/${user.id}`)}>Profile</button>
 		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
 		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
 	</div>
@@ -89,7 +89,8 @@
     let searchProfile: string = '';
     let connectedUsers = [];
 
-    let user: User = undefined;
+	let friendUser: User;
+    let user: User;
     interface User {
         id: number;
         pseudo: string;
@@ -130,25 +131,27 @@
 	}
 
 	async function handleSearchProfile(searchProfile: string) {
-		console.log("handleSearchProfile:", searchProfile);
 		if (!searchProfile) {
 			return;
 		}
 		const accessToken = await fetchAccessToken();
-		const url = `http://localhost:3000/users/${searchProfile}/search`;
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-			'Authorization': `Bearer ${accessToken}`,
-			},
-		});
-		const userExists = await response.json(); // Parse response body as JSON
-		if (userExists) { // Check if user exists
-			goto(`/profile/${searchProfile}`);
-		} else {
-			console.log("user", searchProfile, "does not exist, reloading.......");
-			return;
+		if (accessToken) {
+			const url = `http://localhost:3000/users/${searchProfile}/search`;
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				},
+			});
+			const userExists = await response.json(); // Parse response body as JSON
+			if (userExists) { // Check if user exists
+				goto(`/profile/${userExists.id}`);
+			} else {
+				return;
+			}
 		}
+		else 
+			console.log('Error: Could not get users');
 	}
 
 	async function acceptInvitation() {
@@ -177,18 +180,34 @@
 		else if (invited == 2 || invited == -1){
 			invited = 2;
 			showButtons = value;
-			console.log("showButtons: " + showButtons);
 		}
 	}
 
     async function handleMessageFriend(friendName) {
-        console.log(`Sending message to ${friendName}`);
-    }
+		const accessToken = await fetchAccessToken();
+		if (accessToken)
+		{
+			const url = `http://localhost:3000/users/${friendName}/search`;
+				const response = await fetch(url, {
+					method: 'GET',
+					headers: {
+					'Authorization': `Bearer ${accessToken}`,
+					},
+				});
+				const userExists = await response.json(); // Parse response body as JSON
+				if (userExists) { // Check if user exists
+					await goto(`/chat/dm/${userExists.id}`);
+				}
+		}
+		else 
+			console.log('Error: Could not get users');
+	}
 
     async function handleProfileFriend(friendName) {
         const accessToken = await fetchAccessToken();
+		friendUser = await fetchDataOfUser(friendName);
         if (accessToken)
-			goto(`/profile/${friendName}`)
+			goto(`/profile/${friendUser.id}`)
         else
             console.log('Error: Could not get profile');
     }
@@ -241,12 +260,6 @@
     let imageURL: string = '';
     let newUsername: string = '';
 
-    async function getImageURL() {
-        user = await fetchData(); // Get the user's picture
-        const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
-        const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
-        imageURL = URL.createObjectURL(blob); // Create a URL for the blob
-    }
 
     async function handleUpdateUsername() {
         if (!newUsername) {
@@ -274,17 +287,15 @@
             }
 	}
 
-	async function gotoprofile(friendName)
-	{
-		user = await fetchData(); // Get the user's picture
-		friends = await fetchFriend(user.pseudo);
-		goto(`/profile/${user.pseudo}`);
-	}
-
     onMount(async () => {
-        await getImageURL();
-        friends = await fetchFriend(user.pseudo);
-		getConnectedUsers();
+        user = await fetchData();
+		if (!user)
+			await goto('/');
+		else
+		{
+		    friends = await fetchFriend(user.pseudo);
+			getConnectedUsers();
+		}
     });
 	
 	let currentUser = '';
