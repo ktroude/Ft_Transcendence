@@ -203,36 +203,21 @@
 	}
 
 	async function handleRoomButton(room: ChatRoom, pw: any) {
-		//passwordInput.bool = false;
-		messages = [];
-		//currentRoom = room;
-		if ((await checkBan(room)) === true) {
-			messages = [];
-			messages = [
-				{
-					content: 'Vous avez été banni de cette room.',
-					senderPseudo: 'server'
-				}
-			];
-			membres = [];
-			muted = [];
-			banned = [];
-			return;
-		}
-		//if (currentRoom?.id === room.id) return;
+		// if ((await checkBan(room)) === true) {
+		// 	messages = [];
+		// 	messages = [
+		// 		{
+		// 			content: 'Vous avez été banni de cette room.',
+		// 			senderPseudo: 'server'
+		// 		}
+		// 	];
+		// 	membres = [];
+		// 	muted = [];
+		// 	banned = [];
+		// 	return;
+		// }
+		if (currentRoom?.id === room.id) return;
 		socket.emit('joinRoom', { room: room, password: pw });
-		socket.on('failed', () => {
-			messages = [];
-			messages = [{senderPseudo:'server', content:'Mauvais mot de passe'}];
-		});
-		socket.on('sucess', async() => {
-			currentRoom = room;
-			socket.emit('getMessage', room);
-			socket.emit('getUser', room);
-			await fletchMuteBanData();
-			await fletchMembres();
-			await fletchBlocked();
-		});
 	}
 
 
@@ -475,6 +460,7 @@
 	}
 
 	async function handleClickPseudo(event: any, user: any) {
+		console.log('CLIQUE PSEUDO ==', user);
 		isShown = false;
 		selectedUser = await fletchUserByRoom(user);
 		showOptionsPseudo = await displayDropdownMenu();
@@ -482,6 +468,10 @@
 	}
 
 	function find(array: any[], toFind: any): boolean {
+		return array.find((element) => element === toFind) !== undefined;
+	}
+
+	function findElem(array: any[], toFind: any): boolean {
 		return array.find((element) => element === toFind) !== undefined;
 	}
 
@@ -579,14 +569,25 @@
 		});
 		socket.on('returnMessage', (data: any) => {
 			if (currentUser.id === data.to) {
-				messages = data.msg;
-				scrollToBottom();
+				if (data.banned == true) {
+					messages = [{
+						senderPseudo:'server',
+						content:'Vous êtes banni de cette room (CHEH)',
+					}];
+					return ;
+				}
+				else {
+					messages = data.msg;
+					scrollToBottom();
+				}
 			}
 		});
 		socket.on('newMessage', (msg: any) => {
 			if (currentRoom && currentRoom?.id === msg.chatRoomId) {
-				messages = [...messages, msg];
-				scrollToBottom();
+				if (currentUser?.status != -2) {
+					messages = [...messages, msg];
+					scrollToBottom();
+				}
 			}
 		});
 		socket.on('returnUser', (data: any) => {
@@ -610,12 +611,31 @@
 				membres = [];
 				banned = [];
 				muted = [];
-				scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
-				await fletchMuteBanData();
+				banned = [...banned, data.user];
+				// delete membres[data.user];
 				await fletchMembres();
 			}
-			chatRooms = await fletchChatRoomsData();
+			if (data.room.private === true && currentUser.id === data.user.id)
+				chatRooms = await fletchChatRoomsData();
+		});
+		socket.on('newDeban', async(data) => {
+			if (currentRoom.id == data.room.id) {
+				await fletchMembres();
+				await fletchMuteBanData();
+			}
+			if (currentUser.id == data.user.id) {
+				if (currentRoom == null) {
+					currentRoom = {
+						name: '',
+						id: -1,
+					};
+				}
+				messages = [...messages, {
+					senderPseudo: 'server',
+					content: `Vous etes deban de la room ${data.room.name}`,
+				}];
+			}
 		});
 		socket.on('deleteRoom', async (data) => {
 			if (currentRoom && currentRoom?.id === data) {
@@ -637,7 +657,7 @@
 				chatRooms = await fletchChatRoomsData();
 				currentRoom = {
 					name: '',
-					id: 0
+					id: -1
 				};
 				messages = [
 					...messages,
@@ -649,32 +669,41 @@
 				membres = [];
 				banned = [];
 				muted = [];
-				scrollToBottom();
+				//scrollToBottom();
 			} else if (currentRoom.id === data.room.id) {
-				membres = await fletchMembres();
-				await fletchMuteBanData();
-				await fletchMembres();
+				delete membres[data.user];
 			}
-			chatRooms = await fletchChatRoomsData();
-		});
-		socket.on('newDeban', async (data) => {
-			if (data.user.id === currentUser.id) {
-				chatRooms = await fletchChatRoomsData();
-				messages = [
-					...messages,
-					{
-						senderPseudo: 'server',
-						content: `Vous avez été débanni de la room ${data.room.name}`
-					}
-				];
-				scrollToBottom();
-			} else if (currentRoom.id === data.room.id) {
-				await fletchMuteBanData();
+			if (currentUser.id === data.user.id && data.room.private == true) {
+				delete chatRooms[data.room];
 			}
 		});
 		socket.on('roomLeaved', async (data) => {
 			if (currentRoom?.id === data) {
 				membres = await fletchMembres();
+			}
+		});
+		socket.on('sucess', async(data) => {
+			if (currentUser.id == data.user.id) {
+				currentRoom = data.room;
+				socket.emit('getMessage', data.room);
+				socket.emit('getUser', data.room);
+				muted = data.muted;
+				membres = data.membres;
+				banned = data.banned;
+			}
+			else if(currentRoom.id === data.room.id) {
+				await fletchMuteBanData();
+				await fletchMembres();
+			}
+		});
+		socket.on('failed', (data) => {
+			console.log()
+			if (currentUser.id == data.user.id) {
+				currentRoom = {
+					name: '',
+					id: -1
+				};	
+				messages = [data.message];
 			}
 		});
 		socket.on('adminAdded', async (data) => {
@@ -709,7 +738,7 @@
 		});
 		socket.on('muted', async (data) => {
 			if (currentRoom.id === data.room.id) {
-				fletchMuteBanData();
+				muted = [...muted, data.user];
 			}
 			if (currentRoom.id === data.room.id && currentUser.id === data.user.id) {
 				messages = [
@@ -718,8 +747,6 @@
 				];
 				currentUser.status = -1;
 				scrollToBottom();
-				muted = [...muted, currentUser.pseudo];
-				// await fletchMuteBanData();
 			}
 		});
 		socket.on('unMuted', async (data) => {
@@ -739,7 +766,6 @@
 			}
 		});
 		socket.on('UserAdded', async (data) => {
-			console.log('data ===', data);
 			if (data.sucess === false && !data.userToAdd) {
 				if (currentUser.id === data.user.id) {
 					messages = [
@@ -759,13 +785,11 @@
 				membres = [];
 				await fletchMembres();
 				await fletchMuteBanData();
-				chatRooms = await fletchChatRoomsData();
 			}
 			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
-				// alert = true;
 				currentRoom = null;
 			}
 		});
@@ -1010,7 +1034,7 @@
 				{#each membres as member}
 					<button
 						class="pseudo-button-message"
-						on:click={(event) => handleClickPseudo(event, member.pseudo)}
+						on:click={(event) => handleClickPseudo(event, member.id)}
 					>
 						{member.username}
 					</button>
@@ -1024,7 +1048,7 @@
 			<h2 class="room-title">Banned</h2>
 			{#if banned?.length}
 				{#each banned as ban}
-					<button class="pseudo-button-message" on:click={(event) => handleClickPseudo(event, ban.pseudo)}>
+					<button class="pseudo-button-message" on:click={(event) => handleClickPseudo(event, ban.id)}>
 						💀 {ban.username}
 					</button>
 				{/each}
@@ -1038,7 +1062,7 @@
 					{#each muted as mute}
 						<button
 							class="pseudo-button-message"
-							on:click={(event) => handleClickPseudo(event, mute.pseudo)}>
+							on:click={(event) => handleClickPseudo(event, mute.id)}>
 							🔕 {mute.username}
 						</button>
 					{/each}

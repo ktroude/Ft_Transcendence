@@ -92,10 +92,27 @@ export class ChatRoomGateway
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
       where: { id: data.id },
-      select: { messages: true },
+      select: { 
+        messages: true,
+        id:true,
+        createdAt: true,
+        updatedAt:true,
+        name:true,
+        password:true,
+        private:true,
+        ownerId:true,
+       },
     });
     const messages = chatRoom.messages;
+    if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
+      const toSend = {
+        to: user.id,
+        banned: true
+      }
+      return toSend;
+    }
     const toSend = {
+      banned: false,
       msg: messages,
       to: user.id,
     }
@@ -106,7 +123,6 @@ export class ChatRoomGateway
   @SubscribeMessage('sendMessage')
   async handleSendMessage(@ConnectedSocket() client, @MessageBody() data: any) {
     try {
-
       const user = this.clients.find(([, socket]) => socket === client)?.[0];
       const chatRoom = await this.prismaService.chatRoom.findUnique({
         where: { id: data.roomId }
@@ -349,7 +365,7 @@ export class ChatRoomGateway
       room: chatRoom
     }
     this.server.emit('newMessage', newMsg);
-    this.server.emit('banned ', toSend);
+    this.server.emit('banned', toSend);
   }
 
   @SubscribeMessage('unBan')
@@ -406,13 +422,13 @@ export class ChatRoomGateway
       await this.prismaService.message.deleteMany({
         where: { chatRoomId: data.id },
       })
-      await this.prismaService.chatRoom.update({
-        where: { id: data.id },
-        data: {
-          members: { disconnect: { id: user.id } },
-          admin: { disconnect: { id: user.id } },
-        },
-      })
+      // await this.prismaService.chatRoom.update({
+      //   where: { id: data.id },
+      //   data: {
+      //     members: { disconnect: { id: user.id } },
+      //     admin: { disconnect: { id: user.id } },
+      //   },
+      // })
       await this.prismaService.chatRoom.delete({
         where: { id: data.id },
       });
@@ -439,13 +455,31 @@ export class ChatRoomGateway
       select: {
         members: true,
         password: true,
+        id:true,
+        banned:true,
+        muted:true,
       },
-    })
+    });
+    const sucessData = await this.prismaService.chatRoom.findUnique({
+      where : {id: toCheck.id},
+    });
+    if (await this.chatRoomService.isBanned(user, sucessData) === true) {
+      const msg = {senderPseudo:'server', content:'Vous etes ban de cette room'}
+      this.server.emit('failed',{
+        user:user,
+        message:msg,
+      });
+      return;
+    }
     if (toCheck.password.length) {
       const pwCheck = bcrypt.compareSync(data.password, toCheck.password);
       if (pwCheck === false) {
-        this.server.emit('wrongPW', { room: toCheck, user: user });
-        this.server.emit('failed');
+        //this.server.emit('wrongPW', { room: toCheck, user: user });
+        const msg = {senderPseudo:'server', content:'Mauvais mot de passe'}
+        this.server.emit('failed',{
+          user:user,
+          message:msg,
+        });
         return;
       }
     }
@@ -459,7 +493,13 @@ export class ChatRoomGateway
         { id: 0, pseudo: 'server' }, { id: data.room.id });
       this.server.emit('newMessage', toSend);
     }
-    this.server.emit('sucess');
+    this.server.emit('sucess', {
+      room: sucessData,
+      banned: toCheck.banned,
+      membres: toCheck.members,
+      muted: toCheck.muted,
+      user:user,
+    } );
   }
 
   @SubscribeMessage('addUser')
