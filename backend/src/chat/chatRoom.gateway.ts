@@ -469,6 +469,10 @@ export class ChatRoomGateway
       this.server.emit('failed',{
         user:user,
         message:msg,
+		animation:{
+			content: 'ban',
+			id: toCheck.id
+		  },
       });
       return;
     }
@@ -480,6 +484,10 @@ export class ChatRoomGateway
         this.server.emit('failed',{
           user:user,
           message:msg,
+		  animation: {
+			content: 'wrong',
+			id: toCheck.id
+		  }
         });
         return;
       }
@@ -507,6 +515,10 @@ export class ChatRoomGateway
       membres: toCheck.members,
       muted: toCheck.muted,
       user:user,
+	  animation: {
+		content: 'ok',
+		id: toCheck.id
+	  }
     } );
   }
 

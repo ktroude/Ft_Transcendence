@@ -47,6 +47,7 @@
 		bool: false,
 		roomId: 0
 	};
+	let animation:any;
 
 	// INTERFACES
 
@@ -180,11 +181,13 @@
 	}
 
 	function displayInputPassword(id: number) {
+		animation = null;
 		passwordInput.bool = true;
 		passwordInput.roomId = id;
 	}
 
 	async function handleRoomButton(room: ChatRoom, pw: any) {
+		animation = null;
 		if (currentRoom?.id === room.id && currentUser.status >= 0) return;
 		socket.emit('joinRoom', { room: room, password: pw });
 	}
@@ -542,6 +545,8 @@
 		socket.on('sucess', async (data) => {
 			if (currentUser.id == data.user.id) {
 				currentRoom = data.room;
+				animation = data.animation;
+				console.log("animation =", animation);
 				socket.emit('getMessage', data.room);
 				socket.emit('getUser', data.room);
 				muted = data.muted;
@@ -553,6 +558,8 @@
 		});
 		socket.on('failed', (data) => {
 			if (currentUser.id == data.user.id) {
+				animation = data.animation;
+				console.log("animation =", animation);
 				currentRoom = {
 					name: '',
 					id: -1
@@ -625,6 +632,9 @@
 		socket.on('UserAdded', async (data) => {
 			if (data.sucess === false && !data.userToAdd) {
 				if (currentUser.id === data.user.id) {
+					animation = data.animation;
+					console.log("animation =", animation);
+
 					messages = [
 						...messages,
 						{ senderPseudo: 'server', content: "Cet utilisateur n'existe pas" }
@@ -703,7 +713,10 @@
 	</div>
 	<div class="chat_body">
 		{#if loading === false}
-			<p>Chargement...</p>
+			<!-- <p>Chargement...</p> -->
+			<div class="loading_screen">
+				<p>Chargement...</p>
+			</div>
 		{:else}
 			<div class="left_bloc">
 				<div class="create-room">
@@ -752,16 +765,42 @@
 					<h2 class="room-title">Rooms publics</h2>
 					{#each chatRooms as chatRoom}
 						{#if chatRoom.private === false && chatRoom.password == false}
-							<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
-								{chatRoom.name}
-							</button>
+							{#if currentRoom.id === chatRoom.id}
+								<button class="chatroom-button-connected" on:click={() => handleRoomButton(chatRoom, '')}>
+									{chatRoom.name}
+								</button>
+							{:else}
+								<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
+									{chatRoom.name}
+								</button>
+							{/if}
 						{/if}
 						{#if chatRoom.private === false && chatRoom.password == true}
 							<div class="wrap_button">
-								<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
-									<span>🔒 </span>
-									{chatRoom.name}
-								</button>
+								{#if animation?.id === chatRoom.id && animation?.content === 'wrong'}
+								<!-- cvhdevchdbjkc -->
+									<button class="chatroom-button-failed" on:click={() => displayInputPassword(chatRoom.id)}>
+										<span>🔒 </span>
+										{chatRoom.name}
+									</button>
+								{:else}
+									{#if currentRoom.id === chatRoom.id}
+									<button class="chatroom-button-connected" on:click={() => displayInputPassword(chatRoom.id)}>
+										<span>🔒 </span>
+										{chatRoom.name}
+									</button>
+									{:else}
+										<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+											<span>🔒 </span>
+											{chatRoom.name}
+										</button>
+									{/if}
+
+									<!-- <button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+										<span>🔒 </span>
+										{chatRoom.name}
+									</button> -->
+								{/if}
 							</div>
 							{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
 								<input
@@ -793,6 +832,7 @@
 							</div>
 							{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
 								<input
+									placeholder="Mot de passe"
 									type="text"
 									on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}
 								/>
@@ -801,46 +841,43 @@
 					{/each}
 				</div> 
 				{#if currentRoom}
-					<div class="room_settings">
+				<div class="room_settings">
+						<h2 class="room-title">Réglages</h2>
+						<div class="input_box_settings">
 						{#if currentRoom.name.length}
 							<!-- <h3 class="room_name">{currentRoom.name}</h3> -->
-							<div class="input_box_settings">
-
-
-
-
-
-
 
 
 
 								{#if currentUser?.status === 2 && currentRoom?.password === true}
-								<input class="password_change_input" on:keypress={(event) => handlePasswordChange(event)} />
-								<button class="delete_password_button" on:click={handleDelPassword}> delete password </button>
+								<div class="password_change_bloc">
+									<input 	placeholder="Nouveau mot de passe"
+											type="password"
+											class="password_change_input" on:keypress={(event) => handlePasswordChange(event)} />
+											<button class="delete_password" on:click={handleDelPassword}>Supprimer mot de passe</button>
+								</div>
 								{/if}
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								<input
-									class="room-bandeau-form-input"
-									on:keypress={handleInvitKeyPress}
-									bind:value={userPseudoInput}
-								/>
 
-								<button class="settings_button" on:click={handleInvitUserInput}
-									>Ajouter un utilisateur
-								</button>
+								
+
+								<!-- <div class="useradd_bloc">
+									<input
+										placeholder="Ajouter un utilisateur"
+										class="room-bandeau-form-input"
+										on:keypress={handleInvitKeyPress}
+										bind:value={userPseudoInput}
+									/>
+									<button class="settings_button" on:click={handleInvitUserInput}
+										>+
+									</button>
+								</div> -->
+								{#if currentUser.status === 2}
+								<button class="leave_chat" on:click={leaveRoom}>Supprimer la room ❌</button>
+								{:else}
+								<button class="leave_chat" on:click={leaveRoom}>Quitter la room ❌</button>
+								{/if}
+								{/if}
 							</div>
-							<button class="leave_chat" on:click={leaveRoom}>Quitter❌</button>
-						{/if}
 					</div>
 				{/if}
 			</div>
@@ -911,14 +948,25 @@
 							<div class="member_list">
 								<h2 class="room-title">Membres</h2>
 								{#if membres && membres.length}
-									{#each membres as member}
-										<button
-											class="pseudo-button-message"
-											on:click={(event) => handleClickPseudo(event, member.id)}
-										>
-											{member.username}
-										</button>
-									{/each}
+								{#each membres as member}
+								<button
+								class="pseudo-button-message"
+								on:click={(event) => handleClickPseudo(event, member.id)}
+								>
+								{member.username}
+							</button>
+							{/each}
+							<div class="useradd_bloc">
+								<input
+									placeholder="Ajouter un utilisateur"
+									class="room-bandeau-form-input"
+									on:keypress={handleInvitKeyPress}
+									bind:value={userPseudoInput}
+								/>
+								<!-- <button class="settings_button" on:click={handleInvitUserInput}
+									>+
+								</button> -->
+							</div>
 								{/if}
 							</div>
 						{/if}

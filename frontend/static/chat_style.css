@@ -1,3 +1,13 @@
+.loading_screen{
+	height: 100%;
+	width: 100%;
+	background-color: black;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	display: flex;
+}
+
 
 .game_navbar{
 	height:50px;
@@ -98,7 +108,7 @@
   }
   .room-title{
     color: greenyellow;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
   .chatroom-button {
     width: 116px;
@@ -123,6 +133,76 @@
     -2px 1px 30px #00B309;
     font-size: 16px;
 }
+
+.chatroom-button-connected{
+	width: 116px;
+    min-height: 30px;
+    max-height: 30px;
+    font-size: 16px;
+	text-shadow: 3px 3px 20px #00B309,
+	-2px 1px 30px #00B309;
+    margin: 2px;
+	color: greenyellow;
+    border: 1px solid greenyellow;
+    background: transparent;
+    color: white;
+    text-align: center;
+    align-items: center;
+    white-space: nowrap;
+    padding: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chatroom-button-failed{
+	width: 116px;
+    min-height: 30px;
+    max-height: 30px;
+    font-size: 16px;
+	text-shadow: 3px 3px 20px #00B309,
+	-2px 1px 30px #00B309;
+    margin: 2px;
+	color: greenyellow;
+    border: 1px solid rgba(255, 255, 255, 0.447);
+    background: transparent;
+    color: white;
+    text-align: center;
+    align-items: center;
+    white-space: nowrap;
+    padding: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	animation: shake_button_fail 0.3s ease;
+}
+
+.chatroom-button-failed:hover{
+    cursor: pointer;
+    color: greenyellow;
+    text-shadow: 3px 3px 20px #00B309,
+    -2px 1px 30px #00B309;
+    font-size: 16px;
+}
+
+
+@keyframes shake_button_fail{
+	0% {
+		border: 1px solid red;
+
+		transform: rotate(0deg);
+	}
+	30% {
+		transform: rotate(-3deg);
+	}
+	70% {
+		transform: rotate(3deg);
+	}
+	100% {
+		transform: rotate(0deg);
+		border: 1px solid red;
+	}
+  }
+
+
 .wrap_button{
 	
 	overflow-y: hidden;
@@ -144,12 +224,17 @@
 	overflow-x: scroll;
 }
 
+
+
+
+/*****************SETTINGS************************/
+
 .room_settings{
 	display: flex;
 	background-color: rgba(122, 122, 122, 0.084);
 	flex-direction: column;
 	align-items: center;
-	padding: 10px;
+	padding: 5px;
 	overflow-x: scroll;
 	height:20vh;
 }
@@ -174,24 +259,82 @@
 	font-size: 22px;
 }
 
+.password_change_input{
+	margin: 3px;
+}
+
 .input_box_settings{
+	padding: 10px;
 	display: flex;
 	flex-direction: column;
-	width: 116px;
+	height: 60px;
+	width: 100%;
+	align-items: center;
+	/* background-color: red; */
+	justify-content: center;
+}
 
+.password_change_bloc{
+	display: flex;
+	margin: 3px;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.useradd_bloc{
+	/* background-color: blue; */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-top: auto;
+	margin-bottom: 10px;
+}
+
+.delete_password:hover{
+	color: rgb(255, 47, 47);
+	text-shadow: 3px 3px 20px #b30000,
+	-2px 1px 30px #b30000;
+}
+
+.delete_password{
+	background-color: transparent;
+	cursor: pointer;
+	margin: auto;
+	border: none;
+	color: white;
+	font-size: 15px;
 }
 .leave_chat{
 	background-color: transparent;
 	cursor: pointer;
 	border: none;
 	color: white;
-	font-size: 15px;
+	font-size: 18px;
 }
 .leave_chat:hover{
 	color: rgb(255, 47, 47);
 	text-shadow: 3px 3px 20px #b30000,
 	-2px 1px 30px #b30000;
+	animation: shake_button 0.6s infinite;
 }
+
+@keyframes shake_button{
+	0% {
+		transform: rotate(0deg);
+	}
+	30% {
+		transform: rotate(-5deg);
+	}
+	70% {
+		transform: rotate(5deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+  }
+
+
 
 .message_container{
 	width: 60vw;
@@ -245,6 +388,9 @@
 	-2px 1px 10px rgba(255, 255, 0, 0.357);
 }
 
+.message_input_container{
+	animation: appear_input 0.5s ease-in-out;
+}
 
 .send_message_form{
 	display:flex;
@@ -253,7 +399,6 @@
 }
 
 .send-message-button{
-	animation: appear_input 0.5s ease-in-out;
 	background: white;
 	border: none;
 }
@@ -271,7 +416,6 @@
 	min-height: 30px;
 	border: none;
 	font-size: 20px;
-	animation: appear_input 0.5s ease-in-out;
 }
 
 @keyframes appear_input {
@@ -288,8 +432,7 @@
 .sent_icone{
 	width: 40px;
 	height: 40px;
-	animation: appear_input 0.5s ease-in-out;
-
+	/* animation: appear_input 0.5s ease-in-out; */
 }
 .sent_icone:hover{
 	animation: wiggle_pen 0.3s ease-in-out;
