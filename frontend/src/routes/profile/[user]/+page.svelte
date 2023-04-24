@@ -12,62 +12,62 @@
 <!-- ********** HTML CODE ********* -->
 <!-- ****************************** -->
 
-<body>
 
-    <div class="game_navbar">
-
-        <div class="button_box">
-            <img class="button_picture" src="/img/home_icone.png">
-            <button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
-        </div>
-
-		{#if user?.username === currentUser}
+<body style="margin:0px; padding:0px; background-image:url('/img/bg1.jpg');
+background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh;">
+	{#if loading === true}
+    	<div class="game_navbar">
 			<div class="button_box">
-				<img class="button_picture" src="/img/profile_icone.png">
-				<button class="button_nav">Profile</button>
+				<img class="button_picture" src="/img/home_icone.png">
+				<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
 			</div>
-			{:else}
+			{#if user?.username === currentUser}
+				<div class="button_box">
+					<img class="button_picture" src="/img/profile_icone.png">
+					<button class="button_nav">Profile</button>
+				</div>
+				{:else}
+				<div class="button_box">
+					<img class="button_picture" src="/img/profile_icone.png">
+					<button class="button_nav" on:click={() => fade(`/profile/${realUser}`) && loadpage()}>Profile</button>
+				</div>
+			{/if}
 			<div class="button_box">
-				<img class="button_picture" src="/img/profile_icone.png">
-				<button class="button_nav" on:click={() => goto(`/profile/${realUser}`) && loadpage()}>Profile</button>
+				<img class="button_picture" src="/img/game_icone.png">
+				<button class="button_nav" on:click={() => fade('/game')}>Game</button>
 			</div>
-		{/if}
-        <div class="button_box">
-            <img class="button_picture" src="/img/game_icone.png">
-            <button class="button_nav" on:click={() => goto('/game')}>Game</button>
-        </div>
 
-        <div class="button_box">
-            <img class="button_picture" src="/img/chat_icone.png">
-            <button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
-        </div>
-
-    </div>
-
-	<div class="main_profile">
-		<div class="main_box">
-			<div class="username_bloc">
-				<h1>{user?.username}</h1>
-				{#if user?.username != currentUser && is_blocked === false}
-					<button class="block_button" on:click={() => block(realUser, user.pseudo)}>X</button>
-				{/if}
-				{#if user?.username != currentUser && is_blocked === true}
-					<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>O</button>
-				{/if}
+			<div class="button_box">
+				<img class="button_picture" src="/img/chat_icone.png">
+				<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
 			</div>
-		<h3>{user?.firstname} {user?.lastname}</h3>
-		<h3>Level: {user?.level}</h3>
-		<h3>Created: {new Date(user?.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</h3>
-		<!-- svelte-ignore a11y-img-redundant-alt -->
-		<img class=".profile_img" src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
-		 {#if user?.username === currentUser} 
-		 <button class="edit_button" on:click={() => goto('/profile/edit')}>Edit profile</button>
-     {:else}
-     <button class="send_message" on:click={() => sendMessage()}>
-      <img class="button_picture" src="/img/chat_icone.png" alt="Image button"/>
-    </button>
-		 {/if}
-	</div>
+		</div>
+		<div class="main_profile">
+			<div class="main_box">
+				<div class="username_bloc">
+					<h1>{user?.username}</h1>
+					{#if user?.username != currentUser && is_blocked === false}
+						<button class="block_button" on:click={() => block(realUser, user.pseudo)}>X</button>
+					{/if}
+					{#if user?.username != currentUser && is_blocked === true}
+						<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>O</button>
+					{/if}
+				</div>
+				<h3>{user?.firstname} {user?.lastname}</h3>
+				<h3>Level: {user?.level}</h3>
+				<h3>Created: {new Date(user?.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</h3>
+				<!-- svelte-ignore a11y-img-redundant-alt -->
+				<img class=".profile_img" src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
+				{#if user?.username === currentUser} 
+					<button class="edit_button" on:click={() => goto('/profile/edit')}>Edit profile</button>
+				{:else}
+				<button class="send_message" on:click={() => sendMessage()}>
+				<img class="button_picture" src="/img/chat_icone.png" alt="Image button"/>
+				</button>
+			{/if}
+		</div>
+		</div>
+	{/if}
 </body>
 
 <!-- ****************************** -->
@@ -94,7 +94,7 @@
 		createdAt: Date;
 		level: any;
     }
-	
+	let loading = false;
 	let imageURL: string;
 	let user: User;
 	let blockedusers: any[] = [];
@@ -206,6 +206,16 @@
 				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
 			});
 		}
+		loading = true;
 	});
 
+	function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
 </script>

@@ -110,16 +110,25 @@
 		  border-left: 10px solid transparent;
 		  border-right: 10px solid transparent;
 	  }
-		.button_picture{
-		  height:40px;
-		  margin: 0;
+	.button_picture{
+		height:40px;
+		margin: 0;
+	}
+	.button_box{
+		width: 80px;
+		margin: auto;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
 	  }
-		.button_box{
-		  width: 80px;
-		  margin: auto;
-		  display: flex;
-		  flex-direction: row;
-		  align-items: center;
-		  justify-content: center;
-		  text-align: center;
-	  }
+	  .loading_screen{
+		height: 100%;
+		width: 100%;
+		background:black;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		display: flex;
+	}

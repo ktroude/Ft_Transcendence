@@ -5,6 +5,7 @@ import { UserService } from "src/user/user.service";
 import { JwtGuard } from "src/auth/guard";
 import { get } from "http";
 import { RouterModule } from "@nestjs/core";
+import { async } from "rxjs";
 
 @Controller('chat')
 export class ChatRoomController {
@@ -155,18 +156,37 @@ export class ChatRoomController {
 
     @Get('getMembers')
     async handleGetMembers(@Headers('Authorization') cookie: string, @Query('code') id) {
+		console.log('QUOI')
         try {
-
+			console.log('COUBEH')
             const token = cookie.split(' ')[1];
             const user = await this.userService.decodeToken(token);
-            const room = await this.prisma.chatRoom.findUnique({
-                where: { id: parseInt(id, 10) },
+            let room = await this.prisma.chatRoom.findUnique({
+				where: { id: parseInt(id, 10) },
                 select: {
-                    members: true,
+					members: true,
                     banned:true,
                     muted:true,
+					id: true,
                 }
-            });
+			});
+				const roume = await this.prisma.chatRoom.findUnique({
+					where: {id: room.id},
+				})
+			let membres = [];
+			room.members.forEach(async(elem:any) => {
+				membres.push(elem);
+			});
+			for (let i = 0; i < room.members.length; i++) {
+				if (await this.chatRoomService.isOwner(room.members[i], roume) === true)
+				room.members[i].wins = 2;
+				else if (await this.chatRoomService.isAdmin(room.members[i], roume) === true)
+				room.members[i].wins = 1;
+				else
+				room.members[i].wins = 0;
+					console.log('elem ===', room.members[i].wins);
+			}
+			console.log('hihihi',room.members[0].wins)
             return {
                 membres: room.members,
                 muted: room.muted,

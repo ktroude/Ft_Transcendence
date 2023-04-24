@@ -19,7 +19,7 @@ export class ChatRoomService {
       return false;
   }
 
-  async isOwner(user: User, chatRoom: ChatRoom): Promise<boolean> {
+  async isOwner(user:any, chatRoom:any): Promise<boolean> {
     const isOwner = await this.prisma.chatRoom.findUnique({
       where: { id: chatRoom.id },
       select: { owner: { select: { id: true } } },
@@ -30,7 +30,7 @@ export class ChatRoomService {
       return false;
   }
 
-  async isMuted(user: User, chatRoom: ChatRoom): Promise<boolean> {
+  async isMuted(user:any, chatRoom:any): Promise<boolean> {
     try {
 
       const isMuted = await this.prisma.chatRoom
@@ -47,7 +47,7 @@ export class ChatRoomService {
     }
   }
 
-  async isBanned(user: User, chatRoom: ChatRoom): Promise<boolean> {
+  async isBanned(user:any, chatRoom:any): Promise<boolean> {
     const isBanned = await this.prisma.chatRoom
       .findUnique({ where: { id: chatRoom.id } })
       .banned({ where: { id: user.id } })
@@ -58,7 +58,7 @@ export class ChatRoomService {
       return false;
   }
 
-  async isMember(user: User, chatRoom: any): Promise<boolean> {
+  async isMember(user:any, chatRoom:any): Promise<boolean> {
     const isMember = await this.prisma.chatRoom
       .findUnique({ where: { id: chatRoom.id } })
       .members({ where: { id: user.id } })

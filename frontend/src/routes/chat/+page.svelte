@@ -74,6 +74,16 @@
 
 	// FUNCTIONS
 
+	function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
+
 	function handleNameInput(event: any) {
 		formData.roomName = (event.target as HTMLInputElement).value;
 		checkFormValidity();
@@ -549,9 +559,7 @@
 				console.log("animation =", animation);
 				socket.emit('getMessage', data.room);
 				socket.emit('getUser', data.room);
-				muted = data.muted;
-				membres = data.membres;
-				banned = data.banned;
+				await fletchMembres();
 			} else if (currentRoom === data.room) {
 				await fletchMembres();
 			}
@@ -676,6 +684,8 @@
 
 <svelte:head>
 	<!-- <link rel="stylesheet" href="/style.css" /> -->
+	<link rel="preload" href="/img/bg1.jpg" as="image">
+	<link rel="preload" href="/homepage_style.css" as="style"/>
 	<link rel="stylesheet" href="/homepage_style.css" />
 	<link rel="stylesheet" href="/navbar.css" />
 	<link rel="stylesheet" href="/chat_style.css" />
@@ -688,36 +698,33 @@
 	<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
 </svelte:head>
 
-<body>
+<body style="margin:0px; padding:0px; background-image:url('/img/bg1.jpg');
+background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh;">
+	<!-- <p>Chargement...</p> -->
+	{#if loading === true}
 	<div class="game_navbar">
 		<div class="button_box">
 			<img class="button_picture" src="/img/home_icone.png" />
-			<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+			<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
 		</div>
 
 		<div class="button_box">
 			<img class="button_picture" src="/img/profile_icone.png" />
-			<button class="button_nav" on:click={() => goto(`/profile/${currentUser.id}`)}>Profile</button
+			<button class="button_nav" on:click={() => fade(`/profile/${currentUser.id}`)}>Profile</button
 			>
 		</div>
 
 		<div class="button_box">
 			<img class="button_picture" src="/img/game_icone.png" />
-			<button class="button_nav" on:click={() => goto('/game')}>Game</button>
+			<button class="button_nav" on:click={() => fade('/game')}>Game</button>
 		</div>
 
 		<div class="button_box">
 			<img class="button_picture" src="/img/chat_icone.png" />
-			<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
+			<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
 		</div>
 	</div>
 	<div class="chat_body">
-		{#if loading === false}
-			<!-- <p>Chargement...</p> -->
-			<div class="loading_screen">
-				<p>Chargement...</p>
-			</div>
-		{:else}
 			<div class="left_bloc">
 				<div class="create-room">
 					<h2 class="room-form-title">Créer une room:</h2>
@@ -817,27 +824,53 @@
 				<div class="private_room_list">
 					<h2 class="room-title">Rooms Privées</h2>
 					{#each chatRooms as chatRoom}
-						{#if chatRoom.private === true && chatRoom.password == false}
-							<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
-								<span />
+					{#if chatRoom.private === true && chatRoom.password == false}
+					{#if currentRoom.id === chatRoom.id}
+						<button class="chatroom-button-connected" on:click={() => handleRoomButton(chatRoom, '')}>
+							{chatRoom.name}
+						</button>
+					{:else}
+						<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
+							{chatRoom.name}
+						</button>
+					{/if}
+				{/if}
+				{#if chatRoom.private === true && chatRoom.password == true}
+					<div class="wrap_button">
+						{#if animation?.id === chatRoom.id && animation?.content === 'wrong'}
+						<!-- cvhdevchdbjkc -->
+							<button class="chatroom-button-failed" on:click={() => displayInputPassword(chatRoom.id)}>
+								<span>🔒 </span>
 								{chatRoom.name}
 							</button>
-						{/if}
-						{#if chatRoom.private === true && chatRoom.password == true}
-							<div class="wrap_button">
+						{:else}
+							{#if currentRoom.id === chatRoom.id}
+							<button class="chatroom-button-connected" on:click={() => displayInputPassword(chatRoom.id)}>
+								<span>🔒 </span>
+								{chatRoom.name}
+							</button>
+							{:else}
 								<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
-									<span>🔒</span>
-									<span class="lock"> {chatRoom.name}</span>
+									<span>🔒 </span>
+									{chatRoom.name}
 								</button>
-							</div>
-							{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
-								<input
-									placeholder="Mot de passe"
-									type="text"
-									on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}
-								/>
 							{/if}
+
+							<!-- <button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
+								<span>🔒 </span>
+								{chatRoom.name}
+							</button> -->
 						{/if}
+					</div>
+					{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
+						<input
+							class="password-room-access-input"
+							type="password"
+							placeholder="Mot de passe"
+							on:keydown={(event) => handlePasswordInputKeyDown(event, chatRoom)}
+						/>
+					{/if}
+				{/if}
 					{/each}
 				</div> 
 				{#if currentRoom}
@@ -949,12 +982,30 @@
 								<h2 class="room-title">Membres</h2>
 								{#if membres && membres.length}
 								{#each membres as member}
-								<button
-								class="pseudo-button-message"
-								on:click={(event) => handleClickPseudo(event, member.id)}
-								>
-								{member.username}
-							</button>
+									{#if member?.wins === 2}
+										<button
+										class="pseudo-button-message_owner"
+										on:click={(event) => handleClickPseudo(event, member.id)}
+										>
+										{member.username}
+										</button>
+									{/if}
+									{#if member?.wins === 1}
+										<button
+										class="pseudo-button-message_admin"
+										on:click={(event) => handleClickPseudo(event, member.id)}
+										>
+										{member.username}
+										</button>
+									{/if}
+									{#if member?.wins === 0}
+										<button
+										class="pseudo-button-message"
+										on:click={(event) => handleClickPseudo(event, member.id)}
+										>
+										{member.username}
+										</button>
+									{/if}
 							{/each}
 							<div class="useradd_bloc">
 								<input
@@ -1057,6 +1108,8 @@
 					</div>
 				</div>
 			{/if}
-		{/if}
-	</div></body
+	
+	</div>	
+	{/if}
+	</body
 >

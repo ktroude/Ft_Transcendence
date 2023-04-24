@@ -1,4 +1,6 @@
 <svelte:head>
+	<link rel="preload" href="/img/bg1.jpg" as="image">
+	<link rel="preload" href="/homepage_style.css" as="style"/>
 	<link rel="stylesheet" href="/homepage_style.css" />
 	<link rel="stylesheet" href="/navbar.css" />
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,28 +13,30 @@
 <!-- ********** HTML CODE ********* -->
 <!-- ****************************** -->
 
-<body>
+<body style="margin:0px; padding:0px; background-image:url('/img/bg1.jpg');
+background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh;">
+{#if loading === true}
 
     <div class="game_navbar">
 
         <div class="button_box">
             <img class="button_picture" src="/img/home_icone.png">
-            <button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+            <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
         </div>
 
         <div class="button_box">
             <img class="button_picture" src="/img/profile_icone.png">
-            <button class="button_nav" on:click={() => goto(`/profile/${user.id}`)}>Profile</button>
+            <button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
         </div>
 
         <div class="button_box">
             <img class="button_picture" src="/img/game_icone.png">
-            <button class="button_nav" on:click={() => goto('/game')}>Game</button>
+            <button class="button_nav" on:click={() => fade('/game')}>Game</button>
         </div>
 
         <div class="button_box">
             <img class="button_picture" src="/img/chat_icone.png">
-            <button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
+            <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
         </div>
 
     </div>
@@ -55,7 +59,8 @@
           <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('PKLB')}>Ple-berr</span>
         </p>
       </footer>
-</body>
+	  {/if}
+	</body>
 
 <!-- ****************************** -->
 <!-- **********   SCRIPT  ********* -->
@@ -70,6 +75,7 @@
 
   let socket: Socket;
 
+let loading = false;
   let user: User;
     interface User {
         id: number;
@@ -94,6 +100,17 @@
         socket.emit('userConnected', { pseudo: user.pseudo });
       });
     }
+	loading = true;
 	});
+
+	function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
 
 </script>

@@ -19,22 +19,22 @@
 
         <div class="button_box">
             <img class="button_picture" src="/img/home_icone.png">
-            <button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+            <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
         </div>
 
 		<div class="button_box">
 			<img class="button_picture" src="/img/profile_icone.png">
-			<button class="button_nav" on:click={() => goto(`/profile/${user.id}`)}>Profile</button>
+			<button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
 		</div>
 
         <div class="button_box">
             <img class="button_picture" src="/img/game_icone.png">
-            <button class="button_nav" on:click={() => goto('/game')}>Game</button>
+            <button class="button_nav" on:click={() => fade('/game')}>Game</button>
         </div>
 
         <div class="button_box">
             <img class="button_picture" src="/img/chat_icone.png">
-            <button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
+            <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
         </div>
 
     </div>
@@ -165,4 +165,14 @@
         else
           getImageURL()
     });
+
+	function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
 </script>
