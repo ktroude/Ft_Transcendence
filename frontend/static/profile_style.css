@@ -48,20 +48,37 @@
 }
 .edit_button{
 	color: white;
-	width:120px;
-	height:40px;
-	font-size: 22px;
+	width:170px;
+	font-size: 30px;
+	/* height:40px; */
 	background-color: transparent;
 	cursor: pointer;
+	line-height: 22px;
 	border: none;
+	display:flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	text-align: center;
 }
 .edit_button:hover{
-	color: greenyellow;
-	animation: squeeze_text 0.4s ease-in-out;
-	text-shadow: 3px 3px 20px #00b309,
-	-2px 1px 30px #00b309;
+	color: rgb(255, 175, 47);
+	animation: squeeze_text_edit 0.4s ease-in-out;
+	text-shadow: 3px 3px 20px rgb(255, 175, 47),
+	-2px 1px 30px rgb(255, 175, 47);
 }
-
+@keyframes squeeze_text_edit {
+	0% {
+		font-size: 32px;
+	}
+	30% {
+		font-size: 34px;
+	}
+	100% {
+		font-size: 32px;
+	}
+}
 .send_message{
 	color: white;
 	width:40px;
@@ -86,7 +103,10 @@
 	cursor: pointer;
 	margin-top: 5px;
 } */
-
+.edit_icone{
+	margin: auto;
+	width: 30px;
+}
 .unblock_button {
 	background: rgb(255, 234, 0);
 	width:15px;
@@ -109,6 +129,7 @@
 }
 img {
 	margin-top: 20px;
+	margin-bottom: 10px;
 	max-width: 300px;
 	max-height: 200px;
 	object-fit: cover;

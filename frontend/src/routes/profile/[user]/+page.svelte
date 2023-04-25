@@ -61,7 +61,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<!-- svelte-ignore a11y-img-redundant-alt -->
 				<img class=".profile_img" src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
 				{#if user?.username === currentUser} 
-					<button class="edit_button" on:click={() => fade('/profile/edit')}>Edit profile</button>
+					<button class="edit_button" on:click={() => fade('/profile/edit')}>Edit profile<span><img class="edit_icone" src="/img/edit_profile.png"></span></button>
 				{:else}
 				<button class="send_message" on:click={() => sendMessage()}>
 				<img class="button_picture" src="/img/chat_icone.png" alt="Image button"/>
