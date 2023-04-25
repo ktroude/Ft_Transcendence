@@ -1,5 +1,7 @@
 <svelte:head>
 	<!-- <link rel="stylesheet" href="/style_profile.css" /> -->
+	<link rel="preload" href="/img/bg1.jpg" as="image">
+	<link rel="preload" href="/homepage_style.css" as="style"/>
 	<link rel="stylesheet" href="/edit_style.css" />
 	<link rel="stylesheet" href="/profile_style.css" />
 	<link rel="stylesheet" href="/homepage_style.css" />
@@ -14,9 +16,10 @@
 <!-- ********** HTML CODE ********* -->
 <!-- ****************************** -->
 
-<main>
+<body style="margin:0px; padding:0px; background-image:url('/img/bg1.jpg');
+background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh;">
+	{#if loading === true}
     <div class="game_navbar">
-
         <div class="button_box">
             <img class="button_picture" src="/img/home_icone.png">
             <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
@@ -38,7 +41,7 @@
         </div>
 
     </div>
-	<div class="edit_main">
+	<div class="main_profile">
 		<div class="edit_box">
 			<h1>{user?.pseudo}</h1>
 			<label for="username-input">New Username:</label>
@@ -49,13 +52,15 @@
 			<input type="file" on:change={handleFileUpload} />
 		</div>
 	</div>
-</main>
+	{/if}
+</body>
 
 <!-- ****************************** -->
 <!-- **********   SCRIPT  ********* -->
 <!-- ****************************** -->
 
 <script lang="ts">
+	let loading = false;
   	
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
@@ -164,6 +169,7 @@
           await goto('/');
         else
           getImageURL()
+		loading = true;
     });
 
 	function fade(thisplace:string) {
