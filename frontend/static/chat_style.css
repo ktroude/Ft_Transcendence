@@ -1,7 +1,11 @@
+
+/***************************************************/
+/*****************BODY / NAVBAR TWEAKS*************/
+/*************************************************/
+
 .game_navbar{
 	height:50px;
 }
-
 .chat_body{
 	width: 100%;
 	height: 95%;
@@ -10,7 +14,6 @@
 	background-color: rgba(0, 0, 0, 0.267);
 	margin-bottom: -50px;
 	animation: fade-in 0.6s linear;
-
 }
 @keyframes fade-in{
 	0% {
@@ -19,7 +22,11 @@
 	100% {
 		opacity: 100;
 	}
-  }
+}
+
+/***************************************************/
+/*****************LEFT BLOC************************/
+/*************************************************/
 .left_bloc{
 	height:100vh;
 	width: 20vw;
@@ -35,7 +42,6 @@
 	align-items: center;
 	padding: 10px;
 }
-
 .room-form-title{
 	color: greenyellow;
 }
@@ -46,9 +52,6 @@
 	display: flex;
 	flex-direction: column;
 }
-
-
-/*    buttons    */
 .form_button{
 	color: white;
 	width:120px;
@@ -57,16 +60,15 @@
 	background-color: transparent;
 	cursor: pointer;
 	border: none;
-  }
-  .form_button:hover{
+}
+.form_button:hover{
 	color: greenyellow;
 	animation: squeeze_text_chat 0.4s ease-in-out;
 	text-shadow: 3px 3px 20px #00b309,
 	-2px 1px 30px #00b309;
 	font-size: 18px;
-  }
-
-  @keyframes squeeze_text_chat {
+}
+@keyframes squeeze_text_chat {
 	0% {
 		font-size: 18px;
 	}
@@ -76,22 +78,17 @@
 	100% {
 		font-size: 18px;
 	}
-  }
-
-
-
+}
 ::-webkit-scrollbar{
     width: 6px;
 	height: 100%;
 }
-
 ::-webkit-scrollbar-thumb{
 	background: transparent;
     background-clip: content-box; 
     border-radius: 50px;
     border: 6px #e2dad0 solid;
 }
-
 .public_room_list {
     height: 35vh;
     width: 20vw;
@@ -103,12 +100,12 @@
     align-items: center;
     padding: 10px;
     overflow-y: auto;
-  }
-  .room-title{
+}
+.room-title{
     color: greenyellow;
     margin-bottom: 10px;
 }
-  .chatroom-button {
+.chatroom-button {
     width: 116px;
     min-height: 30px;
     max-height: 30px;
@@ -131,7 +128,6 @@
     -2px 1px 30px #00B309;
     font-size: 16px;
 }
-
 .chatroom-button-connected{
 	width: 116px;
     min-height: 30px;
@@ -151,7 +147,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .chatroom-button-failed{
 	width: 116px;
     min-height: 30px;
@@ -172,20 +167,9 @@
     text-overflow: ellipsis;
 	animation: shake_button_fail 0.3s ease;
 }
-
-.chatroom-button-failed:hover{
-    cursor: pointer;
-    color: greenyellow;
-    text-shadow: 3px 3px 20px #00B309,
-    -2px 1px 30px #00B309;
-    font-size: 16px;
-}
-
-
 @keyframes shake_button_fail{
 	0% {
 		border: 1px solid red;
-
 		transform: rotate(0deg);
 	}
 	30% {
@@ -198,18 +182,21 @@
 		transform: rotate(0deg);
 		border: 1px solid red;
 	}
-  }
-
-
+}
+.chatroom-button-failed:hover{
+    cursor: pointer;
+    color: greenyellow;
+    text-shadow: 3px 3px 20px #00B309,
+    -2px 1px 30px #00B309;
+    font-size: 16px;
+}
 .wrap_button{
-	
 	overflow-y: hidden;
 }
 .lock{
 	z-index: 0;
 	align-items: center;
 }
-
 .private_room_list{
 	border-bottom: 1px solid white;
 	height:30vh;
@@ -222,10 +209,9 @@
 	overflow-x: scroll;
 }
 
-
-
-
-/*****************SETTINGS************************/
+/***********************************************************/
+/*****************SETTINGS LEFT BLOC************************/
+/***********************************************************/
 
 .room_settings{
 	display: flex;
@@ -236,7 +222,6 @@
 	overflow-x: scroll;
 	height:20vh;
 }
-
 .settings_button{
 	color: white;
 	width:120px;
@@ -251,16 +236,13 @@
 	text-shadow: 3px 3px 20px #00b309,
 	-2px 1px 30px #00b309;
 }
-
 .room_name{
 	color: rgb(255, 238, 47);
 	font-size: 22px;
 }
-
 .password_change_input{
 	margin: 3px;
 }
-
 .input_box_settings{
 	padding: 10px;
 	display: flex;
@@ -271,7 +253,6 @@
 	/* background-color: red; */
 	justify-content: center;
 }
-
 .password_change_bloc{
 	display: flex;
 	margin: 3px;
@@ -288,13 +269,11 @@
 	margin-top: auto;
 	margin-bottom: 10px;
 }
-
 .delete_password:hover{
 	color: rgb(255, 47, 47);
 	text-shadow: 3px 3px 20px #b30000,
 	-2px 1px 30px #b30000;
 }
-
 .delete_password{
 	background-color: transparent;
 	cursor: pointer;
@@ -316,7 +295,6 @@
 	-2px 1px 30px #b30000;
 	animation: shake_button 0.6s infinite;
 }
-
 @keyframes shake_button{
 	0% {
 		transform: rotate(0deg);
@@ -330,9 +308,10 @@
 	100% {
 		transform: rotate(0deg);
 	}
-  }
-
-
+}
+/****************************************************/
+/*****************MIDDLE BLOC************************/
+/****************************************************/
 
 .message_container{
 	width: 60vw;
@@ -353,7 +332,6 @@
 	font-size: 20px;
 	margin: 5px;
 }
-
 .pseudo-button-message{
 	background-color: transparent;
 	color: yellow;
@@ -361,7 +339,6 @@
 	font-size: 20px;
 	animation: wiggle_text 0.3s ease-in-out;
 }
-
 .pseudo-button-message_owner{
 	background-color: transparent;
 	color: rgb(255, 0, 47);
@@ -369,7 +346,6 @@
 	font-size: 20px;
 	animation: wiggle_text 0.3s ease-in-out;
 }
-
 .pseudo-button-message_owner:hover{
 	cursor: pointer;
 	background-color: transparent;
@@ -377,7 +353,6 @@
 	text-shadow: 3px 3px 10px rgba(255, 0, 0, 0.353),
 	-2px 1px 10px rgba(255, 0, 0, 0.357);
 }
-
 @keyframes wiggle_text {
 	0% {
 		transform: rotate(5deg);
@@ -392,8 +367,6 @@
 		transform: rotate(0deg);
 	}
   }
-
-
 .pseudo-button-message:hover{
 	cursor: pointer;
 	background-color: transparent;
@@ -401,26 +374,21 @@
 	text-shadow: 3px 3px 10px rgba(255, 255, 0, 0.353),
 	-2px 1px 10px rgba(255, 255, 0, 0.357);
 }
-
 .message_input_container{
 	animation: appear_input 0.5s ease-in-out;
 }
-
 .send_message_form{
 	display:flex;
 	flex-direction:row;
 	padding:1px;
 }
-
 .send-message-button{
 	background: white;
 	border: none;
 }
-
 .send-message-button:hover{
 	cursor: pointer;
 }
-
 .message_input:focus{
 	outline: none;
 }
@@ -431,7 +399,6 @@
 	border: none;
 	font-size: 20px;
 }
-
 @keyframes appear_input {
 	0% {
 		background: transparent;
@@ -442,7 +409,6 @@
 		transform: translateX(0px);
 	}
 }
-
 .sent_icone{
 	width: 40px;
 	height: 40px;
@@ -454,7 +420,6 @@
 .sent_icone:active{
 	animation: shake_pen 0.3s ease-in-out;
 }
-
 @keyframes wiggle_pen {
 	0% {
 		transform: rotate(20deg);
@@ -469,7 +434,6 @@
 		transform: rotate(0deg);
 	}
 }
-
 @keyframes shake_pen {
 	0% {
 	}
@@ -477,6 +441,10 @@
 		transform: rotate(360deg);
 	}
 }
+
+/***************************************************/
+/*****************RIGHT BLOC************************/
+/*************************************************/
 
 .right_bloc{
 	background-color: rgba(122, 122, 122, 0.084);
@@ -486,7 +454,6 @@
 	width: 20vw;
 	animation: appear_div 0.5s ease-in-out;
 }
-
 @keyframes appear_div {
 	0% {
 		transform: translateX(500px);
@@ -495,7 +462,6 @@
 		transform: translateX(0px);
 	}
 }
-
 .user_list{
 	padding-top: 10px;
 	width: 20vw;
@@ -506,7 +472,6 @@
 	display: flex;
 	flex-direction: column;
 }
-
 .menu{
 	padding-top: 10px;
 	height:30vh;
@@ -516,13 +481,11 @@
 	display: flex;
 	flex-direction: column;
 }
-
 .public_room{
 	padding-top: 10px;
 	height: 20vh;
 	border-bottom: 1px solid white;
 }
-
 .member_list{
 	border-bottom: 1px solid white;
 	height: 30vh;
@@ -530,29 +493,24 @@
 	flex-direction: column;
 	overflow: scroll;
 }
-
 .pseudo_button{
 	background-color: transparent;
 	color: yellow;
 	border: none;
 	font-size: 18px;
 }
-
 .server_message{
 	background: transparent;
 	border: none;
 	color: red;
 	font-size: 20px;
 }
-
-
 .button_show_profile{
 	background-color: transparent;
 	color: yellow;
 	border: none;
 	font-size: 18px;
 }
-
 .button_show_profile:hover{
 	cursor: pointer;
 	background-color: transparent;

@@ -46,7 +46,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			<h1>{user?.pseudo}</h1>
 			<label for="username-input">New Username:</label>
 			<input type="text" id="username-input" bind:value={newUsername} />
-			<button  class="update_button" on:click={handleUpdateUsername}>Update</button>
+			<button  class="edit_button" on:click={handleUpdateUsername}>Update</button>
 			<!-- svelte-ignore a11y-img-redundant-alt -->
 			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
 			<input type="file" on:change={handleFileUpload} />
