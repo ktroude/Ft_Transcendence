@@ -77,7 +77,7 @@ async handleCreateDmRoom(@ConnectedSocket() client: Socket, @MessageBody() data:
 
 @SubscribeMessage('DmNotification')
 async handleDmNotification(@ConnectedSocket() client: Socket, @MessageBody() data:any) {
-    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const user = this.clients.find(([user, socket]) => socket === client)?.[0];
     const target = this .clients.find(([search, ]) => search === user)?.[0];
 
     if (!target)  { // target pas sur sa page dm
@@ -87,7 +87,7 @@ async handleDmNotification(@ConnectedSocket() client: Socket, @MessageBody() dat
 
 @SubscribeMessage('sendMessage')
 async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:any) {
-    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    const user = this.clients.find(([user, socket]) => socket === client)?.[0];
     const newMsg = await this.DmService.createMessage(user, data.content, parseInt(data.room.id, 10));
     await this.prisma.directMessageRoom.update({
         where: {id: parseInt(data.room.id, 10)},
@@ -103,16 +103,17 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
 
     @SubscribeMessage('getDirectMessageRoom')
     async handleGetDirectMessageRoom(@ConnectedSocket() client:Socket) {
-        const user = this.clients.find(([, socket]) => socket === client)?.[0];
-        const rooms = await this.prisma.directMessageRoom.findMany({
-            where: { 
-              OR: [
-                { ownerOneId: user.id },
-                { ownerTwoId: user.id },
-              ],
-            }
-          });
-        this.server.emit('DirectMessageRoomData', {
+    const user = this.clients.find(([user, socket]) => socket === client)?.[0];
+    console.log('user id ==', user.id);
+    const rooms = await this.prisma.directMessageRoom.findMany({
+        where: { 
+          OR: [
+            { ownerOneId: user.id },
+            { ownerTwoId: user.id },
+          ],
+        }
+      });
+    this.server.emit('DirectMessageRoomData', {
             rooms: rooms,
             user: user,
         });
@@ -122,12 +123,18 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
     async handleGetMessagesOfRoom(@ConnectedSocket() client:Socket, @MessageBody() data:any) {
         const user = this.clients.find(([, socket]) => socket === client)?.[0];
         const room = await this.prisma.directMessageRoom.findUnique({
-            where: {id: parseInt(data.room.id, 10)},
-            select: { messages:true }
+            where: {id: parseInt(data, 10)},
+            select: { 
+                messages:true,
+                ownerOne:true,
+                ownerTwo:true,
+                id:true,
+            }
         });
+        const selectedUser= this.DmService.otherUser(user, room)
         this.server.emit('returnDirectMessage', {
             room: data.room,
-            user: user,
+            selectedUser: selectedUser,
             messages: room.messages,
         });
     }

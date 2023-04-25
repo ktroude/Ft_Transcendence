@@ -8,7 +8,7 @@ import { UserModule } from './user/user.module';
 import { FriendModule } from './friend/friend.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { BlockModule } from './block/block.module';
-// import { DirectMessagesModule } from './directMessages/dm.module';
+import { DirectMessagesModule } from './directMessages/dm.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { BlockModule } from './block/block.module';
     FriendModule,
     WebsocketModule,
     BlockModule,
-    // DirectMessagesModule,
+    DirectMessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

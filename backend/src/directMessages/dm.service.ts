@@ -16,4 +16,19 @@ export class DirectMessageService {
         }
         });
     }
+
+    async otherUser(user:any, room:any) {
+        if (user.id === room.ownerOne.id) {
+            return room.ownerTwo;
+        }
+        if (user.id == room.ownerTwo) {
+            return room.ownerOne;
+        }
+        return null;
+    }
+
+
+
+
+
 }
