@@ -11,7 +11,7 @@
     let roomList:any[] = [];
     let messages:any[] = [];
     let loading = false;
-    let contactList = [];
+    let contactList:any[] = [];
 
 
 
@@ -217,13 +217,13 @@
             <div class="right_bloc">
                 <div class="connected_users">
                     <h2 class="connected_users_title">Utilisateurs connectés:</h2>
-                    <!-- {#each contactList as contact}
+                    {#each contactList as contact}
                         {#if contact?.connected == true}
                             <button class="connected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
                         {:else}
                             <button class="disconnected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
                         {/if}
-                    {/each} -->
+                    {/each}
                 </div>
             </div>
         </div>

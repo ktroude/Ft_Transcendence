@@ -361,12 +361,15 @@
 	}
 
 	function leaveRoom() {
-		socket.emit('leaveRoom', currentRoom);
-		messages = [];
-		muted = [];
-		banned = [];
-		membres = [];
-		currentRoom = null;
+		if (currentRoom?.id) {
+			socket.emit('leaveRoom', currentRoom);
+			console.log('CU ==', currentRoom)
+			messages = [];
+			muted = [];
+			banned = [];
+			membres = [];
+		}
+		// currentRoom = null;
 	}
 
 	async function showProfile() {
@@ -510,12 +513,8 @@
 		});
 		socket.on('deleteRoom', async (data) => {
 			if (currentRoom && currentRoom?.id === data) {
-				messages = [
-					{
-						senderPseudo: 'server',
-						content: 'La room a été détruite.'
-					}
-				];
+				messages = [];
+				currentRoom = null;
 				membres = [];
 				banned = [];
 				muted = [];
@@ -779,13 +778,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					<h2 class="room-title">Rooms publics</h2>
 					{#each chatRooms as chatRoom}
 						{#if chatRoom.private === false && chatRoom.password == false}
-							{#if currentRoom.id === chatRoom.id}
+							{#if currentRoom?.id === chatRoom.id}
 								<button class="chatroom-button-connected" on:click={() => handleRoomButton(chatRoom, '')}>
-									{chatRoom.name}
+									{chatRoom?.name}
 								</button>
 							{:else}
 								<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
-									{chatRoom.name}
+									{chatRoom?.name}
 								</button>
 							{/if}
 						{/if}
@@ -798,7 +797,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 										{chatRoom.name}
 									</button>
 								{:else}
-									{#if currentRoom.id === chatRoom.id}
+									{#if currentRoom?.id === chatRoom.id}
 									<button class="chatroom-button-connected" on:click={() => displayInputPassword(chatRoom.id)}>
 										<span>🔒 </span>
 										{chatRoom.name}
@@ -816,7 +815,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 									</button> -->
 								{/if}
 							</div>
-							{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
+							{#if passwordInput.bool == true && passwordInput.roomId == chatRoom?.id}
 								<input
 									class="password-room-access-input"
 									type="password"

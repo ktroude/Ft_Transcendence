@@ -414,35 +414,29 @@ export class ChatRoomGateway
 
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(client: Socket, data: any) {
+    console.log('DATTTTTTAAAAAA ====', data);
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const toCheck = await this.prismaService.chatRoom.findUnique({
-      where: { id: data.id },
+      where: { id: parseInt(data.id,10) },
       select: { owner: true, id: true, name: true, messages: true },
     })
     if (toCheck.owner.id === user.id) {
       await this.prismaService.message.deleteMany({
-        where: { chatRoomId: data.id },
+        where: { chatRoomId: toCheck.id },
       })
-      // await this.prismaService.chatRoom.update({
-      //   where: { id: data.id },
-      //   data: {
-      //     members: { disconnect: { id: user.id } },
-      //     admin: { disconnect: { id: user.id } },
-      //   },
-      // })
       await this.prismaService.chatRoom.delete({
-        where: { id: data.id },
+        where: { id: toCheck.id },
       });
-      this.server.emit('deleteRoom', data.id);
+      this.server.emit('deleteRoom', toCheck.id);
       return;
     }
     else {
       await this.prismaService.chatRoom.update({
-        where: { id: data.id },
+        where: { id: toCheck.id },
         data: { members: { disconnect: { id: user.id } } },
       });
       const toSend = await this.chatRoomService.createMessage(`${user.pseudo} a quitté la room`,
-        { id: 0, pseudo: 'server' }, { id: data.id });
+        { id: 0, pseudo: 'server' }, { id: toCheck.id });
       this.server.emit('newMessage', toSend);
       this.server.emit('roomLeaved', toCheck.id);
     }
