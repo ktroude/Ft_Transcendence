@@ -361,12 +361,15 @@
 	}
 
 	function leaveRoom() {
-		socket.emit('leaveRoom', currentRoom);
-		messages = [];
-		muted = [];
-		banned = [];
-		membres = [];
-		currentRoom = null;
+		if (currentRoom?.id) {
+			socket.emit('leaveRoom', currentRoom);
+			console.log('CU ==', currentRoom)
+			messages = [];
+			muted = [];
+			banned = [];
+			membres = [];
+		}
+		// currentRoom = null;
 	}
 
 	async function showProfile() {
@@ -516,6 +519,7 @@
 						content: 'La room a été détruite.'
 					}
 				];
+				currentRoom = null;
 				membres = [];
 				banned = [];
 				muted = [];
@@ -772,34 +776,34 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					<h2 class="room-title">Rooms publics</h2>
 					{#each chatRooms as chatRoom}
 						{#if chatRoom.private === false && chatRoom.password == false}
-							{#if currentRoom.id === chatRoom.id}
+							{#if currentRoom?.id === chatRoom.id}
 								<button class="chatroom-button-connected" on:click={() => handleRoomButton(chatRoom, '')}>
-									{chatRoom.name}
+									{chatRoom?.name}
 								</button>
 							{:else}
 								<button class="chatroom-button" on:click={() => handleRoomButton(chatRoom, '')}>
-									{chatRoom.name}
+									{chatRoom?.name}
 								</button>
 							{/if}
 						{/if}
-						{#if chatRoom.private === false && chatRoom.password == true}
+						{#if chatRoom?.private === false && chatRoom?.password == true}
 							<div class="wrap_button">
-								{#if animation?.id === chatRoom.id && animation?.content === 'wrong'}
+								{#if animation?.id === chatRoom?.id && animation?.content === 'wrong'}
 								<!-- cvhdevchdbjkc -->
 									<button class="chatroom-button-failed" on:click={() => displayInputPassword(chatRoom.id)}>
 										<span>🔒 </span>
-										{chatRoom.name}
+										{chatRoom?.name}
 									</button>
 								{:else}
-									{#if currentRoom.id === chatRoom.id}
+									{#if currentRoom?.id === chatRoom?.id}
 									<button class="chatroom-button-connected" on:click={() => displayInputPassword(chatRoom.id)}>
 										<span>🔒 </span>
-										{chatRoom.name}
+										{chatRoom?.name}
 									</button>
 									{:else}
 										<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
 											<span>🔒 </span>
-											{chatRoom.name}
+											{chatRoom?.name}
 										</button>
 									{/if}
 
@@ -809,7 +813,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 									</button> -->
 								{/if}
 							</div>
-							{#if passwordInput.bool == true && passwordInput.roomId == chatRoom.id}
+							{#if passwordInput?.bool == true && passwordInput?.roomId == chatRoom?.id}
 								<input
 									class="password-room-access-input"
 									type="password"
