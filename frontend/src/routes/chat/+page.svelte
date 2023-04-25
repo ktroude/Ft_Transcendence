@@ -552,14 +552,13 @@
 			}
 		});
 		socket.on('sucess', async (data) => {
-			if (currentUser.id == data.user.id) {
+			if (currentUser?.id == data?.user?.id) {
 				currentRoom = data.room;
 				animation = data.animation;
-				console.log("animation =", animation);
 				socket.emit('getMessage', data.room);
 				socket.emit('getUser', data.room);
 				await fletchMembres();
-			} else if (currentRoom === data.room) {
+			} else if (currentRoom?.id === data?.room?.id) {
 				await fletchMembres();
 			}
 		});
