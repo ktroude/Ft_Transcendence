@@ -513,12 +513,7 @@
 		});
 		socket.on('deleteRoom', async (data) => {
 			if (currentRoom && currentRoom?.id === data) {
-				messages = [
-					{
-						senderPseudo: 'server',
-						content: 'La room a été détruite.'
-					}
-				];
+				messages = [];
 				currentRoom = null;
 				membres = [];
 				banned = [];
@@ -786,24 +781,24 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 								</button>
 							{/if}
 						{/if}
-						{#if chatRoom?.private === false && chatRoom?.password == true}
+						{#if chatRoom.private === false && chatRoom.password == true}
 							<div class="wrap_button">
-								{#if animation?.id === chatRoom?.id && animation?.content === 'wrong'}
+								{#if animation?.id === chatRoom.id && animation?.content === 'wrong'}
 								<!-- cvhdevchdbjkc -->
 									<button class="chatroom-button-failed" on:click={() => displayInputPassword(chatRoom.id)}>
 										<span>🔒 </span>
-										{chatRoom?.name}
+										{chatRoom.name}
 									</button>
 								{:else}
-									{#if currentRoom?.id === chatRoom?.id}
+									{#if currentRoom?.id === chatRoom.id}
 									<button class="chatroom-button-connected" on:click={() => displayInputPassword(chatRoom.id)}>
 										<span>🔒 </span>
-										{chatRoom?.name}
+										{chatRoom.name}
 									</button>
 									{:else}
 										<button class="chatroom-button" on:click={() => displayInputPassword(chatRoom.id)}>
 											<span>🔒 </span>
-											{chatRoom?.name}
+											{chatRoom.name}
 										</button>
 									{/if}
 
@@ -813,7 +808,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 									</button> -->
 								{/if}
 							</div>
-							{#if passwordInput?.bool == true && passwordInput?.roomId == chatRoom?.id}
+							{#if passwordInput.bool == true && passwordInput.roomId == chatRoom?.id}
 								<input
 									class="password-room-access-input"
 									type="password"
