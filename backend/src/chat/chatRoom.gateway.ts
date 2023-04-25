@@ -501,7 +501,6 @@ export class ChatRoomGateway
       private: sucessData.private,
       id: sucessData.id,
       password: sucessData.password.length? true : false,
-
     }
     this.server.emit('sucess', {
       room: dataRoomToSend,
@@ -530,6 +529,10 @@ export class ChatRoomGateway
       return;
     }
     else {
+	  if (await this.chatRoomService.isBanned(userToAdd, chatRoom) === true) {
+		this.server.emit('UserAdded', null)
+		return ;
+	  }
       if (await this.chatRoomService.isMember(userToAdd, chatRoom) === true) {
         this.server.emit('UserAdded', { sucess: false, userToAdd: userToAdd, user: user });
         return;

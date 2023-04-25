@@ -14,7 +14,6 @@
 <!-- ********** HTML CODE ********* -->
 <!-- ****************************** -->
 
-
 <body style="margin:0px; padding:0px; background-image:url('/img/bg1.jpg');
 background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh;">
 	{#if loading === true}
@@ -31,7 +30,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				{:else}
 				<div class="button_box">
 					<img class="button_picture" src="/img/profile_icone.png">
-					<button class="button_nav" on:click={() => fade(`/profile/${realUser}`) && loadpage()}>Profile</button>
+					<button class="button_nav" on:click={() => fade(`/profile/${realUserId}`)}>Profile</button>
 				</div>
 			{/if}
 			<div class="button_box">
@@ -45,15 +44,49 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			</div>
 		</div>
 		<div class="main_profile">
+			{#if user?.username == currentUser}
+			<div class="friends_bloc">
+				<h1 class="profile_h1"><span><img class="friend_profile_icone" src="/img/friend_icone.png"></span>Friends</h1>
+				<ul class="ul_friends">
+					{#if friends}
+					{#each friends as friendName}
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
+						<div class="friendBloc">
+							<span class="friendname">{friendName}</span>
+							{#if invited === 1 }
+							<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
+							<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
+							{/if}
+						</div>
+						{#if clickedFriend === friendName && showButtons && invited === 2}
+						<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+						<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+						<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
+						<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+						{/if}
+					</li>
+					{/each}
+					{/if}
+				</ul>
+				<div class="addfriend_bloc"> <input placeholder="Ajouter un ami" class="input_friend" type="text" bind:value={friendNameAdd} on:keydown={(event) => handleEnter(event)}/>
+					<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
+			</div>
+			{/if}
 			<div class="main_box">
 				<div class="username_bloc">
-					<h1>{user?.username}</h1>
-					{#if user?.username != currentUser && is_blocked === false}
-						<button class="block_button" on:click={() => block(realUser, user.pseudo)}>X</button>
-					{/if}
-					{#if user?.username != currentUser && is_blocked === true}
-						<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>O</button>
-					{/if}
+					<h1 class="username">{user?.username}
+						{#if user?.username != currentUser && is_blocked === false}
+						<span>
+							<button class="block_button" on:click={() => block(realUser, user.pseudo)}>Block</button>
+						</span>
+						{/if}
+						{#if user?.username != currentUser && is_blocked === true}
+						<span>
+							<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>Unblock</button>
+						</span>
+						{/if}
+					</h1>
 				</div>
 				<h3>{user?.firstname} {user?.lastname}</h3>
 				<h3>Level: {user?.level}</h3>
@@ -68,6 +101,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				</button>
 			{/if}
 		</div>
+			<div class="achievements_bloc">
+				<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png"></span>Achievements</h1>
+			</div>
 		</div>
 	{/if}
 </body>
@@ -83,22 +119,230 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchDataOfUser } from '../../../API/api';
+    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend} from '../../../API/api';
+
+/********************** FRIENDS ***********************************************/
 	
 	let socket: Socket;
-    interface User {
-		id: number;
-		pseudo: string;
-		firstName: string;
-		lastName: string;
-		picture: string;
-		username: string;
-		createdAt: Date;
-		level: any;
-    }
+
+    let previousFriend: string;
+    let showButtons = false;
+    let clickedFriend: string;
+    let friends = [];
+    let friendNameAdd: string = '';
+    let searchProfile: string = '';
+    let connectedUsers = [];
 	let loading = false;
-	let imageURL: string;
-	let user: User;
+
+	let friendUser: User;
+    let user: User;
+    interface User {
+        id: number;
+        pseudo: string;
+        firstName: string;
+        lastName: string;
+        picture: string;
+        username: string;
+        createdAt: Date;
+    }
+	/*	
+		-1 -> no invitation received
+		 0 -> invitation denied or accepted
+		 1 -> invitation received -> must be actualized when receiving an invitation
+		 2 -> prevents buttons from showing up when accepting/denying invitation
+	*/
+
+	let invited = -1;
+
+	async function getConnectedUsers() {
+	const accessToken = await fetchAccessToken();
+	if (accessToken) {
+		const response = await fetch(`http://localhost:3000/websocket/getClient`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`
+		},
+		});
+		if (response.ok) {
+			connectedUsers =  await response.json();
+		}
+		else{
+			console.log("FRONT NOT WORKIGN HOHO")
+		}
+	} else {
+		console.log('Error: Could not get users');
+	}
+	}
+
+	async function handleSearchProfile(searchProfile: string) {
+		if (!searchProfile) {
+			return;
+		}
+		const accessToken = await fetchAccessToken();
+		if (accessToken) {
+			const url = `http://localhost:3000/users/${searchProfile}/search`;
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				},
+			});
+			const userExists = await response.json(); // Parse response body as JSON
+			if (userExists) { // Check if user exists
+				goto(`/profile/${userExists.id}`);
+			} else {
+				return;
+			}
+		}
+		else 
+			console.log('Error: Could not get users');
+	}
+
+	async function acceptInvitation() {
+		console.log("Accepted the invitation");
+		goto(`/game/${'roomid'}`);
+		/*function that sends to the other user that the invitation has been accepted*/
+		invited = 0;
+	}
+
+	async function denyInvitation() {
+		console.log("Denied the invitation");
+		/*function that sends to the other user that the invitation has been denied*/
+		invited = 0;
+	}
+
+    async function handleFriendClick(friendName: string) {
+		friends = await fetchFriend(user.pseudo);
+		clickedFriend = friendName;
+		setShowButtons(previousFriend !== clickedFriend ? true : !showButtons);
+		previousFriend = clickedFriend;
+	}
+
+	async function setShowButtons(value: boolean) {
+		if (invited == 0)
+			invited = 2;
+		else if (invited == 2 || invited == -1){
+			invited = 2;
+			showButtons = value;
+		}
+	}
+
+    async function handleMessageFriend(friendName) {
+		const accessToken = await fetchAccessToken();
+		if (accessToken)
+		{
+			const url = `http://localhost:3000/users/${friendName}/search`;
+				const response = await fetch(url, {
+					method: 'GET',
+					headers: {
+					'Authorization': `Bearer ${accessToken}`,
+					},
+				});
+				const userExists = await response.json(); // Parse response body as JSON
+				if (userExists) { // Check if user exists
+					await goto(`/chat/dm/${userExists.id}`);
+				}
+		}
+		else 
+			console.log('Error: Could not get users');
+	}
+
+    async function handleProfileFriend(friendName) {
+        const accessToken = await fetchAccessToken();
+		friendUser = await fetchDataOfUser(friendName);
+        if (accessToken)
+			goto(`/profile/${friendUser.id}`)
+        else
+            console.log('Error: Could not get profile');
+    }
+
+    async function handleDeleteFriend(friendName) {
+        const accessToken = await fetchAccessToken();
+        if (accessToken) {
+            const response = await fetch(`http://localhost:3000/users/${user.pseudo}/deletefriend`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ friend: friendName })
+            });
+            if (response.ok)
+                friends = friends.filter(friend => friend !== friendName);
+            else
+                console.log('Error: Could not delete friend');
+        } 
+		else
+            console.log('Error: Could not delete friend');
+    }
+
+    function handleInviteFriend(friendName) {
+        console.log(`Inviting ${friendName} to play`);
+		/*If accepted -> goto(`/game/${roomid}`); */
+    }
+
+	async function handleEnter(event:any)
+	{
+		if (event.key === 'Enter') {
+			handleAddFriend();
+		}
+	}
+
+    const handleAddFriend = async () => {
+        if (!friendNameAdd)
+            return;
+        const accessToken = await fetchAccessToken();
+        if (accessToken) {
+            const response = await fetch(`http://localhost:3000/users/${user.pseudo}/friend`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({friend: friendNameAdd})
+            });
+            if (response.ok) {
+                friends = await fetchFriend(user.pseudo);
+                friendNameAdd = '';
+            } else
+                console.log('Error: Could not add friend');
+        }
+    }
+
+    let imageURL: string = '';
+    let newUsername: string = '';
+
+
+    async function handleUpdateUsername() {
+        if (!newUsername) {
+            console.log('New username not set');
+            return;
+        }
+		const accessToken = await fetchAccessToken();
+            if (accessToken) {
+                const response = await fetch(`http://localhost:3000/users/${user.pseudo}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({ username: newUsername })
+                });
+                if (response.ok) {
+                    user.username = newUsername;
+                    newUsername = '';
+                } else {
+                    console.log('Error: Could not update username');
+                }
+            } else {
+                console.log('Error: Could not update username');
+            }
+	}
+
+/***********************************************************************************/
+
+
 	let blockedusers: any[] = [];
 
 	async function getImageURL() {
@@ -173,7 +417,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let realUser: string; 
 	let currentUser = ''; 
 	let is_blocked: any;
-	
+	let realUserId: any;
+
 	async function loadpage() {
 		if (!user)
 			goto('/');
@@ -185,6 +430,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		else // If the user is on another profile
 		{
+			realUserId = user.id;
 			realUser = user.username;
 			user = await fetchDataOfUser($page.params.user);
 			if (!user)
@@ -208,6 +454,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
 			});
 		}
+		friends = await fetchFriend(user.pseudo);
+		getConnectedUsers();
 		loading = true;
 	});
 

@@ -566,6 +566,8 @@
 			}
 		});
 		socket.on('failed', (data) => {
+			console.log('CU ID =', currentUser.id);
+			console.log('DATA MOERTO ==', data);
 			if (currentUser.id == data.user.id) {
 				animation = data.animation;
 				console.log("animation =", animation);
@@ -639,6 +641,17 @@
 			}
 		});
 		socket.on('UserAdded', async (data) => {
+			if (!data) {
+				animation = data.animation;
+					console.log("animation =", animation);
+
+					messages = [
+						...messages,
+						{ senderPseudo: 'server', content: "Cet utilisateur EST BAN, pas de ca chez moi" }
+					];
+					scrollToBottom();
+					return
+			}
 			if (data.sucess === false && !data.userToAdd) {
 				if (currentUser.id === data.user.id) {
 					animation = data.animation;
