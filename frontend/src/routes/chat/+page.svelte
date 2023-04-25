@@ -370,6 +370,7 @@
 			membres = [];
 		}
 		// currentRoom = null;
+		currentRoom.id = -1;
 	}
 
 	async function showProfile() {
@@ -457,7 +458,7 @@
 			}
 		});
 		socket.on('newMessage', (msg: any) => {
-			if (currentRoom && currentRoom?.id === msg.chatRoomId) {
+			if (currentRoom && currentRoom?.id === msg?.chatRoomId) {
 				if (currentUser?.status != -2) {
 					messages = [...messages, msg];
 					scrollToBottom();
@@ -470,7 +471,7 @@
 			}
 		});
 		socket.on('banned', async (data) => {
-			if (currentUser.id === data.user.id && currentRoom.id === data.room.id) {
+			if (currentUser.id === data.user.id) {
 				currentRoom = {
 					name: '',
 					id: -1
@@ -478,7 +479,7 @@
 				messages = [
 					{
 						senderPseudo: 'server',
-						content: 'Vous avez été banni de la room par un administrateur'
+						content: `Vous avez été banni de la room ${data.room.name} par un administrateur`
 					}
 				];
 				membres = [];
@@ -514,7 +515,9 @@
 		socket.on('deleteRoom', async (data) => {
 			if (currentRoom && currentRoom?.id === data) {
 				messages = [];
-				currentRoom = null;
+				// currentRoom = null;
+				currentRoom.id = -1;
+
 				membres = [];
 				banned = [];
 				muted = [];
@@ -662,7 +665,8 @@
 		});
 		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
-				currentRoom = null;
+				// currentRoom = null;
+				currentRoom.id = -1;
 			}
 		});
 		socket.on('passwordChanged', async() => {
