@@ -90,20 +90,26 @@ export class ChatRoomService {
   // }
 
   async createMessage(text: string, user: any, chatRoom: any) {
-    const createdMessage = await this.prisma.message.create({
-      data: {
-        content: text,
-        senderId: user.id,
-        senderPseudo: user.username,
-        chatRoom: { connect: { id: chatRoom.id } },
-      },
-    });
+	try{
 
-    await this.prisma.chatRoom.update({
-      where: { id: chatRoom.id },
-      data: { messages: { connect: { id: createdMessage.id } } },
-    });
-    return createdMessage;
+		const createdMessage = await this.prisma.message.create({
+			data: {
+				content: text,
+				senderId: user.id,
+				senderPseudo: user.username,
+				chatRoom: { connect: { id: chatRoom.id } },
+			},
+		});
+		
+		await this.prisma.chatRoom.update({
+			where: { id: chatRoom.id },
+			data: { messages: { connect: { id: createdMessage.id } } },
+		});
+		return createdMessage;
+	}
+	catch {
+		
+	}
   }
 
   async getUniqueChatRoom(idChatRoom: number) {

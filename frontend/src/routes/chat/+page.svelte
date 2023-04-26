@@ -369,6 +369,7 @@
 			membres = [];
 		}
 		// currentRoom = null;
+		currentRoom.id = -1;
 	}
 
 	async function showProfile() {
@@ -456,7 +457,7 @@
 			}
 		});
 		socket.on('newMessage', (msg: any) => {
-			if (currentRoom && currentRoom?.id === msg.chatRoomId) {
+			if (currentRoom && currentRoom?.id === msg?.chatRoomId) {
 				if (currentUser?.status != -2) {
 					messages = [...messages, msg];
 					scrollToBottom();
@@ -469,7 +470,7 @@
 			}
 		});
 		socket.on('banned', async (data) => {
-			if (currentUser.id === data.user.id && currentRoom.id === data.room.id) {
+			if (currentUser.id === data.user.id) {
 				currentRoom = {
 					name: '',
 					id: -1
@@ -477,7 +478,7 @@
 				messages = [
 					{
 						senderPseudo: 'server',
-						content: 'Vous avez été banni de la room par un administrateur'
+						content: `Vous avez été banni de la room ${data.room.name} par un administrateur`
 					}
 				];
 				membres = [];
@@ -513,7 +514,9 @@
 		socket.on('deleteRoom', async (data) => {
 			if (currentRoom && currentRoom?.id === data) {
 				messages = [];
-				currentRoom = null;
+				// currentRoom = null;
+				currentRoom.id = -1;
+
 				membres = [];
 				banned = [];
 				muted = [];
@@ -562,6 +565,8 @@
 			}
 		});
 		socket.on('failed', (data) => {
+			console.log('CU ID =', currentUser.id);
+			console.log('DATA MOERTO ==', data);
 			if (currentUser.id == data.user.id) {
 				animation = data.animation;
 				console.log("animation =", animation);
@@ -635,6 +640,17 @@
 			}
 		});
 		socket.on('UserAdded', async (data) => {
+			if (!data) {
+				animation = data.animation;
+					console.log("animation =", animation);
+
+					messages = [
+						...messages,
+						{ senderPseudo: 'server', content: "Cet utilisateur EST BAN, pas de ca chez moi" }
+					];
+					scrollToBottom();
+					return
+			}
 			if (data.sucess === false && !data.userToAdd) {
 				if (currentUser.id === data.user.id) {
 					animation = data.animation;
@@ -661,7 +677,8 @@
 		});
 		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
-				currentRoom = null;
+				// currentRoom = null;
+				currentRoom.id = -1;
 			}
 		});
 		socket.on('passwordChanged', async() => {
@@ -697,8 +714,10 @@
 
 <body style="margin:0px; padding:0px; background-image:url('/img/bg1.jpg');
 background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh;">
-	<!-- <p>Chargement...</p> -->
-	{#if loading === true}
+{#if loading === true}
+<!----------------------------------------------->
+<!----------------- NAVBAR ---------------------->
+<!----------------------------------------------->
 	<div class="game_navbar">
 		<div class="button_box">
 			<img class="button_picture" src="/img/home_icone.png" />
@@ -722,7 +741,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		</div>
 	</div>
 	<div class="chat_body">
+		<!----------------------------------------------->
+		<!----------------- LEFT BLOC ------------------->
+		<!----------------------------------------------->
 			<div class="left_bloc">
+				<!----------------- CREATE ROOM ------------------->
 				<div class="create-room">
 					<h2 class="room-form-title">Créer une room:</h2>
 					<form
@@ -765,6 +788,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 						>
 					</form>
 				</div>
+				<!----------------- PUBLIC ROOM LIST------------------->
 				<div class="public_room_list">
 					<h2 class="room-title">Rooms publics</h2>
 					{#each chatRooms as chatRoom}
@@ -817,7 +841,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 						{/if}
 					{/each}
 				</div>
-
+				<!----------------- PRIVATE ROOM LIST------------------->
 				<div class="private_room_list">
 					<h2 class="room-title">Rooms Privées</h2>
 					{#each chatRooms as chatRoom}
@@ -870,6 +894,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				{/if}
 					{/each}
 				</div> 
+				<!----------------- ROOM SETTINGS ------------------->
 				{#if currentRoom}
 				<div class="room_settings">
 						<h2 class="room-title">Réglages</h2>
@@ -911,7 +936,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					</div>
 				{/if}
 			</div>
-
+		<!----------------------------------------------->
+		<!----------------- MIDDLE BLOC ----------------->
+		<!----------------------------------------------->
 			<div class="message_container">
 				{#if currentRoom}
 					{#if currentRoom?.id}
@@ -970,7 +997,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 				{/if}
 			</div>
-
+		<!----------------------------------------------->
+		<!----------------- RIGHT BLOC ----------------->
+		<!----------------------------------------------->
 			{#if currentRoom?.id}
 				<div class="right_bloc">
 					<div class="user_list">
