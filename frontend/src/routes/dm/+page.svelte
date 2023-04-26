@@ -37,6 +37,42 @@
 
     }
 
+    function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:any) {
+		event.preventDefault();
+		if (
+			messageInput &&
+			messageInput.value &&
+			messageInput.value.length &&
+			currentRoom &&
+			currentRoom.id
+		) {
+			const messageValue = messageInput.value;
+			const data = {
+				roomId: currentRoom.id,
+				content: messageValue
+			};
+				socket.emit('sendMessage', data);
+			messageInput.value = '';
+		}
+	}
+
+    function handleMessageInput(event: any) {
+		const message = event.target.value;
+		const sendButton = document.getElementById('sendMessageButton');
+		if (sendButton instanceof HTMLButtonElement) {
+			sendButton.disabled = message.trim().length === 0;
+		}
+	}
+
+	function handleMessageKeyPress(event: any) {
+		if (event.key === 'Enter') {
+			const sendButton = document.getElementById('sendMessageButton');
+			if (sendButton instanceof HTMLButtonElement && !sendButton.disabled) {
+				sendButton.click();
+			}
+		}
+	}
+
     async function fletchContactList() {
         try{
             const cookies = document.cookie.split(';');
@@ -105,7 +141,9 @@
             }
         });
         socket.on('newDirectMessage', async(data) => {
-            if (currentRoom.id === data.room.id) {
+            console.log('CU ==', currentRoom);
+            console.log('data ==', data)
+            if (currentRoom.id === data.message.directMessageRoomId) {
                 messages = [...messages, data.message];
             }
         });
@@ -115,6 +153,7 @@
             }
         });
         socket.on('returnDirectMessage', async(data) => {
+            console.log('data ================', data);
             if (currentUser.id === data.user.id) {
                 messages = data.messages;
                 currentRoom = data.room;
@@ -195,15 +234,46 @@
                 <div class="chat_messages_bloc" id="chat-messages">
     
                 </div>
+                {#if currentRoom}
                 <div class="message_input_container">
+                    {#if messages && messages.length}
+								{#each messages as msg}
+									<p class="message_text">
+										{#if msg.senderPseudo == 'server'}
+											<button class="server_message">
+												{msg.senderPseudo}
+											</button>
+										{/if}
+										{#if msg.senderPseudo != 'server'}
+											<button
+												class="pseudo-button-message"
+											>
+												{msg.senderPseudo}
+											</button>
+										{/if}
+										<span class="message">
+											: {msg.content}
+										</span>
+									</p>
+								{/each}
+							{/if}
                     <form class="send_message_form">
                         <input
+                            on:input={handleMessageInput}
+							on:keypress={handleMessageKeyPress}
                             class="message_input"
                             type="text"
                             id="message"
                             name="message"
                         />
                         <button
+                        on:click={(event) => {
+                            const messageInput = document.getElementById('message');
+                            if (messageInput instanceof HTMLInputElement) {
+                                sendMessage(event, messageInput, currentRoom);
+                                messageInput.value = '';
+                            }
+                        }}
                             class="send-message-button"
                             id="sendMessageButton"
                             type="submit"
@@ -212,19 +282,26 @@
                         >
                     </form>
                 </div>
+                {/if}
             </div>
             <!----------------- RIGHT BLOC ---------------------->
             <div class="right_bloc">
                 <div class="connected_users">
                     <h2 class="connected_users_title">Utilisateurs connectés:</h2>
-                    {#each contactList as contact}
+                    <!-- {#each contactList as contact}
                         {#if contact?.connected == true}
                             <button class="connected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
                         {:else}
-                            <button class="disconnected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
+                        <button class="disconnected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
                         {/if}
-                    {/each}
+                        {/each} -->
+                    </div>
+                {#if selectedUser}
+                <div class="selctedUser_button_settings">
+                    <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
+                    <button>Proposer une partie</button>
                 </div>
+                {/if}
             </div>
         </div>
     

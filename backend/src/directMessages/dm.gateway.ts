@@ -88,15 +88,15 @@ async handleDmNotification(@ConnectedSocket() client: Socket, @MessageBody() dat
 @SubscribeMessage('sendMessage')
 async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:any) {
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
-    const newMsg = await this.DmService.createMessage(user, data.content, parseInt(data.room.id, 10));
+    const newMsg = await this.DmService.createMessage(user, data.content, parseInt(data.roomId, 10));
     await this.prisma.directMessageRoom.update({
-        where: {id: parseInt(data.room.id, 10)},
+        where: {id: parseInt(data.roomId, 10)},
         data: {
             messages: {connect: {id: newMsg.id}},
         },
     });
     this.server.emit('newDirectMessage',{
-        room: data.room,
+        room: data.roomId,
         message: newMsg,
     });
 }
@@ -134,7 +134,7 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
         const selectedUser= this.DmService.otherUser(user, room)
         this.server.emit('returnDirectMessage', {
             user: user,
-            room: data.room,
+            room: room,
             selectedUser: selectedUser,
             messages: room.messages,
         });

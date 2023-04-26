@@ -13,10 +13,6 @@
     let loading = false;
     let contactList = [];
 
-    async function handleClickPseudo(event: any, user: any) {
-    
-    }
-
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
     }
@@ -24,6 +20,7 @@
     function handleCheckProfileButton() {
         goto(`/profile/${selectedUser.id}`);
     }
+
 
     function handleBlockButton() {
 
@@ -37,7 +34,7 @@
 
     }
 
-    function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
+    function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:any) {
 		event.preventDefault();
 		if (
 			messageInput &&
@@ -163,7 +160,9 @@
             }
         });
         socket.on('newDirectMessage', async(data) => {
-            if (currentRoom.id === data.room.id) {
+            console.log('CU ==', currentRoom);
+            console.log('data ==', data)
+            if (currentRoom.id === data.message.directMessageRoomId) {
                 messages = [...messages, data.message];
             }
         });
@@ -267,7 +266,6 @@
 										{#if msg.senderPseudo != 'server'}
 											<button
 												class="pseudo-button-message"
-												on:click={(event) => handleClickPseudo(event, msg.senderId)}
 											>
 												{msg.senderPseudo}
 											</button>
@@ -315,6 +313,10 @@
                             <button class="disconnected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
                         {/if}
                     {/each} -->
+                </div>
+                <div class="selctedUser_button_settings">
+                    <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
+                    <button>Proposer une partie</button>
                 </div>
             </div>
         </div>
