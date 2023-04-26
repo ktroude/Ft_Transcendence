@@ -133,6 +133,7 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
         });
         const selectedUser= this.DmService.otherUser(user, room)
         this.server.emit('returnDirectMessage', {
+            user: user,
             room: data.room,
             selectedUser: selectedUser,
             messages: room.messages,

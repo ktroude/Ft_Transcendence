@@ -27,6 +27,39 @@ export class DirectMessageService {
         return null;
     }
 
+    async findRoom(user:User, who:User) {
+        let room = await this.prisma.directMessageRoom.findFirst({
+            where: {
+                ownerOneId : user.id,
+                ownerTwoId: who.id,
+            },
+            select: {
+                ownerOneId: true,
+                ownerTwoId: true,
+                messages: true,
+                ownerOne: true,
+                ownerTwo: true,
+                id: true, 
+            }
+        });
+        if (!room) {
+            room = await this.prisma.directMessageRoom.findFirst({
+                where: {
+                    ownerOneId : who.id,
+                    ownerTwoId: user.id,
+                },
+                select: {
+                    ownerOneId: true,
+                    ownerTwoId: true,
+                    messages: true,
+                    ownerOne: true,
+                    ownerTwo: true,
+                    id: true, 
+                }
+            });
+        }
+        return room;
+    }
 
 
 

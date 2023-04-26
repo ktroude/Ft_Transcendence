@@ -339,7 +339,6 @@
 	}
 
 	async function handleClickPseudo(event: any, user: any) {
-		console.log('CLIQUE PSEUDO ==', user);
 		isShown = false;
 		selectedUser = await fletchUserByRoom(user);
 		showOptionsPseudo = await displayDropdownMenu();

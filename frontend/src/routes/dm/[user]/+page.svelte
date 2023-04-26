@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { io, Socket } from 'socket.io-client';
-
-	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+    import { onMount } from 'svelte';
 
 	let socket:Socket;
     let currentUser:any = null;
@@ -13,16 +13,16 @@
     let loading = false;
     let contactList = [];
 
-
-
-
+    async function handleClickPseudo(event: any, user: any) {
+    
+    }
 
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
     }
 
     function handleCheckProfileButton() {
-		goto(`/profile/${selectedUser.id}`);
+        goto(`/profile/${selectedUser.id}`);
     }
 
     function handleBlockButton() {
@@ -37,7 +37,64 @@
 
     }
 
-    async function fletchContactList() {
+    function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom: ChatRoom) {
+		event.preventDefault();
+		if (
+			messageInput &&
+			messageInput.value &&
+			messageInput.value.length &&
+			currentRoom &&
+			currentRoom.id
+		) {
+			const messageValue = messageInput.value;
+			const data = {
+				roomId: currentRoom.id,
+				content: messageValue
+			};
+				socket.emit('sendMessage', data);
+			messageInput.value = '';
+		}
+	}
+
+    function handleMessageInput(event: any) {
+		const message = event.target.value;
+		const sendButton = document.getElementById('sendMessageButton');
+		if (sendButton instanceof HTMLButtonElement) {
+			sendButton.disabled = message.trim().length === 0;
+		}
+	}
+
+	function handleMessageKeyPress(event: any) {
+		if (event.key === 'Enter') {
+			const sendButton = document.getElementById('sendMessageButton');
+			if (sendButton instanceof HTMLButtonElement && !sendButton.disabled) {
+				sendButton.click();
+			}
+		}
+	}
+
+    async function isExist() {
+            const cookies = document.cookie.split(';');
+            const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		    const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		    if (accessToken) {
+                const headers = new Headers();
+                headers.append('Authorization', `Bearer ${accessToken}`);
+                const response = await fetch(`http://localhost:3000/dm/who?id=${$page.params.user}`, { headers });
+                const data =  await response.json();
+                console.log('data ====', data);
+                if (!data) {
+                    goto('/dm');
+                    return ;
+                }
+                selectedUser = data.who;
+                messages = data.msg;
+                currentRoom = data.room;
+            }
+    }
+
+
+    async function fetchContactList() {
         try{
             const cookies = document.cookie.split(';');
             const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
@@ -45,7 +102,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-                    // remplacer avec l'adresse celle pour fletch les contactes du mec
+                    // remplacer avec l'adresse celle pour fetch les contactes du mec
 			//const response = await fetch('http://localhost:3000/', { headers });
 			// const data =  await response.json();
             // contactList = data;
@@ -54,8 +111,8 @@
     catch {}
     }
 
-    async function fletchDirectMessageRoomData() {
-        try{
+    async function fetchDirectMessageRoomData() {
+        // try{
             const cookies = document.cookie.split(';');
             const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -66,19 +123,20 @@
 			const data =  await response.json();
             currentUser = data.user;
             roomList = data.rooms;
-            roomList.forEach(elem => {
-                if (currentUser.id === elem.ownerOne.id) {
-                    elem.name = elem.ownerTwo.username;
+            for (let i = 0; i < roomList.length; i++) {
+                if (currentUser.id === roomList[i].ownerOne.id) {
+                    roomList[i].name = roomList[i].ownerTwo.username;
                 }
-                if (currentUser.id == elem.ownerTwo) {
-                    elem.name = elem.ownerOne.username;
-                }
-            });
+                else if (currentUser.id == roomList[i].ownerTwo) {
+                    roomList[i].name = roomList[i].ownerOne.username;
+                }            
+            }
+            console.log('RL ==', roomList);
         }
-    }
-    catch {
-        console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
-    }
+    // }
+    // catch {
+    //     console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fetch de fetchDirectMessageRoomData a echoué');
+    // }
     }
 
 	onMount(async() => {
@@ -121,8 +179,10 @@
                 selectedUser = data.selectedUser;
             }
         });
-        await fletchContactList();
-        await fletchDirectMessageRoomData();
+        await isExist();
+        await fetchContactList();
+        await fetchDirectMessageRoomData();
+        
         loading = true;
     });
 
@@ -196,14 +256,45 @@
     
                 </div>
                 <div class="message_input_container">
+                    {#if messages && messages.length}
+								{#each messages as msg}
+									<p class="message_text">
+										{#if msg.senderPseudo == 'server'}
+											<button class="server_message">
+												{msg.senderPseudo}
+											</button>
+										{/if}
+										{#if msg.senderPseudo != 'server'}
+											<button
+												class="pseudo-button-message"
+												on:click={(event) => handleClickPseudo(event, msg.senderId)}
+											>
+												{msg.senderPseudo}
+											</button>
+										{/if}
+										<span class="message">
+											: {msg.content}
+										</span>
+									</p>
+								{/each}
+							{/if}
                     <form class="send_message_form">
                         <input
+                            on:input={handleMessageInput}
+							on:keypress={handleMessageKeyPress}
                             class="message_input"
                             type="text"
                             id="message"
                             name="message"
                         />
                         <button
+                        on:click={(event) => {
+                            const messageInput = document.getElementById('message');
+                            if (messageInput instanceof HTMLInputElement) {
+                                sendMessage(event, messageInput, currentRoom);
+                                messageInput.value = '';
+                            }
+                        }}
                             class="send-message-button"
                             id="sendMessageButton"
                             type="submit"
