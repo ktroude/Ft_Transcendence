@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { config } from 'dotenv';
@@ -5,9 +6,23 @@ import { AppModule } from './app.module';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+import { Server } from 'colyseus';
+import { publicRoom } from './rooms/publicRoom';
+import { gameRoom } from './game/rooms/gameRoom';
+import { async } from 'rxjs';
 
-// import * as cookieSession from 'cookie-session';
 const cookieSession = require('cookie-session'); // cette nomenclature et la meme que celle en commit au dessus, sauf que celle du dessus marche pas, jsp pourquoi.
+async function ServerGame() {
+  const gameServer = new Server();
+  gameServer.listen(3001);
+  gameServer.define('public_room', publicRoom)
+  .filterBy(['maxClients'])
+
+  gameServer.define('my_room', gameRoom)
+  .filterBy(['maxClients'])
+
+}
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,3 +42,4 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
+ServerGame();
