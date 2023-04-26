@@ -6,12 +6,15 @@ import { JwtGuard } from "src/auth/guard";
 import { get } from "http";
 import { RouterModule } from "@nestjs/core";
 import { async } from "rxjs";
+import { BlockService } from "src/block/block.service";
 
 @Controller('chat')
 export class ChatRoomController {
     constructor(private prisma: PrismaService,
         private chatRoomService: ChatRoomService,
-        private userService: UserService) { }
+        private userService: UserService,
+        private blockService:BlockService,     
+        ) { }
 
     @Get('getRoom')
     async getAllChatRoom(@Headers('Authorization') cookie: string) {
@@ -93,11 +96,20 @@ export class ChatRoomController {
     async handleGetMessage(@Headers('Authorization') cookie: string, @Query('code') id) {
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
+        // ajouter blocked msg
         const room = await this.prisma.chatRoom.findUnique({
             where: { id: parseInt(id, 10) },
             select: { messages: true }
         });
-        return room.messages;
+        const blocked = await this.blockService.getAllBlockReturnId(user.id);
+        let messages = room.messages;
+        for (let i = 0; i  < messages.length; i++){
+            for (let j = 0; j < blocked.length; j++) {
+                if (messages[i].senderId === blocked[j])
+                    messages.splice(i, 1);
+            }
+        }
+        return messages;
     }
 
     @Get('UserbyRoom')

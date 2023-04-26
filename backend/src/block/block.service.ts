@@ -159,4 +159,31 @@ export class BlockService {
         });
         return blocks.map(block => block.blocked.username);
     }
+
+    async getAllBlockReturnId(id:number): Promise<number[]> { // Get all the blocked users of and return the id instead of username
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            }
+        });
+        if (!user)
+            return null;
+        const blocks = await this.prisma.block.findMany({
+            where: {
+                user_id: user.id
+            },
+            select: {
+                blocked: {
+                    select: {
+                        id: true
+                    }
+                }
+            }
+        });
+        return blocks.map(block => block.blocked.id);
+    }
+
+
+
+
 }

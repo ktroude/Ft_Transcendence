@@ -37,4 +37,10 @@ export class BlockController {
 	{
 		return this.blockService.existingBlock(pseudo, block);
 	}
+
+    @UseGuards(JwtGuard)
+    @Get('getAllBlockReturnId')
+    async handleGetAllBlockReturnId(@Query('id') id) {
+        return await this.blockService.getAllBlockReturnId(parseInt(id, 10));
+    }
 }   

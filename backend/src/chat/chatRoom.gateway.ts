@@ -14,6 +14,7 @@ import { UserService } from 'src/user/user.service';
 import { ChatRoomService } from './chatRoom.service';
 import * as bcrypt from 'bcryptjs'
 import { RouterModule } from '@nestjs/core';
+import { BlockService } from 'src/block/block.service';
 
 
 @WebSocketGateway({
@@ -29,6 +30,7 @@ export class ChatRoomGateway
     private userService: UserService,
     private prismaService: PrismaService,
     private chatRoomService: ChatRoomService,
+    private blockService: BlockService,
   ) { }
 
   @WebSocketServer()
@@ -104,7 +106,14 @@ export class ChatRoomGateway
         ownerId:true,
        },
     });
-    const messages = chatRoom.messages;
+    let messages = chatRoom.messages;
+    const blocked = await this.blockService.getAllBlockReturnId(user.id);
+    for (let i=0; i < messages.length; i++) {
+      for (let j=0; j < blocked.length; j++) {
+        if (blocked[j] === messages[i].senderId)
+          messages.splice(i, 1);
+      }
+    }
     if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
       const toSend = {
         to: user.id,
@@ -414,7 +423,6 @@ export class ChatRoomGateway
 
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(client: Socket, data: any) {
-    console.log('DATTTTTTAAAAAA ====', data);
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const toCheck = await this.prismaService.chatRoom.findUnique({
       where: { id: parseInt(data.id,10) },
@@ -582,7 +590,6 @@ export class ChatRoomGateway
     if (await this.chatRoomService.isOwner(user, room) === false) {
       return ;
     }
-    console.log('ancien mdp ==', room.password);
     await this.prismaService.chatRoom.update({
       where: {id: room.id},
       data: {
@@ -592,8 +599,20 @@ export class ChatRoomGateway
     const wroom = await this.prismaService.chatRoom.findUnique({
       where: {id: parseInt(data.room.id, 10)}
     });
-    console.log('new mdp ==', wroom.password);
     this.server.emit('passwordChanged');
   }
 
+  @SubscribeMessage('newBlock')
+  async handleNewBlock(client:Socket, data:any) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    await this.blockService.unblock(user.id, parseInt(data.id, 10));
+    this.server.emit('blocked', user);
+  }
+
+  @SubscribeMessage('newUnblock')
+  async handleNewUnlock(client:Socket, data:any) {
+    const user = this.clients.find(([, socket]) => socket === client)?.[0];
+    await this.blockService.unblock(user.id, parseInt(data.id, 10));
+    this.server.emit('unblocked', user);
+  }
 }

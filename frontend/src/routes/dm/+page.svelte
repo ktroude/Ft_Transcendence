@@ -14,8 +14,15 @@
     let contactList:any[] = [];
 
 
-
-
+	function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
 
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);

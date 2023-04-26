@@ -306,36 +306,58 @@
 		return user;
 	};
 
+	async function fetchBlockedData() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch('http://localhost:3000/users/userInfo', { headers });
+			const data = await response.json();
+			blocked = data;
+		}	
+	}
+
 	async function displayDropdownMenu(): Promise<string[]> {
+		let array:string[] = [];
 		if (currentUser && selectedUser) {
 			if (currentUser.id === selectedUser.id) {
-				return ['profile'];
+				array = ['profile'];
 			}
 			if (currentUser.status === 2 && selectedUser.status === 1) {
-				return ['profile', 'unAdmin'];
+				array =  ['profile', 'unAdmin'];
 			} else if (currentUser.status === 2 && selectedUser.status === 0) {
-				return ['profile', 'upAdmin', 'ban', 'mute', 'kick'];
+				array =  ['profile', 'upAdmin', 'ban', 'mute', 'kick'];
 			} else if (currentUser.status === 1 && selectedUser.status === 0) {
-				return ['profile', 'ban', 'mute', 'kick'];
+				array =  ['profile', 'ban', 'mute', 'kick'];
 			} else if (
 				(currentUser.status === 1 || currentUser.status === 2) &&
 				selectedUser.status === -1
 			) {
-				return ['profile', 'unMute', 'kick', 'ban'];
+				array =  ['profile', 'unMute', 'kick', 'ban'];
 			} else if (
 				(currentUser.status === 1 || currentUser.status === 2) &&
 				selectedUser.status === -2
 			) {
-				return ['profile', 'unBan'];
+				array =  ['profile', 'unBan'];
 			} else if (currentUser.status === 0 || currentUser.status === -1) {
-				return ['profile'];
+				array =  ['profile'];
 			} else if (currentUser.status === 1 && selectedUser.status === 2) {
-				return ['profile'];
+				array =  ['profile'];
 			} else if (currentUser.status === selectedUser.status || selectedUser.status === -3) {
-				return ['profile'];
+				array =  ['profile'];
+			}
+
+
+			if (find(blocked, selectedUser.id) === true) {
+				array.push('unblock');
+			}
+			else {
+				array.push('block');
 			}
 		}
-		return [];
+		return array;
 	}
 
 	async function handleClickPseudo(event: any, user: any) {
@@ -362,7 +384,6 @@
 	function leaveRoom() {
 		if (currentRoom?.id) {
 			socket.emit('leaveRoom', currentRoom);
-			console.log('CU ==', currentRoom)
 			messages = [];
 			muted = [];
 			banned = [];
@@ -416,6 +437,14 @@
 	function deUpadmin(userToDowngrade: any, room: any) {
 		socket.emit('unAdminded', { user: userToDowngrade, room: room });
 		isShown = false;
+	}
+
+	function block(userToBlock:any) {
+		socket.emit('newBlock', userToBlock);
+	}
+
+	function unblock(userToUnblock:any) {
+		socket.emit('newUnblock', userToUnblock);
 	}
 
 	onMount(async () => {
@@ -677,21 +706,29 @@
 		});
 		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
-				// currentRoom = null;
 				currentRoom.id = -1;
 			}
 		});
 		socket.on('passwordChanged', async() => {
 			chatRooms = await fletchChatRoomsData();
-			console.log('currentRoom === ', currentRoom);
+		});
+		socket.on('blocked', async (data) => {
+			if (currentUser.id === data.id) {
+				await fetchBlockedData();
+			}
+		});
+		socket.on('unblocked', async (data)=> {
+			if (currentUser.id === data.id) {
+				await fetchBlockedData();
+			}
 		});
 		chatRooms = await fletchChatRoomsData();
 		currentUser = await fletchCurrentUserData();
 		if (currentUser.id < 0) {
 			window.location.pathname = '/';
 		}
+		await fetchBlockedData();
 		checkFormValidity();
-		// sleep(2);
 		loading = true;
 	});
 </script>
@@ -1128,6 +1165,19 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 										on:click={() => deUpadmin(selectedUser, currentRoom)}>DE-OP</button
 									>
 								{/if}
+								{#if  find(showOptionsPseudo, 'block')}
+								<button
+								class="button_show_profile"
+								on:click={() => block(selectedUser)}>DE-OP</button
+								>
+								{/if}
+								{#if  find(showOptionsPseudo, 'unblock')}
+								<button
+								class="button_show_profile"
+								on:click={() => unblock(selectedUser)}>DE-OP</button
+								>
+								{/if}
+
 								<button on:click={delMenu}>X</button>
 							{/if}
 						{/if}

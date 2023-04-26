@@ -62,19 +62,6 @@ async handleCreateDmRoom(@ConnectedSocket() client: Socket, @MessageBody() data:
     this.server.emit('DmRoomCreated', toSend);
 }
 
-// @SubscribeMessage('getDmMessages')
-// async handleGetDmMessages(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-//     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-//     const room = await this.prisma.directMessageRoom.findUnique({
-//         where: {id: parseInt(data.room.id, 10)},
-//         select: {
-//             id:true,
-//             messages:true,
-//         }
-//     });
-//     this.server.emit('returnDmMessages', room);
-// } 
-
 @SubscribeMessage('DmNotification')
 async handleDmNotification(@ConnectedSocket() client: Socket, @MessageBody() data:any) {
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
