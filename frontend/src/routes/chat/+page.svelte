@@ -273,10 +273,10 @@
 			const response = await fetch(
 				`http://localhost:3000/chat/UserbyRoom?room=${currentRoom?.id}&pseudo=${pseudo}`,
 				{ headers }
-			);
-			const data = await response.json();
-			return data;
-		}
+				);
+				const data = await response.json();
+				return data;
+			}
 		return -3;
 	};
 
@@ -350,12 +350,12 @@
 			}
 
 
-			if (find(blocked, selectedUser.id) === true) {
-				array.push('unblock');
-			}
-			else {
-				array.push('block');
-			}
+			// if (find(blocked, selectedUser.id) === true) {
+			// 	array.push('unblock');
+			// }
+			// else {
+			// 	array.push('block');
+			// }
 		}
 		return array;
 	}
@@ -1120,6 +1120,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					<div class="menu">
 						{#if isShown === true}
 							{#if showOptionsPseudo.length}
+								<h1>{selectedUser.pseudo}</h1>
 								{#if find(showOptionsPseudo, 'profile') === true}
 									<button class="button_show_profile" on:click={showProfile}>Voir le profil</button>
 								{/if}
