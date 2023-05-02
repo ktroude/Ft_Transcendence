@@ -44,8 +44,19 @@ const fetchDataOfUserPseudo = async (user) => {
         headers.append('Authorization', `Bearer ${accessToken}`);
         const response = await fetch(`http://localhost:3000/users/${user}/getUserbyPseudo`, { headers });
         const data = await response.json();
-        if (!data)
-            return null;
+        return data;
+    } else {
+        console.log('Access token not found');
+    }
+}
+
+const fetchDataOfUsername = async (user) => {
+    const accessToken = await fetchAccessToken();
+    if (accessToken) {
+        const headers = new Headers();
+        headers.append('Authorization', `Bearer ${accessToken}`);
+        const response = await fetch(`http://localhost:3000/users/${user}/search`, { headers });
+        const data = await response.json();
         return data;
     } else {
         console.log('Access token not found');
@@ -89,4 +100,4 @@ const fetchFriend = async (pseudo) =>
         }
     }
 
-    export {fetchData, fetchFriend, fetchAccessToken, fetchDataOfUser, fetchDataOfUserPseudo};
+    export {fetchData, fetchFriend, fetchAccessToken, fetchDataOfUser, fetchDataOfUserPseudo, fetchDataOfUsername};
