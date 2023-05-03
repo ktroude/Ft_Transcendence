@@ -18,11 +18,22 @@ export class gameRoom extends Room {
   finished: number = 0;
 
   onCreate() {
-    this.setState(new Game);
+    this.setState(new Game());
     this.player1.username = 'null';
     this.player2.username = 'null';
   }
   onJoin(client: Client, options?) {
-      console.log(this.player1);
+    console.log('player =====', this.player1.username);
+    console.log('Joined');
+    console.log();
+    this.onMessage('connect', (client, message) => {
+      if (this.clients.length === 1) {
+        console.log('Room created');
+        console.log(this.player1.username);
+      } else if (this.clients.length === 2) console.log('Room joined');
+      else if (this.clients.length === 3) {
+        console.log('Room full');
+      }
+    });
   }
 }

@@ -15,8 +15,8 @@ const cookieSession = require('cookie-session'); // cette nomenclature et la mem
 async function ServerGame() {
   const gameServer = new Server();
   gameServer.listen(3001);
-  gameServer.define('public_room', publicRoom)
-  .filterBy(['maxClients'])
+  // gameServer.define('public_room', publicRoom)
+  // .filterBy(['maxClients'])
 
   gameServer.define('my_room', gameRoom)
   .filterBy(['maxClients'])
