@@ -43,7 +43,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     </div>
 	<div class="main_profile">
 		<div class="edit_box">
-			<h1>{user?.pseudo}</h1>
+			<h1>{displayUsername}</h1>
 			<label for="username-input">New Username:</label>
 			<input type="text" id="username-input" bind:value={newUsername} />
 			<button  class="edit_button" on:click={handleUpdateUsername}>Update</button>
@@ -73,14 +73,15 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         firstName: string;
         lastName: string;
         picture: string;
+        username: string;
     }
         
     let imageURL: string;
     let user: User;
     let newUsername: string;
+    let displayUsername: string;
     
         async function getImageURL() {
-        user = await fetchData(); // Get the user's picture
         const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
         const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
         imageURL = URL.createObjectURL(blob); // Create a URL for the blob
@@ -112,8 +113,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         });
         if (response.ok){
           console.log('Username updated');
+          displayUsername = newUsername;
           newUsername = '';
-          fetchData();
         }
         else
           console.log('Error: Could not update the username');
@@ -168,7 +169,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         if (!user)
           await goto('/');
         else
+        {
           getImageURL()
+          displayUsername = user.username;
+        }
 		loading = true;
     });
 

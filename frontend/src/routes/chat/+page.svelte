@@ -313,7 +313,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch('http://localhost:3000/users/userInfo', { headers });
+			const response = await fetch(`http://localhost:3000/users/getAllBlockReturnId?id=${currentUser.id}`, { headers });
 			const data = await response.json();
 			blocked = data;
 		}	
@@ -348,14 +348,12 @@
 			} else if (currentUser.status === selectedUser.status || selectedUser.status === -3) {
 				array =  ['profile'];
 			}
-
-
-			// if (find(blocked, selectedUser.id) === true) {
-			// 	array.push('unblock');
-			// }
-			// else {
-			// 	array.push('block');
-			// }
+		}
+		if (findBlocked(blocked, selectedUser.id) === true) {
+			array.push('unblock');
+		}
+		else if (selectedUser?.id !== currentUser?.id) {
+			array.push('block');
 		}
 		return array;
 	}
@@ -363,8 +361,18 @@
 	async function handleClickPseudo(event: any, user: any) {
 		isShown = false;
 		selectedUser = await fletchUserByRoom(user);
+		await fetchBlockedData();
 		showOptionsPseudo = await displayDropdownMenu();
 		isShown = true;
+	}
+
+	function findBlocked(array: any[], toFind:any) {
+		console.log('blocked ==',blocked)
+		for (let i = 0 ; i < array.length; i++) {
+			if (array[i] === toFind)
+				return true;
+		}
+			return false;
 	}
 
 	function find(array: any[], toFind: any): boolean {
@@ -440,11 +448,19 @@
 	}
 
 	function block(userToBlock:any) {
-		socket.emit('newBlock', userToBlock);
+		socket.emit('newBlock', {
+			userToBlock: userToBlock,
+			room : currentRoom,
+		});
+		isShown = false;
 	}
 
 	function unblock(userToUnblock:any) {
-		socket.emit('newUnblock', userToUnblock);
+		socket.emit('newUnblock', {
+			userToUnblock: userToUnblock,
+			room : currentRoom,
+		});
+		isShown = false;
 	}
 
 	onMount(async () => {
@@ -715,11 +731,13 @@
 		socket.on('blocked', async (data) => {
 			if (currentUser.id === data.id) {
 				await fetchBlockedData();
+				// socket.emit('getMessage', data.room);
 			}
 		});
 		socket.on('unblocked', async (data)=> {
 			if (currentUser.id === data.id) {
 				await fetchBlockedData();
+				// socket.emit('getMessage', data.room);
 			}
 		});
 		chatRooms = await fletchChatRoomsData();
@@ -1169,13 +1187,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 								{#if  find(showOptionsPseudo, 'block')}
 								<button
 								class="button_show_profile"
-								on:click={() => block(selectedUser)}>DE-OP</button
+								on:click={() => block(selectedUser)}>block</button
 								>
 								{/if}
 								{#if  find(showOptionsPseudo, 'unblock')}
 								<button
 								class="button_show_profile"
-								on:click={() => unblock(selectedUser)}>DE-OP</button
+								on:click={() => unblock(selectedUser)}>unblock</button
 								>
 								{/if}
 

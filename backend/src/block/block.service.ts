@@ -22,14 +22,13 @@ export class BlockService {
             }
         }
         });
-        if (!block)
-            return null;
         return block;
     }
 
     async unblock(userId: number, blockId: number) // Find the block relation and delete it
     {
-        const deleteFriend = this.prisma.block.findUnique({
+        console.log(userId, blockId);
+        const deleteFriend = await this.prisma.block.findUnique({
 			where: {
 				user_id_blocked_id: {
 					user_id: userId,
@@ -60,44 +59,28 @@ export class BlockService {
             return null;
         if (user.username === usernameBlock)
             return null;
-			const userBlock = await this.prisma.user.findUnique({
-				where: {
-					username: usernameBlock,
-				}
-			});
-		const isBlocked = await this.existingBlock(pseudo, usernameBlock);
-		if (isBlocked == false)
-			return null;
+		const userBlock = await this.prisma.user.findUnique({
+			where: {
+				username: usernameBlock,
+			}
+		});
+        if (!userBlock)
+            return null;
 		await this.unblock(user.id, userBlock.id);
 		return;
     }
        
-    async existingBlock(pseudo: string, usernameBlock: string): Promise<Boolean> { // Check if the user is blocked
-		const user = await this.prisma.user.findUnique({
-            where: {
-                pseudo: pseudo,
-            }
-        });
-        if (!user)
-            return false;
-        if (user.username === usernameBlock)
-            return false;
-        console.log("userBlock: " + usernameBlock);
-		const userBlock = await this.prisma.user.findUnique({
-			where: {
-				pseudo: usernameBlock,
-			}
-		});
+    async existingBlock(userId: number, userBlockId: number): Promise<Boolean> { // Check if the user is blocked
 		const block = await this.prisma.block.findUnique({
             where: {
                 user_id_blocked_id: {
-                    user_id: user.id,
-                    blocked_id: userBlock.id
+                    user_id: userId,
+                    blocked_id: userBlockId
                 }
             }
         });
         if (!block)
-            return false;
+            return null;
         return true;
     }
 
@@ -131,7 +114,7 @@ export class BlockService {
         });
         if (!userBlock)
             return null;
-        if (await this.existingBlock(pseudo, usernameBlock))
+        if (await this.existingBlock(user.id, userBlock.id))
             return null;
         await this.createBlock(user.id, userBlock.id);
         return user;
@@ -183,7 +166,21 @@ export class BlockService {
         return blocks.map(block => block.blocked.id);
     }
 
-
-
+    async blockUserId(me:number, toBlock:number): Promise<User> { // Search for the users and create the block relation
+        const userToBlock = await this.prisma.user.findUnique({
+            where: {id: toBlock}
+        })
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: me,
+            }
+        });
+        if (!user || ! userToBlock || user.id === userToBlock.id)
+            return null;
+        if (await this.existingBlock(user.id, userToBlock.id))
+            return null;
+        await this.createBlock(user.id, userToBlock.id);
+        return userToBlock;
+    }
 
 }

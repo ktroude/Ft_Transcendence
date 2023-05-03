@@ -201,7 +201,7 @@
 				});
 				const userExists = await response.json(); // Parse response body as JSON
 				if (userExists) { // Check if user exists
-					await goto(`/chat/dm/${userExists.id}`);
+					await goto(`/dm/${userExists.id}`);
 				}
 		}
 		else 

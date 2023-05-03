@@ -119,7 +119,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend} from '../../../API/api';
+    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername} from '../../../API/api';
 
 /********************** FRIENDS ***********************************************/
 	
@@ -250,10 +250,18 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     async function handleProfileFriend(friendName) {
         const accessToken = await fetchAccessToken();
-		friendUser = await fetchDataOfUser(friendName);
         if (accessToken)
-			goto(`/profile/${friendUser.id}`)
-        else
+		{
+			friendUser = await fetchDataOfUsername(friendName);
+			if (!friendUser)
+				console.log('Error: Could not get profile');
+			else
+			{
+				await goto(`/profile/${friendUser.id}`);
+				await loadpage();
+			}
+		}
+		else
             console.log('Error: Could not get profile');
     }
 
@@ -358,7 +366,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   {
     const accessToken = await fetchAccessToken();
     if (accessToken)
-      goto(`/chat/dm/${user.id}`);
+      goto(`/dm/${user.id}`);
     else
       console.log('Error: Could not send message');
   }
@@ -382,23 +390,28 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	
 	async function checkBlocked(realUser, blockerUser) { // check if user is blocked
     const accessToken = await fetchAccessToken();
-    const url = `http://localhost:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-        },
-    });
-    if (response.ok) {
-        is_blocked = true;
-    } else {
-        is_blocked = false;
-    }
-    return is_blocked;
+	if (accessToken)
+	{
+		const url = `http://localhost:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			},
+		});
+		const data = await response.json();
+		console.log("JASSAS", data);
+		if (data === true)
+			is_blocked = true;
+		else
+			is_blocked = false;
+		return is_blocked;
+	}
+	else
+		console.log('Error: Could not check if user is blocked');
 }
 
 	async function unblock(realUser, blockerUser) { // unblock user
-		await fetchData();
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
             const response = await fetch(`http://localhost:3000/users/${realUser}/deleteBlock`, {
@@ -425,8 +438,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		if ($page.params.user == user.id.toString()) // If the user is on his own profile
 		{
 			user = await fetchData();
-			currentUser = user.username;
 			await getImageURL();
+			currentUser = user.username;
+			friends = await fetchFriend(user.pseudo);
 		}
 		else // If the user is on another profile
 		{
@@ -438,7 +452,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				user = await fetchData();
 				return await goto(`/homepage`);
 			}
-			is_blocked = checkBlocked(realUser, user.username);
+			is_blocked = await checkBlocked(realUser, user.username);
 			getImageURL();
 		}
 	}
@@ -459,12 +473,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		loading = true;
 	});
 
-	function fade(thisplace:string) {
+	async function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
 		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
 			goto(thisplace);
+			loadpage();
 			document.body.classList.remove('fade-out');
 		}, 400);
 	}

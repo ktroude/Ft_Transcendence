@@ -72,7 +72,7 @@ async handleDmNotification(@ConnectedSocket() client: Socket, @MessageBody() dat
     }
 }
 
-@SubscribeMessage('sendMessage')
+@SubscribeMessage('sendDirectMessage')
 async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:any) {
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
     const newMsg = await this.DmService.createMessage(user, data.content, parseInt(data.roomId, 10));

@@ -3,13 +3,14 @@ import { JwtGuard } from 'src/auth/guard';
 import { User } from '@prisma/client';
 import { BlockService } from './block.service';
 import { Query } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
 
 //Controller for the block system
 
 @UseGuards(JwtGuard)
 @Controller('users')
 export class BlockController {
-    constructor (private blockService: BlockService) {}
+    constructor (private blockService: BlockService, private userService: UserService) {}
 
     @UseGuards(JwtGuard)
     @Put(':pseudo/block') // Block a user
@@ -35,7 +36,10 @@ export class BlockController {
 	@Get(':pseudo/checkBlock') // Check if a user is blocked
 	async checkBlock(@Param('pseudo') pseudo: string, @Query('block') block: string): Promise<Boolean>
 	{
-		return this.blockService.existingBlock(pseudo, block);
+        const user = await this.userService.findUserByPseudo(pseudo);
+        const userBlock = await this.userService.findUserByUsername(block);
+        const blockExists = await this.blockService.existingBlock(user.id, userBlock.id);
+        return blockExists !== null; // Return true if a block exists, false otherwise
 	}
 
     @UseGuards(JwtGuard)

@@ -58,7 +58,7 @@
 				roomId: currentRoom.id,
 				content: messageValue
 			};
-				socket.emit('sendMessage', data);
+				socket.emit('sendDirectMessage', data);
 			messageInput.value = '';
 		}
 	}
@@ -109,15 +109,16 @@
 			const data =  await response.json();
             currentUser = data.user;
             roomList = data.rooms;
-            roomList.forEach(elem => {
-                if (currentUser.id === elem.ownerOne.id) {
-                    elem.name = elem.ownerTwo.username;
+            for (let i = 0; i < roomList.length; i++) {
+                if (currentUser.id === roomList[i].ownerOne.id) {
+                    roomList[i].name = roomList[i].ownerTwo.username;
                 }
-                if (currentUser.id == elem.ownerTwo) {
-                    elem.name = elem.ownerOne.username;
-                }
-            });
+                else if (currentUser.id == roomList[i].ownerTwo) {
+                    roomList[i].name = roomList[i].ownerOne.username;
+                }            
+            }
         }
+            console.log('RL ==', roomList);
     }
     catch {
         console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
@@ -169,6 +170,7 @@
         });
         await fletchContactList();
         await fletchDirectMessageRoomData();
+        console.log(roomList)
         loading = true;
     });
 
