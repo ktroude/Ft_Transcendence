@@ -106,20 +106,27 @@ export class ChatRoomGateway
         ownerId:true,
        },
     });
-    let messages = chatRoom.messages;
+    let messages = [];
     const blocked = await this.blockService.getAllBlockReturnId(user.id);
-    for (let i=0; i < messages.length; i++) {
-      for (let j=0; j < blocked.length; j++) {
-        if (blocked[j] === messages[i].senderId)
-          messages.splice(i, 1);
+    if (!blocked.length)
+      messages = chatRoom.messages
+    else {
+      for (let i=0; i < chatRoom.messages.length; i++) {
+        for (let j=0; j < blocked.length; j++) {
+          if (blocked[j] !== chatRoom.messages[i].senderId) {
+            console.log('chatRoom.messages ==', chatRoom.messages[0]);
+            messages.push(chatRoom.messages[i]);
+          }
+        }
       }
     }
-    if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
-      const toSend = {
-        to: user.id,
-        banned: true
-      }
-      return toSend;
+      if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
+        const toSend = {
+          to: user.id,
+          banned: true
+        }
+        this.server.emit('returnMessage', toSend);
+        return ;
     }
     const toSend = {
       banned: false,
@@ -605,14 +612,19 @@ export class ChatRoomGateway
   @SubscribeMessage('newBlock')
   async handleNewBlock(client:Socket, data:any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-    await this.blockService.unblock(user.id, parseInt(data.id, 10));
-    this.server.emit('blocked', user);
+    const toBlock = await this.blockService.blockUserId(user.id, parseInt(data.userToBlock.id,10));
+    this.server.emit('blocked', {
+      user : user,
+      block: toBlock,
+    });
+    await this.handleGetMessage(client, data.room)
   }
 
   @SubscribeMessage('newUnblock')
   async handleNewUnlock(client:Socket, data:any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-    await this.blockService.unblock(user.id, parseInt(data.id, 10));
+    await this.blockService.unblock(user.id, parseInt(data.userToUnblock.id, 10));
     this.server.emit('unblocked', user);
+    await this.handleGetMessage(client, data.room)
   }
 }

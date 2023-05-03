@@ -166,7 +166,21 @@ export class BlockService {
         return blocks.map(block => block.blocked.id);
     }
 
-
-
+    async blockUserId(me:number, toBlock:number): Promise<User> { // Search for the users and create the block relation
+        const userToBlock = await this.prisma.user.findUnique({
+            where: {id: toBlock}
+        })
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: me,
+            }
+        });
+        if (!user || ! userToBlock || user.id === userToBlock.id)
+            return null;
+        if (await this.existingBlock(user.id, userToBlock.id))
+            return null;
+        await this.createBlock(user.id, userToBlock.id);
+        return userToBlock;
+    }
 
 }

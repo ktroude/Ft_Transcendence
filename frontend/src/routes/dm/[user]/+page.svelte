@@ -48,7 +48,7 @@
 				roomId: currentRoom.id,
 				content: messageValue
 			};
-				socket.emit('sendMessage', data);
+				socket.emit('sendDirectMessage', data);
 			messageInput.value = '';
 		}
 	}
