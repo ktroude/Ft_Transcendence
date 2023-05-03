@@ -366,7 +366,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   {
     const accessToken = await fetchAccessToken();
     if (accessToken)
-      goto(`/chat/dm/${user.id}`);
+      goto(`/dm/${user.id}`);
     else
       console.log('Error: Could not send message');
   }

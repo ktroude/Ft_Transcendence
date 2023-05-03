@@ -71,6 +71,8 @@
 	}
 
     async function isExist() {
+        try {
+
             const cookies = document.cookie.split(';');
             const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		    const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -88,6 +90,10 @@
                 messages = data.msg;
                 currentRoom = data.room;
             }
+        }
+        catch {
+            goto('/dm');
+        }
     }
 
 
@@ -108,8 +114,8 @@
     catch {}
     }
 
-    async function fetchDirectMessageRoomData() {
-        // try{
+    async function fletchDirectMessageRoomData() {
+        try{
             const cookies = document.cookie.split(';');
             const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -128,12 +134,12 @@
                     roomList[i].name = roomList[i].ownerOne.username;
                 }            
             }
-            console.log('RL ==', roomList);
         }
-    // }
-    // catch {
-    //     console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fetch de fetchDirectMessageRoomData a echoué');
-    // }
+            console.log('RL ==', roomList);
+    }
+    catch {
+        console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
+    }
     }
 
 	onMount(async() => {
@@ -180,7 +186,7 @@
         });
         await isExist();
         await fetchContactList();
-        await fetchDirectMessageRoomData();
+        await fletchDirectMessageRoomData();
         
         loading = true;
     });
