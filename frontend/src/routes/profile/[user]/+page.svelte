@@ -469,7 +469,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			});
 		}
 		friends = await fetchFriend(user.pseudo);
-		getConnectedUsers();
+		await getConnectedUsers();
 		loading = true;
 	});
 

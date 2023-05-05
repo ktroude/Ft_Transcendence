@@ -191,13 +191,15 @@
         loading = true;
     });
 
-
-
-
-
-
-
-
+    function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
 
 </script>
 
