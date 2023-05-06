@@ -38,6 +38,8 @@ export class BlockController {
 	{
         const user = await this.userService.findUserByPseudo(pseudo);
         const userBlock = await this.userService.findUserByUsername(block);
+        if (!user || !userBlock)
+            return false;
         const blockExists = await this.blockService.existingBlock(user.id, userBlock.id);
         return blockExists !== null; // Return true if a block exists, false otherwise
 	}

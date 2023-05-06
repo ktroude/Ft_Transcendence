@@ -27,7 +27,7 @@ async handleRoomData(@Headers('Authorization') cookie: String) {
           ownerTwoId: true,
           ownerOne: true,
           ownerTwo: true,
-          id: true, 
+          id: true,
         }
       });
     return {

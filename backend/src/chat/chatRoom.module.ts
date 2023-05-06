@@ -7,10 +7,11 @@ import { ChatRoomController } from './chatRoom.controller';
 import { ChatRoomGateway } from './chatRoom.gateway';
 import { BlockService } from 'src/block/block.service';
 import { ChatRoomService } from './chatRoom.service';
+import { FriendService } from 'src/friend/friend.service';
 
 @Module({
   imports: [PrismaModule, JwtModule],
   controllers: [ChatRoomController],
-  providers: [ChatRoomService, ChatRoomGateway, UserService, BlockService],
+  providers: [ChatRoomService, ChatRoomGateway, UserService, BlockService, FriendService],
 })
 export class ChatRoomModule {}

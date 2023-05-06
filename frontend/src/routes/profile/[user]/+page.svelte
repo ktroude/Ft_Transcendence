@@ -372,9 +372,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   }
 
 	async function block(realUser, blockerUser) { // block user
-		await fetchData();
 		const accessToken = await fetchAccessToken();
-		if (accessToken) {
+		if (accessToken) 
+		{
 			const response = await fetch(`http://localhost:3000/users/${realUser}/block`, {
 				method: 'PUT',
                 headers: {
@@ -383,9 +383,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 },
                 body: JSON.stringify({block: blockerUser})
             });
-			is_blocked = true;
+			if (response.ok)
+				is_blocked = true;
         } else
-			console.log('Error: Could not delete friend');
+			console.log('Error: Could not block user');
     }
 	
 	async function checkBlocked(realUser, blockerUser) { // check if user is blocked
@@ -424,7 +425,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             });
 			is_blocked = false;
         } else
-			console.log('Error: Could not delete friend');
+			console.log('Error: Could not unblock user');
     }
 
 	let realUser: string; 
