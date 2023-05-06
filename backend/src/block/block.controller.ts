@@ -40,8 +40,7 @@ export class BlockController {
         const userBlock = await this.userService.findUserByUsername(block);
         if (!user || !userBlock)
             return false;
-        const blockExists = await this.blockService.existingBlock(user.id, userBlock.id);
-        return blockExists !== null; // Return true if a block exists, false otherwise
+        return await this.blockService.existingBlock(user.id, userBlock.id);
 	}
 
     @UseGuards(JwtGuard)

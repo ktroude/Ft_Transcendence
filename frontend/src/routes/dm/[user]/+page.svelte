@@ -99,9 +99,9 @@
 
     async function fetchContactList() {
         try{
-            const cookies = document.cookie.split(';');
-            const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
-		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+                const cookies = document.cookie.split(';');
+                const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+            const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);

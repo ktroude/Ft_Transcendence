@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient } from '@prisma/client';
+import { BlockService } from 'src/block/block.service';
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 
@@ -84,6 +85,16 @@ export class FriendService{
         if (!friend)
             return null;
         if (await this.existingFriendship(user.id, friend.id))
+            return null;
+        const newFriend = await this.prisma.block.findUnique({
+            where: {
+                user_id_blocked_id: {
+                    user_id: user.id,
+                    blocked_id: friend.id
+                }
+            }
+        });
+        if (newFriend)
             return null;
         await this.createFriendship(user.id, friend.id);
         await this.createFriendship(friend.id, user.id);

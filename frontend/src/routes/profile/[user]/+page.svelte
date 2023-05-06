@@ -401,7 +401,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			},
 		});
 		const data = await response.json();
-		console.log("JASSAS", data);
 		if (data === true)
 			is_blocked = true;
 		else

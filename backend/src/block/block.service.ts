@@ -23,9 +23,14 @@ export class BlockService {
             }
         }
         });
-        await this.friendService.deleteFriendShip(userId, blockId);
-        await this.friendService.deleteFriendShip(blockId, userId);
-        return block;
+        if (await this.friendService.existingFriendship(userId, blockId) == false)
+            return block;
+        else
+        {
+            await this.friendService.deleteFriendShip(userId, blockId);
+            await this.friendService.deleteFriendShip(blockId, userId);
+            return block;
+        }
     }
 
     async unblock(userId: number, blockId: number) // Find the block relation and delete it
@@ -41,14 +46,14 @@ export class BlockService {
 			console.log("Cannot unblock, friend is not blocked");
 			return ;
 		}
-		await this.prisma.block.delete({
-            where: {
-                user_id_blocked_id: {
-                    user_id: userId,
-                    blocked_id: blockId
-                }
-        }});
-        return deleteFriend;
+		const deleted = await this.prisma.block.delete({
+                where: {
+                    user_id_blocked_id: {
+                        user_id: userId,
+                        blocked_id: blockId
+                    }
+            }});
+        return deleted;
     }
 
     async deleteBlock(pseudo: string, pseudoBlock: string) { // Take users looks if they are blocked and delete the block relation
@@ -69,6 +74,7 @@ export class BlockService {
         if (!userBlock)
             return null;
 		await this.unblock(user.id, userBlock.id);
+		await this.unblock(userBlock.id, user.id);
 		return;
     }
        
@@ -82,7 +88,7 @@ export class BlockService {
             }
         });
         if (!block)
-            return null;
+            return false;
         return true;
     }
 
@@ -119,6 +125,7 @@ export class BlockService {
         if (await this.existingBlock(user.id, userBlock.id))
             return null;
         await this.createBlock(user.id, userBlock.id);
+        await this.createBlock(userBlock.id, user.id);
         return user;
     }
 
