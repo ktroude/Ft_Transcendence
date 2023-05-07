@@ -55,8 +55,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         <p>Un projet de 
           <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('ktroude')}>Ktroude</span>,
           <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Krokmouuu')}>Bleroy</span>,
-          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Lmaujean')}>Lmaujean</span> et
-          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('PKLB')}>Ple-berr</span>
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Lmaujean')}>Lmaujean</span>,
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('PKLB')}>Ple-berr</span> et
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('venum78160')}>vl-hotel</span>
         </p>
       </footer>
 	  {/if}
@@ -69,7 +70,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from "$app/navigation";
-  import {fetchData} from "../../API/api";
+  import {fetchData, fetchAccessToken} from "../../API/api";
 	import { redirect } from '@sveltejs/kit';
   import {io, Socket} from 'socket.io-client';
 
@@ -85,8 +86,19 @@ let loading = false;
         username: string;
     }
 
-    function redirectToGithub(username) {
-  window.open(`https://github.com/${username}`, '_blank');
+    async function redirectToGithub(username) {
+      const accessToken = await fetchAccessToken();
+      const response = await fetch(`http://localhost:3000/users/achievements/${user.id}/updateAchievements`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+              },
+              body: JSON.stringify({achievement: 'ImCurious' })
+            });
+          if (!response.ok)
+            console.log("Error update achievements <ImCurious>")
+    window.open(`https://github.com/${username}`, '_blank');
     }
 
     onMount(async function() {
@@ -99,6 +111,23 @@ let loading = false;
       socket.on('connect', async function() {			
         socket.emit('userConnected', { pseudo: user.pseudo });
       });
+      if (user.pseudo === 'yoshi' || user.pseudo === 'tac' || user.pseudo === 'mboy' || user.pseudo === 'palmi')
+      {
+        const accessToken = await fetchAccessToken();
+        if (accessToken)
+        {
+          const response = await fetch(`http://localhost:3000/users/achievements/${user.id}/updateAchievements`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+              },
+              body: JSON.stringify({achievement: 'TheDarkSide' })
+            });
+          if (!response.ok)
+            console.log("Error update achievements <TheDarkSide>")
+        }
+      }
     }
 	loading = true;
 	});

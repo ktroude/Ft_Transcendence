@@ -1,6 +1,10 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+enum Achievement {
+  true
+  false
+}
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,6 +29,16 @@ model User {
   losses    Int @default(0)
   rank      Int @default(0)
   level     Int @default(0)
+
+  //ACHIEVEMENTS
+  FirstWin Achievement @default(false) // 1er win
+  FirstLoss Achievement @default(false) // 1er loss
+  WinStreak Achievement @default(false) // 3 wins d'affilé
+  ImBad Achievement @default(false) // 3 losses d'affilé
+  ImTheBoss Achievement @default(false) // Win vs un des 5 createurs
+  TheDarkSide Achievement @default(false) // Se log en tant que membre du bocal
+  ImCurious Achievement @default(false) // Aller voir le github d'un des createurs
+  SecretAchievement Achievement @default(false) // Mettre un secret ?
 
   // pitié monsieur donne un autre nom a cette variable, je m'en sers deja dans le front du chat et je fais des gros user =  donc ca va ecraser mon status du front
   // onLine c'est bien non?

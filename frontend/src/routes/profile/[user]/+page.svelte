@@ -79,6 +79,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 						{#if user?.username != currentUser && is_blocked === false}
 						<span>
 							<button class="block_button" on:click={() => block(realUser, user.pseudo)}>Block</button>
+							<button class="block_button" on:click={() => AddFriendButton(realUser, user.pseudo)}>Add Friend</button> <!--  Add friend MODIFY THE BUTTON -->
+							<button class="block_button" on:click={() => DeleteFriendButton(realUser, user.pseudo)}>Delete friend</button> <!--  DELETE friend MODIFY THE BUTTON -->
 						</span>
 						{/if}
 						{#if user?.username != currentUser && is_blocked === true}
@@ -153,6 +155,46 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	*/
 
 	let invited = -1;
+
+	async function DeleteFriendButton(realUser, friendName) {
+        const accessToken = await fetchAccessToken();
+        if (accessToken) {
+            const response = await fetch(`http://localhost:3000/users/${realUser}/deletefriend`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ friend: friendName })
+            });
+            if (response.ok)
+                friends = friends.filter(friend => friend !== friendName);
+            else
+                console.log('Error: Could not delete friend');
+        } 
+		else
+            console.log('Error: Could not delete friend');
+    }
+
+	async function AddFriendButton(realUser, friendUser)
+	{
+		const accessToken = await fetchAccessToken();
+        if (accessToken) {
+            const response = await fetch(`http://localhost:3000/users/${realUser}/friend`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({friend: friendUser})
+            });
+            if (response.ok) {
+                friends = await fetchFriend(user.pseudo);
+                friendNameAdd = '';
+            } else
+                console.log('Error: Could not add friend');
+        }
+    }
 
 	async function getConnectedUsers() {
 	const accessToken = await fetchAccessToken();

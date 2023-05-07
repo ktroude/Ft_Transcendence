@@ -9,6 +9,7 @@ import { FriendModule } from './friend/friend.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { BlockModule } from './block/block.module';
 import { DirectMessagesModule } from './directMessages/dm.module';
+import { AchievementsModule } from './achievements/achievements.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DirectMessagesModule } from './directMessages/dm.module';
     WebsocketModule,
     BlockModule,
     DirectMessagesModule,
+    AchievementsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
