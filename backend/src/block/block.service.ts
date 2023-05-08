@@ -12,7 +12,7 @@ const multer = require('multer');
 export class BlockService {
   constructor(private friendService: FriendService, private prisma: PrismaService) {}
 
-    async createBlock(userId: number, blockId: number) { // Create a block relation
+    async createBlock(userId: number, blockId: number) { // Create a block relation''
         const block = await this.prisma.block.create({
             data: {
                 user: {

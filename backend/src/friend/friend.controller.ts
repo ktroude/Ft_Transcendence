@@ -29,25 +29,13 @@ export class FriendController {
     @Get('existingFriendship') // Check if two users are friends or not
     async existingFriendship(@Query('id1') id1: number, @Query('id2') id2: number): Promise<Boolean>
     {
-		// console.log("Are id1 and id2 friends ? ", id1, " & ", id2);
-		// const user1 = await this.prisma.user.findUnique({
-        //     where: {
-        //         id: id1,
-        //     }
-        // });        
-		// const user2 = await this.prisma.user.findUnique({
-        //     where: {
-        //         id: id2,
-        //     }
-        // });
-		return this.friendService.existingFriendship(1, 2);
+		return this.friendService.existingFriendship(Number(id1), Number(id2));
     }
 
     @UseGuards(JwtGuard)
     @Put(':pseudo/deletefriend') // Delete a friend
     async deleteFriend(@Param('pseudo') pseudo: string, @Body() body:{friend: string}): Promise<User>
     {
-		
         return this.friendService.deleteFriend(pseudo, body.friend);
     }
 }

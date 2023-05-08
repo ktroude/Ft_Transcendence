@@ -141,14 +141,14 @@ export class FriendService{
             where: {
                 pseudo: pseudo
             }
-          });
+        });
         if (!user)
             return null;
         const friend = await this.prisma.user.findUnique({
             where: {
                 username: usernameFriend
             }
-          });
+        });
         if (!friend)
             return null;
         await this.deleteFriendShip(user.id, friend.id);

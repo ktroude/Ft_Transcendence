@@ -79,15 +79,15 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					</h1>
 					{#if user?.username != currentUser && is_blocked === false}
 					<span class="buttons_other_user">
-						<button class="block_user_button" on:click={() => block(realUser, user.pseudo)}>
+						<button class="block_user_button" on:click={() => block(realUserPseudo, user.pseudo)}>
 							<span class="tooltiptext">Block</span>
 						</button>
 						{#if isFriend == false}
-							<button class="add_friend_button" on:click={() => AddFriendButton(realUser, user.pseudo)}>
+							<button class="add_friend_button" on:click={() => AddFriendButton(realUserPseudo, user.username)}>
 								<span class="tooltiptext">Add to friends</span>
 							</button>
 						{:else}
-							<button class="remove_friend_button" on:click={() => DeleteFriendButton(realUser, user.pseudo)}>
+							<button class="remove_friend_button" on:click={() => DeleteFriendButton(realUserPseudo, user.username)}>
 								<span class="tooltiptext">Remove from friends</span>
 							</button>
 						{/if}
@@ -95,7 +95,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					{/if}
 					{#if user?.username != currentUser && is_blocked === true}
 					<span>
-						<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>
+						<button class="unblock_button" on:click={() => unblock(realUserPseudo, user.pseudo)}>
 							<span class="tooltiptext">Unblock</span>
 						</button>
 					</span>
@@ -114,10 +114,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				</button>
 			{/if}
 		</div>
-
-
-
-
 
 		<div class="achievements_bloc">
 			<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png"></span>Achievements</h1>
@@ -181,43 +177,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 			{/each}
 		</div>
-
-				<!-- </div>
-				<div class="achievement_div">
-					<div class="achievement">
-					</div>
-					<div class="achievement_title_text_box">
-						<h4 class="achievement_title">Win streak</h4>
-						<h5 class="achievement_text">Win 3 games in a row.</h5>
-					</div>
-				</div>
-				<div class="achievement_div">
-					<div class="achievement">
-					</div>
-					<div class="achievement_title_text_box">
-						<h4 class="achievement_title">I'm Curious</h4>
-						<h5 class="achievement_text">Check one of the creator's GitHub.</h5>
-					</div>
-				</div>
-				<div class="achievement_div">
-					<div class="achievement">
-					</div>
-					<div class="achievement_title_text_box">
-						<h4 class="achievement_title">I'm the Boss</h4>
-						<h5 class="achievement_text">Win against a creator.</h5>
-					</div>
-				</div>
-				<div class="achievement_div">
-					<div class="achievement">
-					</div>
-					<div class="achievement_title_text_box">
-						<h4 class="achievement_title">The Darkside</h4>
-						<h5 class="achievement_text">Log in as a bocal member.</h5>
-					</div> -->
 				</div> 
-
-
-
 	{/if}
 </body>
 
@@ -328,7 +288,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			connectedUsers =  await response.json();
 		}
 		else{
-			console.log("FRONT NOT WORKIGN HOHO")
+			console.log("Error: Could not get users")
 		}
 	} else {
 		console.log('Error: Could not get users');
@@ -443,7 +403,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         } 
 		else
             console.log('Error: Could not delete friend');
-		isFriend = checkFrienship(user.id, realUserId);
     }
 
     function handleInviteFriend(friendName) {
@@ -546,9 +505,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             });
 			if (response.ok)
 				is_blocked = true;
+
         } else
 			console.log('Error: Could not block user');
-		isFriend = checkFrienship(user.id, realUserId);
     }
 	
 	async function checkBlocked(realUser, blockerUser) { // check if user is blocked
@@ -571,14 +530,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
 	else
 		console.log('Error: Could not check if user is blocked');
-	isFriend = checkFrienship(user.id, realUserId);
 }
 
 	async function checkFrienship(id1, id2) { // check if the two users are friends
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
-			const url = `http://localhost:3000/users/existingFriendship?id1=${id1}id2=${id2}`;
+			const url = `http://localhost:3000/users/existingFriendship?id1=${id1}&id2=${id2}`;
 			const response = await fetch(url, {
 				method: 'GET',
 				headers: {
@@ -607,32 +565,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			},
 			});
 			const data = await response.json();
-
 			if (data)
 				all_achievements = new Map(data);
-			console.log("LETWGOOOOOOOOO");
-			console.table(all_achievements);
-		} else {
+			}
+		else 
 			console.log('Error: Could not get achievements');
-		}
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	async function unblock(realUser, blockerUser) { // unblock user
 		const accessToken = await fetchAccessToken();
@@ -654,7 +592,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let currentUser = ''; 
 	let is_blocked: any;
 	let realUserId: any;
-
+	let realUserPseudo: any;
+	
 	async function loadpage() {
 		if (!user)
 			goto('/');
@@ -670,6 +609,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		{
 			realUserId = user.id;
 			realUser = user.username;
+			realUserPseudo = user.pseudo;
 			user = await fetchDataOfUser($page.params.user);
 			if (!user)
 			{
@@ -677,15 +617,15 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				return await goto(`/homepage`);
 			}
 			is_blocked = await checkBlocked(realUser, user.username);
-			await getImageURL();
 			isFriend = await checkFrienship(user.id, realUserId);
+			await getImageURL();
 			await getAllAchievements();
 		}
 	}
 	onMount(async function() {
 		user = await fetchData(); // Catch the user
 		if (!user)
-		await goto('/'); // If no user redirect
+			await goto('/'); // If no user redirect
 		else
 		{
 			await loadpage();
@@ -696,7 +636,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		friends = await fetchFriend(user.pseudo);
 		await getConnectedUsers();
-		isFriend = await checkFrienship(user.id, realUserId);
 		loading = true;
 	});
 
