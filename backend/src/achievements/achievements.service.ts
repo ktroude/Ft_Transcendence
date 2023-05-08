@@ -31,12 +31,12 @@ export class AchievementsService{
           throw new Error('Invalid achievement');
         }
         console.log(this.getAchievements(id))
-        if (user[field])
+        if (user[field] === true)
           return; // If the field is already true, we return
         const data: Record<string, boolean> = {}; // We create a new object with the field name as key
         data[field] = true; // We set the field to true
         console.log(`The user ${user.username} has unlocked the achievement ${achievement}`)
-        console.log(this.getAchievements(id))
+        // console.log(this.getAchievements(id))
         return await this.prisma.user.update({
           where: {
             id: id,
@@ -57,7 +57,9 @@ export class AchievementsService{
             for (const [key, value] of Object.entries(user)) // We iterate over the user object
                 if (typeof value === 'boolean') // If the value is a boolean
                     listAchievements.set(key, value); // We add it to the map
+			console.log("=================");
             console.log(listAchievements);
+			console.log("=================");
             return listAchievements;
             }
     }

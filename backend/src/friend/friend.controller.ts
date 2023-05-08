@@ -40,8 +40,6 @@ export class FriendController {
         //         id: id2,
         //     }
         // });
-		console.log("Are they friends? ->");
-		console.log(this.friendService.existingFriendship(1,2));
 		return this.friendService.existingFriendship(1, 2);
     }
 

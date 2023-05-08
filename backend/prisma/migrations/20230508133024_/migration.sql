@@ -12,6 +12,14 @@ CREATE TABLE "user" (
     "losses" INTEGER NOT NULL DEFAULT 0,
     "rank" INTEGER NOT NULL DEFAULT 0,
     "level" INTEGER NOT NULL DEFAULT 0,
+    "FirstWin" BOOLEAN NOT NULL DEFAULT false,
+    "FirstLoss" BOOLEAN NOT NULL DEFAULT false,
+    "WinStreak" BOOLEAN NOT NULL DEFAULT false,
+    "ImBad" BOOLEAN NOT NULL DEFAULT false,
+    "ImTheBoss" BOOLEAN NOT NULL DEFAULT false,
+    "TheDarkSide" BOOLEAN NOT NULL DEFAULT false,
+    "ImCurious" BOOLEAN NOT NULL DEFAULT false,
+    "SecretBoolean" BOOLEAN NOT NULL DEFAULT false,
     "connected" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
@@ -53,6 +61,17 @@ CREATE TABLE "chat_room" (
 );
 
 -- CreateTable
+CREATE TABLE "direct_message" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "ownerOneId" INTEGER NOT NULL,
+    "ownerTwoId" INTEGER NOT NULL,
+
+    CONSTRAINT "direct_message_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "chat_room_members" (
     "chatRoomId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
@@ -71,6 +90,18 @@ CREATE TABLE "message" (
     "chatRoomId" INTEGER NOT NULL,
 
     CONSTRAINT "message_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "DirectMessage" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "content" TEXT NOT NULL,
+    "senderId" INTEGER NOT NULL,
+    "senderPseudo" TEXT NOT NULL,
+    "directMessageRoomId" INTEGER NOT NULL,
+
+    CONSTRAINT "DirectMessage_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -149,7 +180,16 @@ ALTER TABLE "friend" ADD CONSTRAINT "friend_friend_id_fkey" FOREIGN KEY ("friend
 ALTER TABLE "chat_room" ADD CONSTRAINT "chat_room_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "direct_message" ADD CONSTRAINT "direct_message_ownerOneId_fkey" FOREIGN KEY ("ownerOneId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "direct_message" ADD CONSTRAINT "direct_message_ownerTwoId_fkey" FOREIGN KEY ("ownerTwoId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "message" ADD CONSTRAINT "message_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "chat_room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DirectMessage" ADD CONSTRAINT "DirectMessage_directMessageRoomId_fkey" FOREIGN KEY ("directMessageRoomId") REFERENCES "direct_message"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ChatRoomMembers" ADD CONSTRAINT "_ChatRoomMembers_A_fkey" FOREIGN KEY ("A") REFERENCES "chat_room"("id") ON DELETE CASCADE ON UPDATE CASCADE;

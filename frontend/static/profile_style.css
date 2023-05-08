@@ -374,3 +374,42 @@ img {
 	display:block;
 	float:right
 }
+
+
+.achievement_div{
+	display: flex;
+	flex-direction: row;
+	margin: 5px;
+	padding: 5px;
+	background: rgba(0, 0, 0, 0.305);
+	border-radius: 5px;
+	width: 200px;
+}
+
+.achievement{
+	border-radius: 5px;
+	padding-top: 3px;
+	margin: 3px;
+	background-color: transparent;
+	width: 50px;
+	height: 50px;
+	background: url("img/firstwin_icone.png") no-repeat center;
+	background-size: contain;
+	filter: grayscale(1);
+	align-items: flex-start;
+
+}
+
+.achievement_title_text_box{
+	display: flex;
+	flex-direction: column;
+}
+.achievement_title{
+	margin-top: 3px;
+	text-align: left;
+}
+.achievement_text{
+	width: 120px;
+	color: white;
+	text-align: left;
+}

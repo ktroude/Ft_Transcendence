@@ -116,6 +116,46 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		</div>
 			<div class="achievements_bloc">
 				<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png"></span>Achievements</h1>
+				<div class="achievement_div">
+					<div class="achievement">
+					</div>
+					<div class="achievement_title_text_box">
+						<h4 class="achievement_title">First win</h4>
+						<h5 class="achievement_text">Win a game.</h5>
+					</div>
+				</div>
+				<div class="achievement_div">
+					<div class="achievement">
+					</div>
+					<div class="achievement_title_text_box">
+						<h4 class="achievement_title">Win streak</h4>
+						<h5 class="achievement_text">Win 3 games in a row.</h5>
+					</div>
+				</div>
+				<div class="achievement_div">
+					<div class="achievement">
+					</div>
+					<div class="achievement_title_text_box">
+						<h4 class="achievement_title">I'm Curious</h4>
+						<h5 class="achievement_text">Check one of the creator's GitHub.</h5>
+					</div>
+				</div>
+				<div class="achievement_div">
+					<div class="achievement">
+					</div>
+					<div class="achievement_title_text_box">
+						<h4 class="achievement_title">I'm the Boss</h4>
+						<h5 class="achievement_text">Win against a creator.</h5>
+					</div>
+				</div>
+				<div class="achievement_div">
+					<div class="achievement">
+					</div>
+					<div class="achievement_title_text_box">
+						<h4 class="achievement_title">The Darkside</h4>
+						<h5 class="achievement_text">Log in as a bocal member.</h5>
+					</div>
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -147,6 +187,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     let connectedUsers = [];
 	let loading = false;
 	let isFriend = undefined;
+
+	let all_achievements = new Map<string, Boolean>();
+
 
 	let friendUser: User;
     let user: User;
@@ -493,6 +536,41 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
 
 
+	async function getAllAchievements() { // check if the two users are friends
+		const accessToken = await fetchAccessToken();
+		if (accessToken)
+		{
+			const url = `http://localhost:3000/users/achievements/${user.id}/getAchievements`;
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${accessToken}`,
+				},
+			});
+			const data = await response.json();
+			if (data)
+				all_achievements = data;
+			console.log("LETWGOOOOOOOOO");
+			console.log(all_achievements);
+			// console.log("Fetching achievements....");
+			// console.table(data);
+			// console.log("SIUUUUUU");
+			// console.log(all_achievements);
+
+		}
+		else
+			console.log('Error: Could not get achievements');
+	}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -516,19 +594,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			console.log('Error: Could not unblock user');
     }
 
-
-
-
-
-	
-
-
-
-
-
-
-
-
 	let realUser: string; 
 	let currentUser = ''; 
 	let is_blocked: any;
@@ -543,6 +608,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			await getImageURL();
 			currentUser = user.username;
 			friends = await fetchFriend(user.pseudo);
+			await getAllAchievements();
+			console.table(all_achievements);
 		}
 		else // If the user is on another profile
 		{
@@ -555,13 +622,16 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				return await goto(`/homepage`);
 			}
 			is_blocked = await checkBlocked(realUser, user.username);
-			getImageURL();
+			await getImageURL();
+			isFriend = await checkFrienship(user.id, realUserId);
+			await getAllAchievements();
+			console.table(all_achievements);
 		}
 	}
 	onMount(async function() {
 		user = await fetchData(); // Catch the user
 		if (!user)
-			await goto('/'); // If no user redirect
+		await goto('/'); // If no user redirect
 		else
 		{
 			await loadpage();
@@ -572,7 +642,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		friends = await fetchFriend(user.pseudo);
 		await getConnectedUsers();
-		await checkFrienship(user.id, realUserId);
+		isFriend = await checkFrienship(user.id, realUserId);
 		loading = true;
 	});
 
