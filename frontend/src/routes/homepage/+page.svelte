@@ -111,6 +111,7 @@ let loading = false;
       socket.on('connect', async function() {			
         socket.emit('userConnected', { pseudo: user.pseudo });
       });
+    
       if (user.pseudo === 'yoshi' || user.pseudo === 'tac' || user.pseudo === 'mboy' || user.pseudo === 'palmi')
       {
         const accessToken = await fetchAccessToken();
