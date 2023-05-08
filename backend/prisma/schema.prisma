@@ -28,13 +28,10 @@ model User {
 
   // Achievements
   FirstWin Boolean @default(false) // 1er win
-  FirstLoss Boolean @default(false) // 1er loss
   WinStreak Boolean @default(false) // 3 wins d'affilé
-  ImBad Boolean @default(false) // 3 losses d'affilé
   ImTheBoss Boolean @default(false) // Win vs un des 5 createurs
   TheDarkSide Boolean @default(false) // Se log en tant que membre du bocal
   ImCurious Boolean @default(false) // Aller voir le github d'un des createurs
-  SecretBoolean Boolean @default(false) // Mettre un secret ?
 
   // pitié monsieur donne un autre nom a cette variable, je m'en sers deja dans le front du chat et je fais des gros user =  donc ca va ecraser mon status du front
   // onLine c'est bien non?

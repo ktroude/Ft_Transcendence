@@ -6,13 +6,10 @@ import { User } from "@prisma/client";
 export class AchievementsService{
     private readonly achievementsList = {
         FirstWin: 'FirstWin',
-        FirstLoss: 'FirstLoss',
         WinStreak: 'WinStreak',
-        ImBad: 'ImBad',
         ImTheBoss: 'ImTheBoss',
         TheDarkSide: 'TheDarkSide',
         ImCurious: 'ImCurious',      
-        SecretAchievement: 'SecretAchievement',
       };
     constructor(private prisma: PrismaService) {}
 
