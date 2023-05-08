@@ -120,6 +120,8 @@ export class FriendService{
     // Deleting friendship
     async deleteFriendShip(userId: number, friendId: number)
     {
+		if (await this.existingFriendship(userId, friendId) == false)
+			return;
         const deleteFriend = await this.prisma.friend.delete({
             where: {
                 user_id_friend_id: {

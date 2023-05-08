@@ -33,6 +33,7 @@
 .username_bloc {
 	align-items: center;
 	display: flex;
+	text-align: center;
 	flex-direction: column;
 	justify-content: center;
 }
@@ -209,7 +210,7 @@ img {
 	flex-direction: row;
 }
 .username{
-	margin-bottom: 20px;
+	margin-bottom: 0px;
 	font-size: 40px;
 	display: flex;
 	flex-direction: row;
@@ -256,4 +257,120 @@ img {
 	width: 60px;
 	height: 40px;
 	font-size: 20px;
+}
+
+.other_user_button{
+	border: none;
+
+}
+
+.add_friend_button{
+	background: url("img/online_icone.png") no-repeat center;
+	background-size: contain;
+	width: 40px;
+	border: none;
+	cursor: pointer;
+	height: 40px;
+}
+
+.add_friend_button .tooltiptext {
+	visibility: hidden;
+	width: 60px;
+	background-color: rgba(0, 0, 0, 0.519);
+	color: #fff;
+	text-align: center;
+	padding: 5px 0;
+	border-radius: 6px;
+	position: absolute;
+	z-index: 1;
+  }
+
+  .add_friend_button:hover .tooltiptext {
+	visibility: visible;
+  }
+
+.remove_friend_button{
+	background: url("img/offline_icone.png") no-repeat center;
+	background-size: contain;
+	width: 40px;
+	border: none;
+	cursor: pointer;
+	height: 40px;
+}
+
+.remove_friend_button .tooltiptext {
+	visibility: hidden;
+	width: 70px;
+	background-color: rgba(0, 0, 0, 0.519);
+	color: #fff;
+	text-align: center;
+	padding: 5px 0;
+	border-radius: 6px;
+	position: absolute;
+	z-index: 1;
+  }
+
+  .remove_friend_button:hover .tooltiptext {
+	visibility: visible;
+  }
+
+.block_user_button{
+	background: url("img/chafer_icone.png") no-repeat center;
+	background-size: contain;
+	width: 40px;
+	border: none;
+	cursor: pointer;
+	height: 40px;
+}
+
+.block_user_button .tooltiptext {
+	visibility: hidden;
+	width: 60px;
+	background-color: rgba(0, 0, 0, 0.519);
+	color: #fff;
+	text-align: center;
+	padding: 2px 0;
+	border-radius: 6px;
+	position: absolute;
+	z-index: 1;
+  }
+
+  .block_user_button:hover .tooltiptext {
+	visibility: visible;
+  }
+
+  .buttons_other_user{
+	display:block;
+	float:right
+}
+
+.unblock_button{
+	background: url("img/lapino_icone.png") no-repeat center;
+	background-size: contain;
+	width: 40px;
+	border: none;
+	cursor: pointer;
+	height: 40px;
+	font-size: 12px;
+}
+
+.unblock_button .tooltiptext {
+	visibility: hidden;
+	width: 60px;
+	background-color: rgba(0, 0, 0, 0.519);
+	color: #fff;
+	text-align: center;
+	padding: 2px 0;
+	border-radius: 6px;
+	position: absolute;
+	z-index: 1;
+  }
+
+  .unblock_button:hover .tooltiptext {
+	visibility: visible;
+  }
+
+  .buttons_other_user{
+	display:block;
+	float:right
 }

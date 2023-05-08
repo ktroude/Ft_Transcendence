@@ -76,19 +76,30 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			<div class="main_box">
 				<div class="username_bloc">
 					<h1 class="username">{user?.username}
-						{#if user?.username != currentUser && is_blocked === false}
-						<span>
-							<button class="block_button" on:click={() => block(realUser, user.pseudo)}>Block</button>
-							<button class="block_button" on:click={() => AddFriendButton(realUser, user.pseudo)}>Add Friend</button> <!--  Add friend MODIFY THE BUTTON -->
-							<button class="block_button" on:click={() => DeleteFriendButton(realUser, user.pseudo)}>Delete friend</button> <!--  DELETE friend MODIFY THE BUTTON -->
-						</span>
-						{/if}
-						{#if user?.username != currentUser && is_blocked === true}
-						<span>
-							<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>Unblock</button>
-						</span>
-						{/if}
 					</h1>
+					{#if user?.username != currentUser && is_blocked === false}
+					<span class="buttons_other_user">
+						<button class="block_user_button" on:click={() => block(realUser, user.pseudo)}>
+							<span class="tooltiptext">Block</span>
+						</button>
+						{#if isFriend == false}
+							<button class="add_friend_button" on:click={() => AddFriendButton(realUser, user.pseudo)}>
+								<span class="tooltiptext">Add to friends</span>
+							</button>
+						{:else}
+							<button class="remove_friend_button" on:click={() => DeleteFriendButton(realUser, user.pseudo)}>
+								<span class="tooltiptext">Remove from friends</span>
+							</button>
+						{/if}
+					</span>
+					{/if}
+					{#if user?.username != currentUser && is_blocked === true}
+					<span>
+						<button class="unblock_button" on:click={() => unblock(realUser, user.pseudo)}>
+							<span class="tooltiptext">Unblock</span>
+						</button>
+					</span>
+					{/if}
 				</div>
 				<h3>{user?.firstname} {user?.lastname}</h3>
 				<h3>Level: {user?.level}</h3>
@@ -135,6 +146,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     let searchProfile: string = '';
     let connectedUsers = [];
 	let loading = false;
+	let isFriend = undefined;
 
 	let friendUser: User;
     let user: User;
@@ -174,7 +186,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         } 
 		else
             console.log('Error: Could not delete friend');
-    }
+		isFriend = checkFrienship(user.id, realUserId)
+	}
 
 	async function AddFriendButton(realUser, friendUser)
 	{
@@ -193,7 +206,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 friendNameAdd = '';
             } else
                 console.log('Error: Could not add friend');
-        }
+        
+		}
+		isFriend = checkFrienship(user.id, realUserId);
     }
 
 	async function getConnectedUsers() {
@@ -325,6 +340,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         } 
 		else
             console.log('Error: Could not delete friend');
+		isFriend = checkFrienship(user.id, realUserId);
     }
 
     function handleInviteFriend(friendName) {
@@ -429,6 +445,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				is_blocked = true;
         } else
 			console.log('Error: Could not block user');
+		isFriend = checkFrienship(user.id, realUserId);
     }
 	
 	async function checkBlocked(realUser, blockerUser) { // check if user is blocked
@@ -451,7 +468,37 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
 	else
 		console.log('Error: Could not check if user is blocked');
+	isFriend = checkFrienship(user.id, realUserId);
 }
+
+	async function checkFrienship(id1, id2) { // check if the two users are friends
+		const accessToken = await fetchAccessToken();
+		if (accessToken)
+		{
+			const url = `http://localhost:3000/users/existingFriendship?id1=${id1}id2=${id2}`;
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${accessToken}`,
+				},
+			});
+			const data = await response.json();
+			if (data === true)
+				isFriend =  true;
+			else
+				isFriend =  false;
+		}
+		else
+			console.log('Error: Could not check if user is friend');
+	}
+
+
+
+
+
+
+
+
 
 	async function unblock(realUser, blockerUser) { // unblock user
 		const accessToken = await fetchAccessToken();
@@ -468,6 +515,19 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         } else
 			console.log('Error: Could not unblock user');
     }
+
+
+
+
+
+	
+
+
+
+
+
+
+
 
 	let realUser: string; 
 	let currentUser = ''; 
@@ -512,6 +572,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		friends = await fetchFriend(user.pseudo);
 		await getConnectedUsers();
+		await checkFrienship(user.id, realUserId);
 		loading = true;
 	});
 

@@ -1,14 +1,15 @@
-import { Controller, Get, UseGuards, Request, Put, Param, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Put, Param, Body, Query } from '@nestjs/common';
 import { FriendService } from 'src/friend/friend.service';
 import { JwtGuard } from 'src/auth/guard';
 import { User } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 // Controller for the friend system
 
 @UseGuards(JwtGuard)
 @Controller('users')
 export class FriendController {
-    constructor(private friendService: FriendService) {}
+    constructor(private friendService: FriendService, private prisma: PrismaService) {}
 
     @UseGuards(JwtGuard)
     @Put(':pseudo/friend') // Add a friend
@@ -25,9 +26,30 @@ export class FriendController {
     }
 
     @UseGuards(JwtGuard)
+    @Get('existingFriendship') // Check if two users are friends or not
+    async existingFriendship(@Query('id1') id1: number, @Query('id2') id2: number): Promise<Boolean>
+    {
+		// console.log("Are id1 and id2 friends ? ", id1, " & ", id2);
+		// const user1 = await this.prisma.user.findUnique({
+        //     where: {
+        //         id: id1,
+        //     }
+        // });        
+		// const user2 = await this.prisma.user.findUnique({
+        //     where: {
+        //         id: id2,
+        //     }
+        // });
+		console.log("Are they friends? ->");
+		console.log(this.friendService.existingFriendship(1,2));
+		return this.friendService.existingFriendship(1, 2);
+    }
+
+    @UseGuards(JwtGuard)
     @Put(':pseudo/deletefriend') // Delete a friend
     async deleteFriend(@Param('pseudo') pseudo: string, @Body() body:{friend: string}): Promise<User>
     {
+		
         return this.friendService.deleteFriend(pseudo, body.friend);
     }
 }
