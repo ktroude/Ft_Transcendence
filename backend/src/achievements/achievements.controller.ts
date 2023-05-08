@@ -8,13 +8,8 @@ export class AchievementsController {
 
     @UseGuards(JwtGuard)
     @Get(':id/getAchievements')
-    async getAchievements(@Param('id') id: number) : Promise<Map<String, Boolean>>{
-		let all_achievements = new Map<string, Boolean>();
-		all_achievements = await this.achievementsService.getAchievements(Number(id));
-		console.log("*****************************************");
-		console.log(all_achievements);
-		console.log("*****************************************");
-        return  all_achievements;
+    async getAchievements(@Param('id') id: number): Promise<[string, boolean][]>{
+        return await this.achievementsService.getAchievements(Number(id));
     }
 
     @UseGuards(JwtGuard)

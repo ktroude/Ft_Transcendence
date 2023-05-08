@@ -188,7 +188,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let loading = false;
 	let isFriend = undefined;
 
-	let all_achievements = new Map<string, Boolean>();
+	let all_achievements = {};
 
 
 	let friendUser: User;
@@ -536,31 +536,27 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
 
 
-	async function getAllAchievements() { // check if the two users are friends
+	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
-		if (accessToken)
-		{
+		if (accessToken) {
 			const url = `http://localhost:3000/users/achievements/${user.id}/getAchievements`;
 			const response = await fetch(url, {
-				method: 'GET',
-				headers: {
-					'Authorization': `Bearer ${accessToken}`,
-				},
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			},
 			});
 			const data = await response.json();
+
 			if (data)
-				all_achievements = data;
+				all_achievements = new Map(data);
 			console.log("LETWGOOOOOOOOO");
 			console.log(all_achievements);
-			// console.log("Fetching achievements....");
-			// console.table(data);
-			// console.log("SIUUUUUU");
-			// console.log(all_achievements);
-
-		}
-		else
+		} else {
 			console.log('Error: Could not get achievements');
+		}
 	}
+
 
 
 
@@ -609,7 +605,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			currentUser = user.username;
 			friends = await fetchFriend(user.pseudo);
 			await getAllAchievements();
-			console.table(all_achievements);
 		}
 		else // If the user is on another profile
 		{
@@ -625,7 +620,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			await getImageURL();
 			isFriend = await checkFrienship(user.id, realUserId);
 			await getAllAchievements();
-			console.table(all_achievements);
 		}
 	}
 	onMount(async function() {

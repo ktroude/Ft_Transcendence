@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateResult } from "typeorm";
-
+import { User } from "@prisma/client";
 @Injectable()
 export class AchievementsService{
     private readonly achievementsList = {
@@ -16,7 +16,7 @@ export class AchievementsService{
       };
     constructor(private prisma: PrismaService) {}
 
-    async updateAchievements(id: number, achievement: string) {
+    async updateAchievements(id: number, achievement: string): Promise<User>{
         const user = await this.prisma.user.findUnique({
           where: {
             id: id,
@@ -30,13 +30,11 @@ export class AchievementsService{
         if (!field) {
           throw new Error('Invalid achievement');
         }
-        console.log(this.getAchievements(id))
         if (user[field] === true)
           return; // If the field is already true, we return
         const data: Record<string, boolean> = {}; // We create a new object with the field name as key
         data[field] = true; // We set the field to true
         console.log(`The user ${user.username} has unlocked the achievement ${achievement}`)
-        // console.log(this.getAchievements(id))
         return await this.prisma.user.update({
           where: {
             id: id,
@@ -45,21 +43,23 @@ export class AchievementsService{
         });
       }
 
-        async getAchievements(id: number) {
+          async getAchievements(id: number): Promise<[string, boolean][]>{ // We return an array of [string, boolean] (achievement name, achievement value)
             const user = await this.prisma.user.findUnique({
-                where: {
-                    id: id,
-                },
+              where: {
+                id: id,
+              },
             });
-            if (!user)
-                throw new Error('User not found');
-            const listAchievements = new Map<string, boolean>();
-            for (const [key, value] of Object.entries(user)) // We iterate over the user object
-                if (typeof value === 'boolean') // If the value is a boolean
-                    listAchievements.set(key, value); // We add it to the map
-			console.log("=================");
-            console.log(listAchievements);
-			console.log("=================");
-            return listAchievements;
+          
+            if (!user) {
+              throw new Error('User not found');
             }
+          
+            const achievements = [];
+            for (const [key, value] of Object.entries(user)) {
+              if (typeof value === 'boolean') {
+                achievements.push([key, value]);
+              }
+            }
+            return achievements;
+        }
     }
