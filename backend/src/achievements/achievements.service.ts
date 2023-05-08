@@ -30,12 +30,13 @@ export class AchievementsService{
         if (!field) {
           throw new Error('Invalid achievement');
         }
-        this.getAchievements(id);
+        console.log(this.getAchievements(id))
         if (user[field])
           return; // If the field is already true, we return
         const data: Record<string, boolean> = {}; // We create a new object with the field name as key
         data[field] = true; // We set the field to true
         console.log(`The user ${user.username} has unlocked the achievement ${achievement}`)
+        console.log(this.getAchievements(id))
         return await this.prisma.user.update({
           where: {
             id: id,
