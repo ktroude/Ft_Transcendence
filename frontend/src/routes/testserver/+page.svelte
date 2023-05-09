@@ -16,18 +16,25 @@
     async function connect() {
         Colyseus = await import("colyseus.js");
         client = new Colyseus.Client('ws://localhost:3001'); // or whereever your colyseus server instance is
-        room = await client.joinOrCreate("my_room", {
+        room = await client.joinOrCreate('Private_Room', {
             MaxClient: 2,
             name: currentUser.username
         });
         console.log('Joined succefuly', room);
     }
-    function send(){
-    let message = {
-        user: currentUser,
-        
-    }
-      room?.send('connect', message);
+    function init_client(){
+      room = room;
+      room.onMessage("Player_init", (message) => {
+        player.username = message.player1_name;
+        player2.username = message.player2_name;
+        player.id = message.player1_id;
+        player2.id = message.player2_id;
+        player.score = message.player1_score;
+        player2.score = message.player2_score;
+      })
+      room?.send('player_name', {player_pseudo : currentUser.pseudo, Id : currentUser.id});
+      console.log(currentUser.pseudo);
+      console.log(currentUser.id);
     }
 
 const PLAYER_HEIGHT = 100;
@@ -226,7 +233,7 @@ li {
 <main role="main">
 <h1>
     <button on:click={connect}>connect</button>
-    <button on:click={send}>send</button>
+    <button on:click={init_client}>send</button>
 
 </h1>
 <p>
@@ -240,6 +247,6 @@ li {
     <button id="stop-game">Stop</button>
   </li>
 </ul>
-<h2>joined {room?.name}</h2>
+<h2>joined {room?.name} tu es {currentUser?.pseudo}</h2>
 <canvas id="canvas" width="640" height="480"></canvas>
 </main>
