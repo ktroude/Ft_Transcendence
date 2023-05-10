@@ -16,29 +16,34 @@
 
     async function connect() {
         Colyseus = await import("colyseus.js");
-        client = new Colyseus.Client('ws://localhost:3001'); // or whereever your colyseus server instance is
+        client = new Colyseus.Client('ws://localhost:3001');
         room = await client.joinOrCreate('Private_Room', {
             MaxClient: 2,
             name: currentUser.username
         });
+
         console.log('Joined succefuly', room);
     }
     function init_client(){
       room = room;
-      room.onMessage("Player_init", (message) => {
-        player.username = message.player1_name;
-        player2.username = message.player2_name;
+      room.onMessage('Player_init', (message) => {
+        player.pseudo = message.player1_pseudo;
+        player2.pseudo = message.player2_pseudo;
         player.id = message.player1_id;
         player2.id = message.player2_id;
         player.score = message.player1_score;
         player2.score = message.player2_score;
+        console.log('1', player.pseudo);
+        console.log('2', player2.pseudo);
+        console.log('3', player.id);
+        console.log('4', player2.id);
+        console.log('5', player.score);
+        console.log('6', player2.score);
       })
       room.onMessage('role', async (message) => {
         clientId = message.client;
-        console.log('client id ===', clientID);
       })
-      room?.send('player_name', {player_pseudo : currentUser.pseudo, Id : currentUser.id});
-      console.log(currentUser.id);
+      room?.send('player_name', {player_pseudo : currentUser.pseudo});
     }
 
 const PLAYER_HEIGHT = 100;

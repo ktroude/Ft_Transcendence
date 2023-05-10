@@ -29,10 +29,24 @@ export class gameRoom extends Room {
         this.p2_id = client.sessionId;
         client.send('role', { client: client.sessionId });
       }
-      console.log('Pseudo du player', this.player1.pseudo);
-      console.log('ID du joueur', this.p1_id);
-      console.log('Pseudo du player 2', this.player2.pseudo);
-      console.log('ID du joueur', this.p2_id);
+      if (this.player1.pseudo != 'null' && this.player2.pseudo != 'null') {
+        for (let i = 0; i < this.clients.length; i++) {
+          this.clients[i].send('Player_init', {
+            player1_pseudo: this.player1.pseudo,
+            player2_pseudo: this.player2.pseudo,
+            player1_score: this.p1_score,
+            player2_score: this.p2_score,
+            player1_id: this.p1_id,
+            player2_id: this.p2_id,
+          });
+          console.log('Pseudo du player', this.player1.pseudo);
+          console.log('Pseudo du player 2', this.player2.pseudo);
+        }
+      }
+      // console.log('Pseudo du player', this.player1.pseudo);
+      // console.log('ID du joueur', this.p1_id);
+      // console.log('Pseudo du player 2', this.player2.pseudo);
+      // console.log('ID du joueur', this.p2_id);
     });
   }
 }
