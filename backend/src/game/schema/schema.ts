@@ -17,15 +17,15 @@ export class players extends Schema {
   @type('number')
   id: number;
   @type('string')
-  username: string;
+  pseudo: string;
 
-  constructor(x = 0, y = 0, score = 0, id = 0, userName = '') {
+  constructor(x = 0, y = 0, score = 0, id = 0, Pseudo = '') {
     super();
     this.x = x;
     this.y = y;
     this.score = score;
     this.id = id;
-    this.username = userName;
+    this.pseudo = Pseudo;
   }
 }
 
