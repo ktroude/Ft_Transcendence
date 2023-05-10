@@ -18,7 +18,6 @@ export class ChatRoomController {
 
     @Get('getRoom')
     async getAllChatRoom(@Headers('Authorization') cookie: string) {
-        console.log("getAllChatRoom");
         const token = cookie.split(' ')[1];
         const user = await this.userService.decodeToken(token);
         let rooms: any = await this.chatRoomService.getAllChatRoom();
@@ -120,11 +119,9 @@ export class ChatRoomController {
             status: -3,
             room: 0
         };
-        console.log('pseudo ==', pseudo);
         const user = await this.prisma.user.findUnique({
             where: { id: parseInt(pseudo, 10)},
         });
-        console.log('user == ', user)
         const room = await this.prisma.chatRoom.findUnique({
             where: { id: parseInt(idRoom, 10) },
         });
@@ -168,9 +165,7 @@ export class ChatRoomController {
 
     @Get('getMembers')
     async handleGetMembers(@Headers('Authorization') cookie: string, @Query('code') id) {
-		console.log('QUOI')
         try {
-			console.log('COUBEH')
             const token = cookie.split(' ')[1];
             const user = await this.userService.decodeToken(token);
             let room = await this.prisma.chatRoom.findUnique({
@@ -196,9 +191,7 @@ export class ChatRoomController {
 				room.members[i].wins = 1;
 				else
 				room.members[i].wins = 0;
-					console.log('elem ===', room.members[i].wins);
 			}
-			console.log('hihihi',room.members[0].wins)
             return {
                 membres: room.members,
                 muted: room.muted,

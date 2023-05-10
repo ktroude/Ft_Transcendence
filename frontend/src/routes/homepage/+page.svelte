@@ -1,4 +1,5 @@
 <svelte:head>
+	<title>Homepage</title>
 	<link rel="preload" href="/img/bg1.jpg" as="image">
 	<link rel="preload" href="/homepage_style.css" as="style"/>
 	<link rel="stylesheet" href="/homepage_style.css" />
@@ -68,16 +69,20 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <!-- ****************************** -->
 
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { goto } from "$app/navigation";
-  import {fetchData, fetchAccessToken} from "../../API/api";
+	import { onMount } from 'svelte';
+	import { goto } from "$app/navigation";
+    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername} from '../../API/api';
 	import { redirect } from '@sveltejs/kit';
-  import {io, Socket} from 'socket.io-client';
+	import {io, Socket} from 'socket.io-client';
 
-  let socket: Socket;
+	let socket: Socket;
+	let anim = false;
 
-let loading = false;
-  let user: User;
+	let all_achievements = {};
+
+
+	let loading = false;
+	let user: User;
     interface User {
         id: number;
         pseudo: string;
@@ -87,19 +92,47 @@ let loading = false;
     }
 
     async function redirectToGithub(username) {
-      const accessToken = await fetchAccessToken();
-      const response = await fetch(`http://localhost:3000/users/achievements/${user.id}/updateAchievements`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-              },
-              body: JSON.stringify({achievement: 'ImCurious' })
+      	const accessToken = await fetchAccessToken();
+      	const response = await fetch(`http://localhost:3000/users/achievements/${user.id}/updateAchievements`, {
+			method: 'PUT',
+			headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`
+			},
+			body: JSON.stringify({achievement: 'ImCurious' })
             });
-          if (!response.ok)
+		if (!response.ok)
             console.log("Error update achievements <ImCurious>")
-    window.open(`https://github.com/${username}`, '_blank');
-    }
+		else if (anim == false){
+			for (const [key, value] of Array.from(all_achievements)) {
+				if (key == "ImCurious" && value == false)
+				{
+					anim = true;
+					const boxito = document.querySelector("body");
+					const toast = document.createElement("div");
+					toast.innerHTML = `<div class="popup">
+												<div class="popup_img">
+												</div>
+												<div class="popup_title_text_box">
+													<h4 class="popup_title">Curious</h4>
+													<h5 class="popup_text">Check one of our Githubs.</h5>
+												</div>
+										</div>`;
+					boxito.appendChild(toast);
+					setTimeout(() => removePopup(toast), 3000);
+				}
+			}
+		}
+		// window.open(`https://github.com/${username}`, '_blank');
+}
+
+
+	const removePopup = (toast) => {
+    if(toast.timeoutId) clearTimeout(toast.timeoutId); 
+    setTimeout(() => toast.remove(), 3000);
+	getAllAchievements();
+	anim = false;
+	}
 
     onMount(async function() {
 		user = await fetchData();
@@ -130,6 +163,7 @@ let loading = false;
         }
       }
     }
+	await getAllAchievements();
 	loading = true;
 	});
 
@@ -142,5 +176,28 @@ let loading = false;
 			document.body.classList.remove('fade-out');
 		}, 400);
 	}
+
+
+	async function getAllAchievements() {
+		const accessToken = await fetchAccessToken();
+		if (accessToken) {
+			const url = `http://localhost:3000/users/achievements/${user.id}/getAchievements`;
+			const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			},
+			});
+			const data = await response.json();
+			if (data)
+				all_achievements = new Map(data);
+			}
+		else 
+			console.log('Error: Could not get achievements');
+	}
+
+
+
+
 
 </script>

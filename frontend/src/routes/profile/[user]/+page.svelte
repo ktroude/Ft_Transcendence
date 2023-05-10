@@ -1,4 +1,5 @@
 <svelte:head>
+	<title>{user?.username}</title>
 	<link rel="preload" href="/img/bg1.jpg" as="image">
 	<link rel="preload" href="/homepage_style.css" as="style"/>
 	<link rel="stylesheet" href="/profile_style.css" />
