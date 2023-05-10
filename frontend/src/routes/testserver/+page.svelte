@@ -10,6 +10,7 @@
     let Colyseus;
     let client;
     let room;
+    let clientId;
     let player = Player;
     let player2 = Player;
 
@@ -32,13 +33,17 @@
         player.score = message.player1_score;
         player2.score = message.player2_score;
       })
+      room.onMessage('role', async (message) => {
+        clientId = message.client;
+        console.log('client id ===', clientID);
+      })
       room?.send('player_name', {player_pseudo : currentUser.pseudo, Id : currentUser.id});
-      console.log(currentUser.pseudo);
       console.log(currentUser.id);
     }
 
 const PLAYER_HEIGHT = 100;
 const PLAYER_WIDTH = 5;
+const MAX_SPEED = 8;
 
 let canvas;
 let anim;
