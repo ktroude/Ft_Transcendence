@@ -1,7 +1,7 @@
 <script>
 // @ts-nocheck
 
-    import { Client, Room, } from 'colyseus.js'
+    // import { Client, Room, } from 'colyseus.js'
     import { Ball } from './ball';
     import { Player } from './player';
 	  import { onMount } from 'svelte';
@@ -17,9 +17,7 @@
     async function connect() {
         Colyseus = await import("colyseus.js");
         client = new Colyseus.Client('ws://localhost:3001');
-        room = await client.joinOrCreate('Private_Room', {
-            MaxClient: 2,
-        });
+        room = await client.joinOrCreate('Private_Room');
 
         console.log('Joined succefuly', room);
     }
@@ -136,13 +134,13 @@ if (game.ball.y < player.y || game.ball.y > player.y + PLAYER_HEIGHT) {
     game.player2.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
     if (player == game.player){
       game.player2.score++;
-      room.send('score_uptdate', {player_score: player.score, player2_score: player2.score});
+      room.send('score_uptdate', {player_score: game.player.score, player2_score: game.player2.score});
       document.querySelector('#player2-score').textContent = game.player2.score;
       game.ball.speed.x = 2;
       game.ball.speed.y = 2;
     } else {
       game.player.score++;
-      room.send('score_uptdate', {player_score: player.score, player2_score: player2.score});
+      room.send('score_uptdate', {player_score: game.player.score, player2_score: game.player2.score});
       document.querySelector('#player-score').textContent = game.player.score;
       game.ball.speed.x = 2;
       game.ball.speed.y = 2;
@@ -171,6 +169,7 @@ if (game.ball.x > canvas.width - PLAYER_WIDTH) {
   collide(game.player);
 }
 game.ball.x += game.ball.speed.x;
+room.send('update_ball', {ball_x: game.ball.x})
 game.ball.y += game.ball.speed.y;
 }
 
@@ -205,7 +204,7 @@ function playerMove(event) {
         game.player.y = mouseLocation - PLAYER_HEIGHT / 2;
     }
     if (room){
-      room.send("player", {player_y: player.y});
+      room.send("player", {player_y: game.player.y});
     }
   }
   else if (clientId === player2?.id){
@@ -220,7 +219,7 @@ function playerMove(event) {
         game.player.y = mouseLocation - PLAYER_HEIGHT / 2;
     }
     if (room){
-      room.send("player2", {player2_y: player2.y});
+      room.send("player2", {player2_y: game.player2.y});
     }
   }
 // Obtenir l'emplacement de la souris dans le canevas

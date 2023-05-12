@@ -19,7 +19,7 @@ async function ServerGame() {
   // .filterBy(['maxClients'])
 
   gameServer.define('Private_Room', gameRoom)
-  .filterBy(['maxClients'])
+  // .filterBy(['maxClients'])
 
 }
 

@@ -35,16 +35,16 @@ export class gameRoom extends Room {
     //     }
     //   }
     // });
-    // this.onMessage('update_score', (client, message) => {
-    //   for (let i = 0; i < this.clients.length; i++) {
-    //     this.p1_score = message.player_score;
-    //     this.p2_score = message.player2_score;
-    //     this.clients[i].send('score_uptdate', {
-    //       player_score: message.player_score,
-    //       player2_score: message.player2_score,
-    //     });
-    //   }
-    // });
+    this.onMessage('update_score', (client, message) => {
+      for (let i = 0; i < this.clients.length; i++) {
+        this.p1_score = message.player_score;
+        this.p2_score = message.player2_score;
+        this.clients[i].send('score_uptdate', {
+          player_score: message.player_score,
+          player2_score: message.player2_score,
+        });
+      }
+    });
     this.onMessage('player_name', (client, message) => {
       if (this.player1.pseudo === 'null') {
         this.player1.pseudo = message.player_pseudo;
