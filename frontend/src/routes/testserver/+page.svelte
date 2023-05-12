@@ -11,15 +11,14 @@
     let client;
     let room;
     let clientId;
-    let player = Player;
-    let player2 = Player;
+    let player = new Player;
+    let player2 = new Player;
 
     async function connect() {
         Colyseus = await import("colyseus.js");
         client = new Colyseus.Client('ws://localhost:3001');
         room = await client.joinOrCreate('Private_Room', {
             MaxClient: 2,
-            name: currentUser.username
         });
 
         console.log('Joined succefuly', room);
@@ -27,18 +26,15 @@
     function init_client(){
       room = room;
       room.onMessage('Player_init', (message) => {
+        console.log(message);
         player.pseudo = message.player1_pseudo;
         player2.pseudo = message.player2_pseudo;
         player.id = message.player1_id;
         player2.id = message.player2_id;
         player.score = message.player1_score;
         player2.score = message.player2_score;
-        console.log('1', player.pseudo);
-        console.log('2', player2.pseudo);
-        console.log('3', player.id);
-        console.log('4', player2.id);
-        console.log('5', player.score);
-        console.log('6', player2.score);
+        player.color = message.player1_color;
+        player2.color = message.player2_color;
       })
       room.onMessage('role', async (message) => {
         clientId = message.client;
@@ -124,23 +120,11 @@ function play() {
     game.ball.x += game.ball.speed.x;
     game.ball.y += game.ball.speed.y;
     draw();
-    player2Move();
+    //player2Move();
     ballMove();
     anim = requestAnimationFrame(play);
 }
-function playerMove(event) {
-var canvasLocation = canvas.getBoundingClientRect();
-var mouseLocation = event.clientY - canvasLocation.y;
 
-if (mouseLocation < PLAYER_HEIGHT / 2){
-    game.player.y = 0;
-} else if (mouseLocation > canvas.height - PLAYER_HEIGHT / 2){
-    game.player.y = canvas.height - PLAYER_HEIGHT;
-} else {
-    game.player.y = mouseLocation - PLAYER_HEIGHT / 2;
-}
-// Obtenir l'emplacement de la souris dans le canevas
-}
 
 function collide(player) {
 // Le joueur ne touche pas la balle
@@ -152,11 +136,13 @@ if (game.ball.y < player.y || game.ball.y > player.y + PLAYER_HEIGHT) {
     game.player2.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
     if (player == game.player){
       game.player2.score++;
+      room.send('score_uptdate', {player_score: player.score, player2_score: player2.score});
       document.querySelector('#player2-score').textContent = game.player2.score;
       game.ball.speed.x = 2;
       game.ball.speed.y = 2;
     } else {
       game.player.score++;
+      room.send('score_uptdate', {player_score: player.score, player2_score: player2.score});
       document.querySelector('#player-score').textContent = game.player.score;
       game.ball.speed.x = 2;
       game.ball.speed.y = 2;
@@ -206,8 +192,38 @@ document.querySelector('#player-score').textContent = game.player.score;
 draw();
 }
 
-function player2Move() {
-game.player2.y += game.ball.speed.y * 1.85;
+function playerMove(event) {
+  if ((player?.id) && clientId === player?.id){
+      var canvasLocation = canvas.getBoundingClientRect();
+      var mouseLocation = event.clientY - canvasLocation.y;
+    
+    if (mouseLocation < PLAYER_HEIGHT / 2){
+        game.player.y = 0;
+    } else if (mouseLocation > canvas.height - PLAYER_HEIGHT / 2){
+        game.player.y = canvas.height - PLAYER_HEIGHT;
+    } else {
+        game.player.y = mouseLocation - PLAYER_HEIGHT / 2;
+    }
+    if (room){
+      room.send("player", {player_y: player.y});
+    }
+  }
+  else if (clientId === player2?.id){
+      var canvasLocation = canvas.getBoundingClientRect();
+      var mouseLocation = event.clientY - canvasLocation.y;
+    
+    if (mouseLocation < PLAYER_HEIGHT / 2){
+        game.player.y = 0;
+    } else if (mouseLocation > canvas.height - PLAYER_HEIGHT / 2){
+        game.player.y = canvas.height - PLAYER_HEIGHT;
+    } else {
+        game.player.y = mouseLocation - PLAYER_HEIGHT / 2;
+    }
+    if (room){
+      room.send("player2", {player2_y: player2.y});
+    }
+  }
+// Obtenir l'emplacement de la souris dans le canevas
 }
 
 onMount(async() => {
@@ -247,7 +263,7 @@ li {
 
 </h1>
 <p>
-  joueur 1 : <em id="player-score">0</em> - Joueur 2 : <em id="player2-score">0</em>
+  {player?.pseudo} : <em id="player-score">0</em> - {player2?.pseudo} : <em id="player2-score">0</em>
 </p>
 <ul>
   <li>
