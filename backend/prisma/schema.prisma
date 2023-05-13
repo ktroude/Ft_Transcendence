@@ -26,6 +26,12 @@ model User {
   rank      Int @default(0)
   level     Int @default(0)
 
+  //2FA
+  FA2       Boolean @default(false)
+  FA2lock   Boolean @default(false)
+  FA2secret String?
+  FA2code   String?
+
   // Achievements
   FirstWin Boolean @default(false) // 1er win
   WinStreak Boolean @default(false) // 3 wins d'affilé

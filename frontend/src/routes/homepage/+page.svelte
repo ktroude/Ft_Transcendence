@@ -114,7 +114,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 												<div class="popup_img">
 												</div>
 												<div class="popup_title_text_box">
-													<h4 class="popup_title">Curious</h4>
+													<h4 class="popup_title">I'm Curious</h4>
 													<h5 class="popup_text">Check one of our Githubs.</h5>
 												</div>
 										</div>`;

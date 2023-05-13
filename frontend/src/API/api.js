@@ -13,6 +13,25 @@ import { goto } from "$app/navigation";
     return accessToken;
  }
 
+ const fetch2FA = async (user) => {
+    try
+    {
+        const access_token = await fetchAccessToken();
+        if (access_token)
+        {
+            const headers = new Headers();
+            headers.append('Authorization', `Bearer ${access_token}`);
+            const response = await fetch(`http://localhost:3000/users/${user}/get2fa`, { headers });
+            const data = await response.json();
+            return data;
+        }
+    }
+    catch
+    {
+        return null;
+    }
+}
+
  const fetchDataOfUser = async (user) => {
     try 
     {
@@ -100,4 +119,4 @@ const fetchFriend = async (pseudo) =>
         }
     }
 
-    export {fetchData, fetchFriend, fetchAccessToken, fetchDataOfUser, fetchDataOfUserPseudo, fetchDataOfUsername};
+    export {fetchData, fetchFriend, fetchAccessToken, fetchDataOfUser, fetchDataOfUserPseudo, fetchDataOfUsername, fetch2FA};
