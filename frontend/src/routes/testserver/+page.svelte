@@ -17,7 +17,7 @@
     async function connect() {
         Colyseus = await import("colyseus.js");
         client = new Colyseus.Client('ws://localhost:3001');
-        room = await client.joinOrCreate('Private_Room');
+        room = await client.joinOrCreate("Private_Room");
 
         console.log('Joined succefuly', room);
     }
