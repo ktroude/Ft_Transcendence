@@ -36,9 +36,8 @@ function init_ball() {
     async function connect() {
         Colyseus = await import("colyseus.js");
         client = new Colyseus.Client('ws://localhost:3001');
-        room = await client.joinOrCreate('Private_Room');
+        room = await client.joinOrCreate("Private_Room");
         room.onMessage('Player_init', (message) => {
-        console.log(message);
         player.pseudo = message.player1_pseudo;
         player2.pseudo = message.player2_pseudo;
         player.id = message.player1_id;
