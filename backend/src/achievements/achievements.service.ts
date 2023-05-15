@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateResult } from "typeorm";
 import { User } from "@prisma/client";
+
 @Injectable()
 export class AchievementsService{
     private readonly achievementsList = {
@@ -51,10 +52,10 @@ export class AchievementsService{
               throw new Error('User not found');
             }
           
-            const achievements = [];
-            for (const [key, value] of Object.entries(user)) {
-              if (typeof value === 'boolean') {
-                achievements.push([key, value]);
+            const achievements = [];        
+            for (const key of Object.values(this.achievementsList)) {
+              if (typeof user[key] === 'boolean') {
+                achievements.push([key, user[key]]);
               }
             }
             return achievements;
