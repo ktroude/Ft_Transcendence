@@ -14,8 +14,8 @@ import { async } from 'rxjs';
 const cookieSession = require('cookie-session'); // cette nomenclature et la meme que celle en commit au dessus, sauf que celle du dessus marche pas, jsp pourquoi.
 async function ServerGame() {
   const gameServer = new Server();
-  // gameServer.listen(3001);
-  gameServer.listen(3002);
+  gameServer.listen(3001);
+  // gameServer.listen(3002);
   // gameServer.define('public_room', publicRoom)
   // .filterBy(['maxClients'])
 

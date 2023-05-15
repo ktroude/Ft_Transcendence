@@ -2,8 +2,10 @@
 
 <script lang=ts>
   import { onMount } from 'svelte';
-  import Colyseus from 'colyseus.js';
+  // import { Room, Client } from "colyseus";
+  // import Colyseus from 'colyseus.js';
 
+  let Colyseus;
   let canvas;
   let game;
   let anim;
@@ -12,7 +14,30 @@
 
   const PLAYER_HEIGHT = 100;
   const PLAYER_WIDTH = 5;
-  const MAX_SPEED = 1;
+  const MAX_SPEED = 8;
+
+  async function connect()
+  {
+    Colyseus = await import("colyseus.js");
+    client = new Colyseus.Client('ws://localhost:3001');
+    room = await client.joinOrCreate("Private_Room");
+    // room.onMessage('Player_init', (message) => {
+    // player.pseudo = message.player1_pseudo;
+    // player2.pseudo = message.player2_pseudo;
+    // player.id = message.player1_id;
+    // player2.id = message.player2_id;
+    // player.score = message.player1_score;
+    // player2.score = message.player2_score;
+    // player.color = message.player1_color;
+    // player2.color = message.player2_color;
+  // })
+  // room.onMessage('role', async (message) => {
+  //   clientId = message.client;
+  // });
+  // room.send('player_name', {player_pseudo : currentUser.pseudo});
+  
+    console.log('Joined succefuly', room);
+  }
 
   function draw() {
     const canvas = document.querySelector('canvas');
@@ -162,34 +187,34 @@
     };
 
     console.log("here");
-    client = new Colyseus.Client('ws://localhost:3002');
-    console.log(client);
-    room = await client.joinOrCreate('pong');
+    // client = new Colyseus.Client('ws://localhost:3002');
+    // console.log(client);
+    // room = await client.joinOrCreate("Private_Room");
 
-    room.onStateChange((state) => {
-      // Update computer player position
-      game.computer.y = state.computer.y;
-    });
+    // room.onStateChange((state) => {
+    //   // Update computer player position
+    //   game.computer.y = state.computer.y;
+    // });
 
-    room.state.players.onAdd = (player, sessionId) => {
-      if (sessionId !== room.sessionId) {
-        // Add opponent player to game state
-        game.opponent = {
-          y: (canvas.height - PLAYER_HEIGHT) / 2,
-          score: 0,
-        };
+    // room.state.players.onAdd = (player, sessionId) => {
+    //   if (sessionId !== room.sessionId) {
+    //     // Add opponent player to game state
+    //     game.opponent = {
+    //       y: (canvas.height - PLAYER_HEIGHT) / 2,
+    //       score: 0,
+    //     };
 
-        // Listen for opponent player position updates
-        room.state.players[sessionId].onChange = (changes) => {
-          if (changes.y !== undefined) {
-            game.opponent.y = changes.y;
-          }
-        };
-      }
-    };
+    //     // Listen for opponent player position updates
+    //     room.state.players[sessionId].onChange = (changes) => {
+    //       if (changes.y !== undefined) {
+    //         game.opponent.y = changes.y;
+          // }
+    //     };
+    //   }
+    // };
 
-    reset();
-    play();
+    // reset();
+    // play();
   });
 </script>
 
@@ -208,7 +233,7 @@ li {
 
 <main role="main">
 <h1>
-
+    <button on:click={connect}>connect</button>
 </h1>
 <p>
   {"Joueur"} : <em id="player-score">0</em> - {"Computer"} : <em id="computer-score">0</em>
