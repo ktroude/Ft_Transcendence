@@ -12,14 +12,14 @@ CREATE TABLE "user" (
     "losses" INTEGER NOT NULL DEFAULT 0,
     "rank" INTEGER NOT NULL DEFAULT 0,
     "level" INTEGER NOT NULL DEFAULT 0,
+    "FA2" BOOLEAN NOT NULL DEFAULT false,
+    "FA2lock" BOOLEAN NOT NULL DEFAULT false,
+    "FA2code" TEXT NOT NULL,
     "FirstWin" BOOLEAN NOT NULL DEFAULT false,
-    "FirstLoss" BOOLEAN NOT NULL DEFAULT false,
     "WinStreak" BOOLEAN NOT NULL DEFAULT false,
-    "ImBad" BOOLEAN NOT NULL DEFAULT false,
     "ImTheBoss" BOOLEAN NOT NULL DEFAULT false,
     "TheDarkSide" BOOLEAN NOT NULL DEFAULT false,
     "ImCurious" BOOLEAN NOT NULL DEFAULT false,
-    "SecretBoolean" BOOLEAN NOT NULL DEFAULT false,
     "connected" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")

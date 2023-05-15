@@ -47,6 +47,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			<h1>{displayUsername}</h1>
 			<label for="username-input">New Username:</label>
 			<input type="text" id="username-input" bind:value={newUsername} />
+      {#if FAstatus === false}
+        <button  class="edit_button" on:click={enable2fa}>ACTIVATE</button>
+      {:else if FAstatus === true}
+        <button  class="edit_button" on:click={disable2fa}>DESACTIVATE</button>
+      {/if}
 			<button  class="edit_button" on:click={handleUpdateUsername}>Update</button>
 			<!-- svelte-ignore a11y-img-redundant-alt -->
 			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
@@ -54,6 +59,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		</div>
 	</div>
 	{/if}
+  {#if qrImage}
+  <img src="{qrImage}" alt="QR Code" />
+  <p>Please scan this QR code with Google Authenticator.</p>
+{:else}
+  <p>Loading QR code...</p>
+{/if}
 </body>
 
 <!-- ****************************** -->
@@ -66,7 +77,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchFriend } from '../../../API/api';
+    import { fetchAccessToken, fetchData, fetchFriend, fetch2FA} from '../../../API/api';
 
     interface User {
         id: number;
@@ -76,12 +87,76 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         picture: string;
         username: string;
     }
-        
+    
+    let code = '';
+    let qrImage = '';
+    let secret = '';
+    let FAstatus: boolean;
     let imageURL: string;
     let user: User;
     let newUsername: string;
     let displayUsername: string;
-    
+  
+
+    async function disable2fa()
+    {
+      const accessToken = await fetchAccessToken();
+      if (accessToken)
+      {
+        const response = await fetch(`http://localhost:3000/users/${user.id}/enable2fa`, {
+        method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            },
+          body: JSON.stringify({status : 'disable'})
+        });
+        if (response.ok)
+        {
+          qrImage = '';
+          FAstatus = false;
+        }
+        else
+          console.log('Error: Could not update the 2fa');
+      }
+      else {
+        console.log('Error: Could not update the 2fa');
+      }
+    }
+
+    async function enable2fa() // Update the 2fa
+    {
+      const accessToken = await fetchAccessToken();
+      if (accessToken)
+      {
+        const response = await fetch(`http://localhost:3000/users/${user.id}/enable2fa`, {
+        method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            },
+          body: JSON.stringify({status : 'enable'})
+        });
+        if (response.ok)
+        {
+          const response = await fetch(`http://localhost:3000/${user.id}/auth/2fa/setup`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+          const data = await response.json();
+          qrImage = data.image;
+          FAstatus = true;
+        }
+        else
+          console.log('Error: Could not update the 2fa');
+      }
+      else {
+        console.log('Error: Could not update the 2fa');
+      }
+    }
+
         async function getImageURL() {
         const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
         const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
@@ -171,6 +246,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           await goto('/');
         else
         {
+          FAstatus = await fetch2FA(user.id);
           getImageURL()
           displayUsername = user.username;
         }
