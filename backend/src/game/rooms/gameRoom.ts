@@ -22,47 +22,56 @@ export class gameRoom extends Room {
     this.player2.pseudo = 'null';
   }
   onJoin(client: Client, options?) {
-    // this.onMessage('player', (client, message) => {
-      //   for (let i = 0; i < this.clients.length; i++) {
-    //     if (this.clients[i].sessionId != client.sessionId)
-    //       this.clients[i].send('player', { player_y: message.player_y });
-    //   }
-    // });
-    // this.onMessage('player2', (client, message) => {
-      //   for (let i = 0; i < this.clients.length; i++) {
-    //     if (this.clients[i].sessionId != client.sessionId) {
-    //       this.clients[i].send('player2', { player2_y: message.player2_y });
-    //     }
-    //   }
-    // });
-    this.onMessage('update_score', (client, message) => {
+    this.onMessage('player', (client, message) => {
+      for (let i = 0; i < this.clients.length; i++) {
+        if (this.clients[i].sessionId != client.sessionId)
+          this.clients[i].send('player', { player_y: message.player_y });
+      }
+    });
+    this.onMessage('player2', (client, message) => {
+      for (let i = 0; i < this.clients.length; i++) {
+        if (this.clients[i].sessionId != client.sessionId) {
+          this.clients[i].send('player2', { player2_y: message.player2_y });
+        }
+      }
+    });
+    this.onMessage('updateScore', (client, message) => {
       for (let i = 0; i < this.clients.length; i++) {
         this.p1_score = message.player_score;
         this.p2_score = message.player2_score;
-        this.clients[i].send('score_uptdate', {
+        this.clients[i].send('updateScore', {
           player_score: message.player_score,
           player2_score: message.player2_score,
         });
       }
     });
+    this.onMessage('ballPos', (client, message) => {
+      for (let i = 0; i < this.clients.length; i++) {
+        if (this.clients[i].sessionId != client.sessionId)
+          this.clients[i].send('ballPos', {
+            ball_x: message.ball_x,
+            ball_y: message.ball_y,
+          });
+      }
+    });
     this.onMessage('player_name', (client, message) => {
-      if (this.player1.pseudo === 'null') {
+      if (this.clients.length === 1 && this.player1.pseudo === 'null') {
         this.player1.pseudo = message.player_pseudo;
         this.p1_id = client.sessionId;
         client.send('role', { client: client.sessionId });
         this.clientIds.push(client.sessionId);
-      } else if (this.player2.pseudo === 'null') {
+      } else if (this.clients.length === 2 && this.player2.pseudo === 'null') {
         this.player2.pseudo = message.player_pseudo;
         this.p2_id = client.sessionId;
         client.send('role', { client: client.sessionId });
-        // this.clientIds.push(client.sessionId);
+        this.clientIds.push(client.sessionId);
       }
       console.log('les id des clients', this.clientIds);
       console.log('id du p1', this.p1_id);
-      if (this.clientIds[0] === this.p2_id) {
-        console.log('deja rejoint fdp');
-        return;
-      }
+      // if (this.clientIds[0] === this.p2_id) {
+      //   console.log('deja rejoint fdp');
+      //   return;
+      // }
       if (this.player1.pseudo != 'null' && this.player2.pseudo != 'null') {
         for (let i = 0; i < this.clients.length; i++) {
           this.clients[i].send('Player_init', {
@@ -96,4 +105,4 @@ export class gameRoom extends Room {
       // Réinitialisez toutes les autres propriétés du joueur 2 que vous devez réinitialiser
     }
   }
-  }
+}
