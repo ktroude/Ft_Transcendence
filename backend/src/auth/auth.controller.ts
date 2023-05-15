@@ -8,6 +8,7 @@ import { UserService } from 'src/user/user.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
+import { authenticator } from 'otplib';
 
 @Controller({})
 export class AuthController {
@@ -32,20 +33,19 @@ export class AuthController {
 
   @Get(':id/auth/2fa/setup')
   async generate2faSecret(@Param('id') id: string, @Res() res) {
-    const secret = speakeasy.generateSecret({ length: 20 });
+    const secret = authenticator.generateSecret();
     const user = await this.prisma.user.findUnique({
       where: {
         id: parseInt(id, 10)
       }
     });
-    const sec = secret.base32;
-    const otpauthUrl = `otpauth://totp/Transcendence:${user.firstname}?secret=${encodeURIComponent(sec)}&issuer=Transcendence`;
+    const otpauthUrl = authenticator.keyuri(user.firstname, 'Transcendence', secret);
     await this.prisma.user.update({
       where: {
         id: parseInt(id, 10)
       },
       data: {
-        FA2secret: sec,
+        FA2secret: secret,
       }
     });
     QRCode.toDataURL(otpauthUrl, (err, imageUrl) => {
@@ -53,29 +53,18 @@ export class AuthController {
         console.error(err);
         return res.sendStatus(500);
       }
-      res.json({ secret: sec, image: imageUrl });
+      res.json({ secret: secret, image: imageUrl });
     });
   }
 
   @Post(':id/auth/2fa/verify')
-  async verify2FA(@Param('id') id: string, @Body() body: {code: string}, @Res() res) {
+  async verify2FA(@Param('id') id: string, @Body('code') code: any, @Res() res) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: parseInt(id, 10)
       }
     });
-  
-    console.log(body.code)
-    const isVerified = speakeasy.totp.verify({
-      secret: user.FA2secret,
-      encoding: 'base32',
-      token: body.code,
-      window: 20,
-    });
-  
-    if (!isVerified) {
-      throw new HttpException('Invalid verification code', HttpStatus.UNAUTHORIZED);
-    }
-    res.redirect('http://localhost:5173/homepage');
+    const isVerified = authenticator.check(code, user.FA2secret);
+    return res.json({ isVerified });
   }
 }

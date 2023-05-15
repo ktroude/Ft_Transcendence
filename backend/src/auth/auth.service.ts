@@ -93,6 +93,7 @@ export class AuthService {
     });
     return { access_token: token };
   }
+  
 }
 
 // maintenant il faut convertir les data du user qu'on recupere en un jwt token --> done

@@ -1,19 +1,19 @@
 <script lang=ts>
   import { onMount } from 'svelte';
   import { fetchData, fetchAccessToken } from '../../../API/api';
-  
+
   let qrImage = '';
-  let code = '';
-  
+  let code: string;
+  let user: User;
+    interface User {
+        id: number;
+        pseudo: string;
+        firstName: string;
+        lastName: string;
+        username: string;
+    }
   onMount(async () => {
-    const response = await fetch(`http://localhost:3000/${1}/auth/2fa/setup`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    const data = await response.json();
-    qrImage = data.image;
+    user = await fetchData();
   });
   
   async function handleSubmit(event) {
@@ -21,15 +21,16 @@
     const accessToken = await fetchAccessToken();
     const user = await fetchData();
     if (accessToken) {
-      const headers = new Headers();
-      headers.append('Authorization', `Bearer ${accessToken}`);
       const response = await fetch(`http://localhost:3000/${user.id}/auth/2fa/verify`, {
-        method: 'Post',
-        headers,
-        body: JSON.stringify({code})
-      });
+        method: 'POST',
+          headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+          },
+			  body: JSON.stringify({code: code})
+            });
       const data = await response.json();
-      if (data.true)
+      if (data.isVerified)
         alert('2FA verification successful!');
       else
         alert('2FA verification failed. Please try again.');
@@ -39,9 +40,6 @@
   
   <h1>Enable Two-Factor Authentication</h1>
   
-  {#if qrImage}
-    <img src="{qrImage}" alt="QR Code" />
-    <p>Please scan this QR code with Google Authenticator.</p>
     <form on:submit="{handleSubmit}">
       <label>
         Verification Code:
@@ -49,7 +47,4 @@
       </label>
       <button type="submit">Verify</button>
     </form>
-  {:else}
-    <p>Loading QR code...</p>
-  {/if}
     
