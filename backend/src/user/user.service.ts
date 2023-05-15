@@ -22,7 +22,7 @@ export class UserService {
         {
             const updatedUser = await this.prisma.user.update({
                 where: { id: user }, // where id = user
-                data: { FA2: false, FA2secret: undefined, FA2code: undefined } // set FA2 to false
+                data: { FA2: false, FA2secret: undefined } // set FA2 to false
             });
             return updatedUser;
         }

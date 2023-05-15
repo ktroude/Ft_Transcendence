@@ -69,7 +69,7 @@ export class AuthController {
     const isVerified = speakeasy.totp.verify({
       secret: user.FA2secret,
       encoding: 'base32',
-      token: user.FA2code,
+      token: body.code,
       window: 20,
     });
   
