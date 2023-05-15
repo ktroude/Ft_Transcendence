@@ -1,7 +1,6 @@
 <script>
 // @ts-nocheck
 
-    // import { Client, Room, } from 'colyseus.js'
     import { Ball } from './ball';
     import { Player } from './player';
 	  import { onMount } from 'svelte';

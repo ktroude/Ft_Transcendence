@@ -41,6 +41,19 @@ export class UserController {
     }
 
     @UseGuards(JwtGuard)
+    @Get(':id/get2fa')
+    async get2fa(@Param('id') user: string): Promise<Boolean> {
+        return await this.userService.get2fastatus(parseInt(user,10));
+    }
+
+    @UseGuards(JwtGuard)
+    @Put(':id/enable2fa')
+    async enable2fa(@Param('id') id: string, @Body() body: {status : string}): Promise<User> {
+        return await this.userService.enable2FA(parseInt(id,10), body.status);
+    }
+
+
+    @UseGuards(JwtGuard)
     @Get(':user/search')
     async searchUser(@Param('user') searchProfile: string): Promise<User> {
         return await this.userService.findUserByUsername(searchProfile);

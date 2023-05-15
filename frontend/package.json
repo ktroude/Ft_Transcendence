@@ -39,8 +39,10 @@
 		"buffer": "^6.0.3",
 		"colyseus": "^0.15.0",
 		"pg": "^8.10.0",
+		"qrcode": "^1.5.3",
 		"socket.io": "^4.6.1",
 		"socket.io-client": "^4.6.1",
+		"speakeasy": "^2.0.0",
 		"svelte-navigator": "^3.2.2",
 		"svelte-routing": "^1.6.0"
 	}

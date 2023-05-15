@@ -9,6 +9,39 @@ const upload = multer({ dest: 'uploads/' });
 export class UserService {
     constructor(private prisma: PrismaService) {}
     
+    async enable2FA(user: number, status: string): Promise<User> {
+        if (status == 'enable') 
+        {
+            const updatedUser = await this.prisma.user.update({ // update user
+            where: { id: user }, // where id = user
+            data: { FA2: true } // set FA2 to true
+            });
+            return updatedUser; // return updated user
+        }
+        else if (status == 'disable')
+        {
+            const updatedUser = await this.prisma.user.update({
+                where: { id: user }, // where id = user
+                data: { FA2: false, FA2secret: undefined, FA2code: undefined } // set FA2 to false
+            });
+            return updatedUser;
+        }
+    }
+
+    async get2fastatus(user: number): Promise<Boolean> {
+      const user2fa = await this.prisma.user.findUnique({ // find user
+        where: {
+            id: user, // where id = user
+        },
+        select : {
+            FA2: true // select FA2
+        }
+    });
+        if (!user2fa)
+            return null;
+        return user2fa.FA2; // return FA2
+    }
+
     // Update the prisma with the new picture
     async changeNewProfilePicture(pseudo: string, newProfilePicture: string): Promise<User>
     {
