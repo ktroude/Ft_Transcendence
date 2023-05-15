@@ -120,32 +120,32 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png"></span>Achievements</h1>
 			{#each Array.from(all_achievements) as [key, value]}
 				{#if value === false}
-					<div class="achievement_div">
-						<div class="achievement">
+						<div class="achievement_div">
+							<div class="achievement">
+							</div>
+							<div class="achievement_title_text_box">
+								{#if String(key) === 'FirstWin'}
+								<h4 class="achievement_title">First Win</h4>
+								<h5 class="achievement_text">Win a game.</h5>
+								{/if}
+								{#if String(key) === "WinStreak"}
+								<h4 class="achievement_title">Win Streak</h4>
+								<h5 class="achievement_text">Win three games in a row.</h5>
+								{/if}
+								{#if String(key) === "ImTheBoss"}
+								<h4 class="achievement_title">I'm The Boss</h4>
+								<h5 class="achievement_text">Win against a creator.</h5>
+								{/if}
+								{#if String(key) === "TheDarkSide"}
+								<h4 class="achievement_title">The Dark Side</h4>
+								<h5 class="achievement_text">Log in as a bocal member.</h5>
+								{/if}
+								{#if String(key) === "ImCurious"}
+								<h4 class="achievement_title">???</h4>
+								<h5 class="achievement_text">???</h5>
+								{/if}
+							</div>
 						</div>
-						<div class="achievement_title_text_box">
-							{#if String(key) === 'FirstWin'}
-							<h4 class="achievement_title">First Win</h4>
-							<h5 class="achievement_text">Win a game.</h5>
-							{/if}
-							{#if String(key) === "WinStreak"}
-							<h4 class="achievement_title">Win Streak</h4>
-							<h5 class="achievement_text">Win three games in a row.</h5>
-							{/if}
-							{#if String(key) === "ImTheBoss"}
-							<h4 class="achievement_title">I'm The Boss</h4>
-							<h5 class="achievement_text">Win against a creator.</h5>
-							{/if}
-							{#if String(key) === "TheDarkSide"}
-							<h4 class="achievement_title">The Dark Side</h4>
-							<h5 class="achievement_text">Log in as a bocal member.</h5>
-							{/if}
-							{#if String(key) === "ImCurious"}
-							<h4 class="achievement_title">???</h4>
-							<h5 class="achievement_text">???</h5>
-							{/if}
-						</div>
-					</div>
 					{:else}
 						<div class="achievement_div">
 							<div class="achievement_true">

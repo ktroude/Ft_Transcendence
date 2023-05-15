@@ -30,7 +30,6 @@ model User {
   FA2       Boolean @default(false)
   FA2lock   Boolean @default(false)
   FA2secret String?
-  FA2code   String?
 
   // Achievements
   FirstWin Boolean @default(false) // 1er win
