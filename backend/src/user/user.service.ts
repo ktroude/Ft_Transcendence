@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrimaryColumnCannotBeNullableError } from 'typeorm';
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
@@ -42,6 +43,40 @@ export class UserService {
         return user2fa.FA2; // return FA2
     }
 
+    async get2faLockStatus(user: number): Promise<Boolean> {
+        const user2fa = await this.prisma.user.findUnique({ // find user
+            where: {
+                id: user, // where id = user
+            },
+            select : {
+                FA2lock: true // select FA2
+            }
+        });
+        if (!user2fa)
+            return null;
+        return user2fa.FA2lock; // return FA2
+    }
+
+    async update2fastatus(user: number, status: string){
+        if (status == 'lock')
+        {
+            const updatedUser = await this.prisma.user.update({ // update user
+                where: { id: user }, // where id = user
+                data: { FA2lock: true } // set FA2 to true
+            });
+            return updatedUser; // return updated user
+        }
+        else if (status == 'unlock')
+        {
+            const updatedUser = await this.prisma.user.update({
+                where: { id: user }, // where id = user
+                data: { FA2lock: false } // set FA2 to false
+            });
+            return updatedUser;
+        }
+    }
+    
+    
     // Update the prisma with the new picture
     async changeNewProfilePicture(pseudo: string, newProfilePicture: string): Promise<User>
     {

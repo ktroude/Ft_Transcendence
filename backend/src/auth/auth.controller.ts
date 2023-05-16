@@ -9,6 +9,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { authenticator } from 'otplib';
+import { JwtGuard } from '../auth/guard';
+import { UseGuards } from '@nestjs/common';
 
 @Controller({})
 export class AuthController {
@@ -24,11 +26,17 @@ export class AuthController {
     res.cookie('access_token', access_token, { httpOnly: false });
     const user = await this.userService.decodeToken(access_token);
     if (await this.userService.get2fastatus(user.id) == true) {
+      await this.userService.update2fastatus(user.id, 'lock');
       res.redirect('http://localhost:5173/auth/2fa');
       return;
     }
     res.redirect('http://localhost:5173/homepage');
     return;
+  }
+
+  @Put(':id/auth/2fa/lockstatus')
+  async update2fastatus(@Param('id') id: string, @Body() body: { lockstatus: string }){
+    return await this.userService.update2fastatus(parseInt(id, 10), body.lockstatus);
   }
 
   @Get(':id/auth/2fa/setup')

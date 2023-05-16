@@ -72,7 +72,7 @@
 	import { goto } from "$app/navigation";
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-    import { fetchAccessToken, fetchData, fetchDataOfUser } from '../../../API/api';
+    import { fetchAccessToken, fetchData, fetchDataOfUser, fetch2FA } from '../../../API/api';
 	
 	/*
 	Room ID = id of user1 + id of user2?
@@ -104,6 +104,11 @@
 	
 	async function loadpage() {
 		user = await fetchData();
+		if (!user)
+			goto('/');
+		const FA2 = await fetch2FA(user.id);
+		if (FA2 == true)
+			goto('auth/2fa');
 		if ($page.params.user == user.pseudo)
 		{
 			getImageURL();

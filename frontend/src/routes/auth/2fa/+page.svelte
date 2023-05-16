@@ -1,6 +1,7 @@
 <script lang=ts>
   import { onMount } from 'svelte';
-  import { fetchData, fetchAccessToken } from '../../../API/api';
+  import { fetchData, fetchAccessToken, fetch2FA } from '../../../API/api';
+  import { goto } from '$app/navigation';
 
   let qrImage = '';
   let code: string;
@@ -14,6 +15,11 @@
     }
   onMount(async () => {
     user = await fetchData();
+    if (!user)
+      goto('/');
+    const FA2 = await fetch2FA(user.id);
+    if (FA2 == false)
+      goto('/homepage');
   });
   
   async function handleSubmit(event) {
@@ -31,11 +37,22 @@
             });
       const data = await response.json();
       if (data.isVerified)
-        alert('2FA verification successful!');
+      {
+        const response = fetch(`http://localhost:3000/${user.id}/auth/2fa/lockstatus`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({lockstatus: 'unlock'})
+        });
+          await alert('2FA verification successful!');
+          goto('/homepage');
+      }
+      }
       else
         alert('2FA verification failed. Please try again.');
     }
-  }
   </script>
   
   <h1>Enable Two-Factor Authentication</h1>
