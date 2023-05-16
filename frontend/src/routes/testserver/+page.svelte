@@ -14,6 +14,7 @@
   let canvas;
   let showButtons = false;
   let mainclient = false;
+  let winner;
   let started = 0;
 
 function countdown(counter)
@@ -36,6 +37,25 @@ function countdown(counter)
       // Le compte à rebours est terminé, vous pouvez exécuter votre code ici
     }
   }, 1000);
+}
+
+// Fonction pour afficher le message de victoire
+function print_win(gagnant, score) {
+  // Effacer le canvas
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Style du texte
+  context.font = '48px Arial';
+  context.fillStyle = 'white';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  
+  // Coordonnées du message
+  const x = canvas.width / 2;
+  const y = canvas.height / 2;
+  
+  // Afficher le message de victoire
+  context.fillText(`${gagnant} a gagné ! Score : ${player1.score} vs ${player2.score}`, x, y);
 }
 
 function init_player1() {
@@ -166,10 +186,11 @@ function play()
     ballMove();
   }
   updatePos();
-  Updatescore()
-  Updateball()
+  Updatescore();
+  Updateball();
   // console.log(ball.x);
   draw();
+  endGame();
   anim = requestAnimationFrame(play);
 }
 
@@ -199,6 +220,7 @@ function collide(playerCurrent) {
   else
   {
     // Augmente la vitesse et change la direction
+    if(Math.abs(ball.velocity_x) < MAX_SPEED)
     ball.velocity_x *= -1.1;
     changeDirection(playerCurrent.y);
   }
@@ -210,6 +232,21 @@ function changeDirection(playerPosition)
   var ratio = 100 / (setting_game.paddle_height / 2);
   // Obtenir une valeur entre 0 et 10
   ball.velocity_y = Math.round(impact * ratio / 10);
+}
+
+function endGame()
+{
+  room.onMessage("gameFinished", (message) => {
+    winner == message.winner;
+    console.log("Dans le end_game", message.winner);
+    if (winner == player.pseudo && mainclient == true)
+    {
+      print_win(winner)
+    }
+    else
+      console.log("perdu mon pote", winner);
+    cancelAnimationFrame(anim);
+  });
 }
 
 function Updatescore()

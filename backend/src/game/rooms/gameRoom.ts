@@ -15,6 +15,7 @@ export class gameRoom extends Room {
   p2_id: string = '';
   p1_color: string = 'green';
   p2_color: string = 'green';
+  max_score: number = 5;
   finished: number = 0;
   clientIds: string[] = [];
 
@@ -49,7 +50,16 @@ export class gameRoom extends Room {
           player2_score: message.player2_score,
         });
       }
+      if (this.p1_score >= this.max_score || this.p2_score >= this.max_score)
+      {
+        if(this.p1_score > this.p2_score)
+          this.broadcast('gameFinished', { winner: this.player1.pseudo });
+        else
+          this.broadcast('gameFinished', { winner: this.player2.pseudo });
+        console.log("envoie winner", this.player1.pseudo, this.player2.pseudo);
+      }
     });
+    // const isGameFinished: boolean = this.p1_score >= this.max_score || this.p2_score >= this.max_score;
     this.onMessage('ballPos', (client, message) => {
       for (let i = 0; i < this.clients.length; i++) {
         if (this.clients[i].sessionId != client.sessionId)
