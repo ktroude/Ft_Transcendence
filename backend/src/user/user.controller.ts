@@ -41,6 +41,12 @@ export class UserController {
     }
 
     @UseGuards(JwtGuard)
+    @Get(':id/get2fa/lockstatus')
+    async get2faLockStatus(@Param('id') user: string): Promise<Boolean> {
+        return await this.userService.get2faLockStatus(parseInt(user,10));
+    }
+    
+    @UseGuards(JwtGuard)
     @Get(':id/get2fa')
     async get2fa(@Param('id') user: string): Promise<Boolean> {
         return await this.userService.get2fastatus(parseInt(user,10));

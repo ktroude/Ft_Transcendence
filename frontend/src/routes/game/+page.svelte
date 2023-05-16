@@ -81,7 +81,7 @@
     import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser } from '../../API/api';
+    import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../API/api';
 	import { page } from '$app/stores';
 
 	let socket: Socket;
@@ -298,6 +298,9 @@
         user = await fetchData();
 		if (!user)
 			await goto('/'); 
+		const FA2 = await fetch2FA(user.id);
+		if (FA2 == true)
+			await goto('auth/2fa');
 		else
 		{
 			const socket = io('http://localhost:3000');

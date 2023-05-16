@@ -13,7 +13,7 @@ import { goto } from "$app/navigation";
     return accessToken;
  }
 
- const fetch2FA = async (user) => {
+ const fetch2FAstatus = async (user) => { // USED ONLY FOR ACTIVATION IN PROFILE USER
     try
     {
         const access_token = await fetchAccessToken();
@@ -22,6 +22,25 @@ import { goto } from "$app/navigation";
             const headers = new Headers();
             headers.append('Authorization', `Bearer ${access_token}`);
             const response = await fetch(`http://localhost:3000/users/${user}/get2fa`, { headers });
+            const data = await response.json();
+            return data;
+        }
+    }
+    catch
+    {
+        return null;
+    }
+ }
+
+ const fetch2FA = async (user) => { // USE THIS ONE FOR CHECKING 2FA STATUS LOCK OR UNLOCKED
+    try
+    {
+        const access_token = await fetchAccessToken();
+        if (access_token)
+        {
+            const headers = new Headers();
+            headers.append('Authorization', `Bearer ${access_token}`);
+            const response = await fetch(`http://localhost:3000/users/${user}/get2fa/lockstatus`, { headers });
             const data = await response.json();
             return data;
         }
@@ -119,4 +138,4 @@ const fetchFriend = async (pseudo) =>
         }
     }
 
-    export {fetchData, fetchFriend, fetchAccessToken, fetchDataOfUser, fetchDataOfUserPseudo, fetchDataOfUsername, fetch2FA};
+    export {fetchData, fetchFriend, fetchAccessToken, fetchDataOfUser, fetchDataOfUserPseudo, fetchDataOfUsername, fetch2FA, fetch2FAstatus};

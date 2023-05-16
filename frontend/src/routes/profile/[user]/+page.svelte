@@ -193,7 +193,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
-    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername} from '../../../API/api';
+    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../../API/api';
 
 /********************** FRIENDS ***********************************************/
 	
@@ -627,6 +627,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		user = await fetchData(); // Catch the user
 		if (!user)
 			await goto('/'); // If no user redirect
+		const FA2 = await fetch2FA(user.id);
+		if (FA2 == true)
+			await goto('auth/2fa');
 		else
 		{
 			await loadpage();

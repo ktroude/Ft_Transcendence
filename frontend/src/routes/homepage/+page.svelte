@@ -71,7 +71,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from "$app/navigation";
-    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername} from '../../API/api';
+    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../API/api';
 	import { redirect } from '@sveltejs/kit';
 	import {io, Socket} from 'socket.io-client';
 
@@ -123,7 +123,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				}
 			}
 		}
-		// window.open(`https://github.com/${username}`, '_blank');
+		window.open(`https://github.com/${username}`, '_blank');
 }
 
 
@@ -136,8 +136,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     onMount(async function() {
 		user = await fetchData();
+		const FA2 = await fetch2FA(user.id)
     if (!user)
       await goto('/');
+	if (FA2 == true)
+		await goto('/auth/2fa');
     else
     {
       const socket = io('http://localhost:3000');
