@@ -57,15 +57,23 @@ export class gameRoom extends Room {
           });
       }
     });
-    this.onMessage('player_name', (client, message) => {
+    this.onMessage('player_name', (client, message) =>
+    {
       if (this.clients.length === 1 && this.player1.pseudo === 'null') {
         this.player1.pseudo = message.player_pseudo;
-        this.p1_id = client.sessionId;
         client.send('role', { client: client.sessionId });
+        this.p1_id = client.sessionId;
         this.clientIds.push(client.sessionId);
       } else if (this.clients.length === 2 && this.player2.pseudo === 'null') {
         this.player2.pseudo = message.player_pseudo;
         this.p2_id = client.sessionId;
+        if (this.player1.pseudo === this.player2.pseudo)
+        {
+          this.player2.pseudo = 'null';
+          this.p2_id = 'null';
+          this.clients.length--;
+          return;
+        }
         client.send('role', { client: client.sessionId });
         this.clientIds.push(client.sessionId);
       }
@@ -77,7 +85,8 @@ export class gameRoom extends Room {
       // }
       if (this.player1.pseudo != 'null' && this.player2.pseudo != 'null') {
         for (let i = 0; i < this.clients.length; i++) {
-          this.clients[i].send('Player_init', {
+          this.clients[i].send('Player_init',
+          {
             player1_pseudo: this.player1.pseudo,
             player2_pseudo: this.player2.pseudo,
             player1_score: this.p1_score,
@@ -86,6 +95,7 @@ export class gameRoom extends Room {
             player2_id: this.p2_id,
             player1_color: this.p1_color,
             player2_color: this.p2_color,
+            mainclient: i === 0 // true si i est égal à 0, sinon false
           });
         }
       }
