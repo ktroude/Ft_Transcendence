@@ -61,9 +61,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	{/if}
   {#if qrImage}
   <img src="{qrImage}" alt="QR Code" />
-  <p>Please scan this QR code with Google Authenticator.</p>
-{:else}
-  <p>Loading QR code...</p>
+  <p>Please scan this QR code with Google Authenticator and enter the code to activate.</p>
+  <form on:submit="{handleSubmit2fa}">
+      <label>
+        Verification Code:
+        <input type="text" bind:value="{code}" />
+      </form>
 {/if}
 </body>
 
@@ -124,21 +127,44 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       }
     }
 
-    async function enable2fa() // Update the 2fa
+    async function handleSubmit2fa()
     {
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
         const response = await fetch(`http://localhost:3000/users/${user.id}/enable2fa`, {
-        method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`
-            },
-          body: JSON.stringify({status : 'enable'})
-        });
-        if (response.ok)
-        {
+          method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+              },
+            body: JSON.stringify({status : 'enable'})
+          });
+          if (response.ok)
+          {
+            ;
+          }
+          else
+            console.log('Error: Could not update the 2fa');
+      }
+    }
+
+
+    async function enable2fa() // Update the 2fa
+    {
+      const accessToken = await fetchAccessToken();
+      if (accessToken)
+      {
+        // const response = await fetch(`http://localhost:3000/users/${user.id}/enable2fa`, {
+        // method: 'PUT',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //       'Authorization': `Bearer ${accessToken}`
+        //     },
+        //   body: JSON.stringify({status : 'enable'})
+        // });
+        // if (response.ok)
+        // {
           const response = await fetch(`http://localhost:3000/${user.id}/auth/2fa/setup`, {
           method: 'GET',
           headers: {
@@ -148,9 +174,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           const data = await response.json();
           qrImage = data.image;
           FAstatus = true;
-        }
-        else
-          console.log('Error: Could not update the 2fa');
+        // }
+        // else
+        //   console.log('Error: Could not update the 2fa');
       }
       else {
         console.log('Error: Could not update the 2fa');
