@@ -8,6 +8,8 @@ export class gameRoom extends Room {
   p2_pseudo: string = '';
   game = Game;
   p1_score: number = 0;
+  p1_rtplay: boolean = false; //if the player is ready to play
+  p2_rtplay: boolean = false;
   p2_score: number = 0;
   p1_id: string = '';
   p2_id: string = '';
@@ -21,7 +23,8 @@ export class gameRoom extends Room {
     this.player1.pseudo = 'null';
     this.player2.pseudo = 'null';
   }
-  onJoin(client: Client, options?) {
+  onJoin(client: Client, options?)
+  {
     this.onMessage('player', (client, message) => {
       for (let i = 0; i < this.clients.length; i++) {
         if (this.clients[i].sessionId != client.sessionId)

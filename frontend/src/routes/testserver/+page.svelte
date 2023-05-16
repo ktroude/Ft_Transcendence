@@ -12,6 +12,7 @@
     let room;
     let clientId;
     let canvas;
+    let showButtons = false;
     let started = 0;
     
     function init_player1() {
@@ -53,6 +54,7 @@ function init_ball() {
       room.send('player_name', {player_pseudo : currentUser.pseudo});
       
       console.log('Joined succefuly', room);
+      showButtons = true;
     }
     
 const MAX_SPEED = 8;
@@ -114,6 +116,7 @@ function draw() {
   context.arc(ball.x, ball.y, setting_game.ball_radius, 0, Math.PI * 2, false);
   context.fill();
 }
+
 function play() {
     ball.x += ball.velocity_x;
     ball.y += ball.velocity_y;
@@ -156,7 +159,8 @@ ball.velocity_y = Math.round(impact * ratio / 10);
 }
 
 function ballMove(){
-if (player.id) {
+if (player.id)
+{
     if (ball?.y > canvas.height || ball?.y < 0) {
         ball.velocity_y *= -1;
     }
@@ -179,22 +183,23 @@ if (player.id) {
   }
 }
 
-function stop() {
-cancelAnimationFrame(anim);
-// Placez la balle et les joueurs au centre
-ball.x = canvas.width / 2;
-ball.y = canvas.height / 2;
-player.y = canvas.height / 2 - setting_game.paddle_height / 2;
-player2.y = canvas.height / 2 - setting_game.paddle_height / 2;
-// Reset speed
-ball.velocity_y = 2;
-ball.velocity_x = 2;
-// Init score
-player2.score = 0;
-player.score = 0;
-document.querySelector('#player2-score').textContent = player2.score;
-document.querySelector('#player-score').textContent = player.score;
-draw();
+function stop()
+{
+  cancelAnimationFrame(anim);
+  // Placez la balle et les joueurs au centre
+  ball.x = canvas.width / 2;
+  ball.y = canvas.height / 2;
+  player.y = canvas.height / 2 - setting_game.paddle_height / 2;
+  player2.y = canvas.height / 2 - setting_game.paddle_height / 2;
+  // Reset speed
+  ball.velocity_y = 2;
+  ball.velocity_x = 2;
+  // Init score
+  player2.score = 0;
+  player.score = 0;
+  document.querySelector('#player2-score').textContent = player2.score;
+  document.querySelector('#player-score').textContent = player.score;
+  draw();
 }
 
 function playerMove(event) {
@@ -272,8 +277,8 @@ onMount(async() => {
   console.log(currentUser);
   canvas.addEventListener('mousemove', playerMove);
   canvas.addEventListener('mousemove', player2Move);
-  document.querySelector('#start-game').addEventListener('click', play);
-  document.querySelector('#stop-game').addEventListener('click', stop);
+  // document.querySelector('#start-game').addEventListener('click', play);
+  // document.querySelector('#stop-game').addEventListener('click', stop);
 });
 
 </script>
@@ -299,12 +304,15 @@ li {
   {player.pseudo} : <em id="player-score">0</em> - {player2.pseudo} : <em id="player2-score">0</em>
 </p>
 <ul>
-  <li>
-    <button id="start-game">Start</button>
-  </li>
-  <li>
-    <button id="stop-game">Stop</button>
-  </li>
+  {#if showButtons}
+    <li>
+      <button on:click={play}>Start</button>
+      <!-- <button id="start-game">Start</button> -->
+    </li>
+    <li>
+      <button id="stop-game">Stop</button>
+    </li>
+  {/if}
 </ul>
 <h2>joined {room?.name} tu es {currentUser?.pseudo}</h2>
 <canvas id="canvas" width={setting_game.canvas_width} height={setting_game.canvas_height}></canvas>

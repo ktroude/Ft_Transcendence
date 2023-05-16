@@ -16,7 +16,7 @@ export class Player extends Schema {
 	@type ('string')
 	color : string;
   
-	constructor(x = 0, y = 0, score = 0, id = 0, Pseudo = "", nickname = "", color = "white") {
+	constructor(x = 0, y = 0, score = 0, id = 0, Pseudo = "", nickname = "", color = "red") {
 	  super();
 	  this.x = x;
 	  this.y = y;
