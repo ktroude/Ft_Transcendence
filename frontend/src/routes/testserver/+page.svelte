@@ -113,13 +113,28 @@ function draw()
 {
   const context = canvas.getContext('2d');
   // Draw field
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  // context.clearRect(0, 0, canvas.width, canvas.height);
+  // context.fillStyle = 'black';
+  // context.font = "30px Arial";
   context.fillStyle = 'black';
-  context.font = "30px Arial";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // player name
   context.fillText(player.pseudo, canvas.width / 15, canvas.height / 10);
+
+
   // Draw middle line
-  context.fillStyle = "black";
-  context.font = "30px Arial";
+  context.strokeStyle = 'white';
+  context.beginPath();
+  context.moveTo(canvas.width / 2, 0);
+  context.lineTo(canvas.width / 2, canvas.height);
+  context.stroke();
+  
+  // context.fillStyle = "black";
+  // context.font = "30px Arial";
+
+
+  // player name
   context.fillText(player2.pseudo, 10 * canvas.width / 15, canvas.height / 10);
   //context.fillText(player2.score, 3 * canvas.current.width / 4, canvas.current.height / 2);
   context.strokeStyle = 'black';
@@ -132,51 +147,60 @@ function draw()
   context.fillRect(0, player.y, setting_game.paddle_width, setting_game.paddle_height);
   context.fillRect(canvas.width - setting_game.paddle_width, player2.y, setting_game.paddle_width, setting_game.paddle_height);
   // Draw ball
+  // context.beginPath();
+  // context.fillStyle = 'black';
+  // context.arc(ball.x, ball.y, setting_game.ball_radius, 0, Math.PI * 2, false);
+  // context.fill();
+
+  // Draw ball
   context.beginPath();
-  context.fillStyle = 'black';
+  context.fillStyle = 'white';
   context.arc(ball.x, ball.y, setting_game.ball_radius, 0, Math.PI * 2, false);
   context.fill();
 }
 
 function play()
 {
-  if (mainclient = true)
+  if (mainclient == true)
   {
-    ball.x += ball.velocity_x;
-    ball.y += ball.velocity_y;
-    updatePos();
     ballMove();
   }
-  draw();
+  updatePos();
   Updatescore()
+  Updateball()
+  // console.log(ball.x);
+  draw();
   anim = requestAnimationFrame(play);
 }
 
 
 function collide(playerCurrent) {
   // Le joueur ne touche pas la balle
-  if (ball.y < player.y || ball.y > player.y + setting_game.paddle_height)
+  if (ball.y < playerCurrent.y || ball.y > playerCurrent.y + setting_game.paddle_height)
   {
-    // Remet la balle et les joueurs au centre
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
-    if (mainclient == false)
-    {
-      player2.score++;
-    }
-    else
+    if (ball.x > canvas.width - setting_game.paddle_width)
     {
       player.score++;
     }
+    else
+    {
+      player2.score++;
+    }
+    // Remet la balle et les joueurs au centre
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    // envoie les scores.
     room.send("updateScore", {player_score: player.score , player2_score : player2.score});
     ball.velocity_x = (Math.random() * 3 + 2) * (Math.random() < .5 ? -1 : 1);
 		ball.velocity_y = Math.random();
+    // if(Math.abs(ball.velocity_x) < MAX_SPEED)
+    //   ball.velocity_x *= 1.2;
   }
   else
   {
     // Augmente la vitesse et change la direction
     ball.velocity_x *= -1.1;
-    changeDirection(player.y);
+    changeDirection(playerCurrent.y);
   }
 }
 
@@ -198,6 +222,14 @@ function Updatescore()
   document.querySelector('#player2-score').textContent = player2.score;
 }
 
+function Updateball()
+{
+  room.onMessage("ballPos", (message) => {
+    ball.x = message.ball_x;
+    ball.y = message.ball_y;
+  })
+}
+
 function ballMove()
 {
   if (ball?.y > canvas.height || ball?.y < 0) {
@@ -210,15 +242,7 @@ function ballMove()
   }
   ball.x += ball.velocity_x;
   ball.y += ball.velocity_y;
-  room.send("ballpos", {ball_x: ball.x, ball_y: ball.y});
-  room.onMessage("ballpos", (message) => {
-    ball.x = message.ball_x;
-    ball.y = message.ball.y;
-  })
-  room.onMessage("updateScore", (message) => {
-      player.score = message.player_score;
-      player2.score = message.player2_score;
-  })
+  room.send("ballPos", {ball_x: ball.x, ball_y: ball.y});
 }
 
 function stop()
@@ -297,7 +321,6 @@ function player2Move(event)
 // Obtenir l'emplacement de la souris dans le canevas
 function updatePos()
 {
-  console.log("dans update Position", mainclient);
   if (room)
   {
     room.onMessage("player", (message) => {

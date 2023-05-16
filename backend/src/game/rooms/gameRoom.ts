@@ -38,11 +38,13 @@ export class gameRoom extends Room {
         }
       }
     });
-    this.onMessage('updateScore', (client, message) => {
+    this.onMessage('updateScore', (client, message) =>
+    {
+      this.p1_score = message.player_score;
+      this.p2_score = message.player2_score;
       for (let i = 0; i < this.clients.length; i++) {
-        this.p1_score = message.player_score;
-        this.p2_score = message.player2_score;
-        this.clients[i].send('updateScore', {
+        this.clients[i].send('updateScore',
+        {
           player_score: message.player_score,
           player2_score: message.player2_score,
         });
