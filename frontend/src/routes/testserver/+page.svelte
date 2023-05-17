@@ -15,6 +15,7 @@
   let showButtons = false;
   let mainclient = false;
   let winner;
+  let gameFinished = false;
   let started = 0;
 
 function countdown(counter)
@@ -39,25 +40,6 @@ function countdown(counter)
   }, 1000);
 }
 
-// Fonction pour afficher le message de victoire
-function print_win(gagnant, score) {
-  // Effacer le canvas
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Style du texte
-  context.font = '48px Arial';
-  context.fillStyle = 'white';
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  
-  // Coordonnées du message
-  const x = canvas.width / 2;
-  const y = canvas.height / 2;
-  
-  // Afficher le message de victoire
-  context.fillText(`${gagnant} a gagné ! Score : ${player1.score} vs ${player2.score}`, x, y);
-}
-
 function init_player1() {
   let player = new Player(0, setting_game.canvas_height / 2, 0, 0);
   return player;
@@ -77,6 +59,28 @@ function init_ball()
 let player = init_player1();
 let player2 = init_player2();
 let ball = init_ball();
+
+// Fonction pour afficher le message de victoire
+function print_win(gagnant)
+{
+  // Effacer le canvas
+  const context = canvas.getContext('2d');
+  cancelAnimationFrame(anim);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Style du texte
+  context.font = '42px Arial';
+  context.fillStyle = 'Red';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  
+  // Coordonnées du message
+  const x = canvas.width / 2;
+  const y = canvas.height / 2;
+  
+  // Afficher le message de victoire
+  context.fillText(`${gagnant} a gagné ! Score : ${player.score} vs ${player2.score}`, x, y);
+}
     
 async function connect()
 {
@@ -191,7 +195,8 @@ function play()
   // console.log(ball.x);
   draw();
   endGame();
-  anim = requestAnimationFrame(play);
+  if(!gameFinished)
+    anim = requestAnimationFrame(play);
 }
 
 
@@ -237,15 +242,14 @@ function changeDirection(playerPosition)
 function endGame()
 {
   room.onMessage("gameFinished", (message) => {
-    winner == message.winner;
-    console.log("Dans le end_game", message.winner);
+    winner = message.winner;
+    gameFinished = true;
     if (winner == player.pseudo && mainclient == true)
     {
-      print_win(winner)
+      print_win(winner);
     }
     else
-      console.log("perdu mon pote", winner);
-    cancelAnimationFrame(anim);
+      print_win(winner);
   });
 }
 
