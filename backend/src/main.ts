@@ -8,7 +8,8 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import { Server } from 'colyseus';
 import { publicRoom } from './rooms/publicRoom';
-import { gameRoom } from './game/rooms/gameRoom';
+import { gameRoomService } from './game/rooms/gameRoom';
+import { RankedLobbyRoom } from './game/matchmaking/matchmaking';
 import { async } from 'rxjs';
 
 const cookieSession = require('cookie-session'); // cette nomenclature et la meme que celle en commit au dessus, sauf que celle du dessus marche pas, jsp pourquoi.
@@ -18,8 +19,8 @@ async function ServerGame() {
   // gameServer.listen(3002);
   // gameServer.define('public_room', publicRoom)
   // .filterBy(['maxClients'])
-
-  gameServer.define('Private_Room', gameRoom)
+  gameServer.define('ranked', RankedLobbyRoom);
+  gameServer.define('Private_Room', gameRoomService);
   // .filterBy(['maxClients'])
 
 }
@@ -42,5 +43,5 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   await app.listen(3000);
 }
-bootstrap();
 ServerGame();
+bootstrap();

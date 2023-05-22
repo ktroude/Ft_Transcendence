@@ -10,6 +10,7 @@ import { WebsocketModule } from './websocket/websocket.module';
 import { BlockModule } from './block/block.module';
 import { DirectMessagesModule } from './directMessages/dm.module';
 import { AchievementsModule } from './achievements/achievements.module';
+import { gameRoom } from './game/rooms/gameRoom.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AchievementsModule } from './achievements/achievements.module';
     BlockModule,
     DirectMessagesModule,
     AchievementsModule,
+    gameRoom,
   ],
   controllers: [AppController],
   providers: [AppService],
