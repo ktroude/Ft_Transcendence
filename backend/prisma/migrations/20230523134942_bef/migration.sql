@@ -14,7 +14,7 @@ CREATE TABLE "user" (
     "level" INTEGER NOT NULL DEFAULT 0,
     "FA2" BOOLEAN NOT NULL DEFAULT false,
     "FA2lock" BOOLEAN NOT NULL DEFAULT false,
-    "FA2code" TEXT NOT NULL,
+    "FA2secret" TEXT,
     "FirstWin" BOOLEAN NOT NULL DEFAULT false,
     "WinStreak" BOOLEAN NOT NULL DEFAULT false,
     "ImTheBoss" BOOLEAN NOT NULL DEFAULT false,

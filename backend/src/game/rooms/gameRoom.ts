@@ -4,15 +4,17 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { User } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
+import { async } from 'rxjs';
 
 @Injectable()
 export class gameRoomService extends Room {
+  constructor(private userservice: UserService){
+    super();
+  }
   maxClients: number = 2;
   prisma = new PrismaService();
   player1: players = new players();
   player2: players = new players();
-  p1_pseudo: string = '';
-  p2_pseudo: string = '';
   game = Game;
   p1_score: number = 0;
   p1_rtplay: boolean = false; //if the player is ready to play
@@ -31,6 +33,7 @@ export class gameRoomService extends Room {
     this.setState(new Game());
     this.player1.pseudo = 'null';
     this.player2.pseudo = 'null';
+    console.log("room pong crée ts =", this.roomId);
   }
   onJoin(client: Client, options?)
   {
@@ -65,11 +68,11 @@ export class gameRoomService extends Room {
         {
           await this.prisma.user.update({
             where: {username : this.player1.pseudo},
-            data: { wins: { increment: 1 } }
+            data: { wins: { increment: 1 }, win_streak: { increment: 1 } }
           });
           await this.prisma.user.update({
             where: {username : this.player2.pseudo},
-            data: { losses: { increment: 1 } }
+            data: { losses: { increment: 1 }, win_streak: 0}
           });
           this.broadcast('gameFinished', { winner: this.player1.pseudo });
         }
@@ -77,11 +80,11 @@ export class gameRoomService extends Room {
         {
           await this.prisma.user.update({
             where: {username : this.player2.pseudo},
-            data: { wins: { increment: 1 } }
+            data: { wins: { increment: 1 }, win_streak: { increment: 1 } }
           });
           await this.prisma.user.update({
             where: {username : this.player1.pseudo},
-            data: { losses: { increment: 1 } }
+            data: { losses: { increment: 1 }, win_streak: 0}
           });
           this.broadcast('gameFinished', { winner: this.player2.pseudo });
         }
@@ -98,7 +101,7 @@ export class gameRoomService extends Room {
           });
       }
     });
-    this.onMessage('player_name', (client, message) =>
+    this.onMessage('player_name', async(client, message) =>
     {
       if (this.clients.length === 1 && this.player1.pseudo === 'null') {
         this.player1.pseudo = message.player_pseudo;
@@ -137,8 +140,19 @@ export class gameRoomService extends Room {
             player1_color: this.p1_color,
             player2_color: this.p2_color,
             mainclient: i === 0 // true si i est égal à 0, sinon false
+
+            // rajouter ici pour le ingame
           });
         }
+        await this.prisma.user.update({
+          where: {username : this.player2.pseudo},
+          data: { connected: 2}
+        });
+        await this.prisma.user.update({
+          where: {username : this.player1.pseudo},
+          data: { connected: 2}
+        });
+        // console.log(this.userservice.getConnectedStatus(this.player1.pseudo));
       }
     });
   }
@@ -159,5 +173,8 @@ export class gameRoomService extends Room {
       // Réinitialisez toutes les autres propriétés du joueur 2 que vous devez réinitialiser
     }
     console.log("Leave la salle pong ", this.roomId,client.id);
+  }
+  OnDispose(){
+    console.log('Room is disposed', this.roomId);
   }
 }

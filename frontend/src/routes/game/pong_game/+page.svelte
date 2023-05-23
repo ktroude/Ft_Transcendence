@@ -49,20 +49,10 @@ function countdown(counter)
   }, 1000);
 }
 
-function getRoomIdFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('room_id');
-  }
-
-async function joinRoomById(roomId) {
-  try {
-    const room_pong = await client.joinById(roomId);
-    console.log('Rejoindre la salle réussie:', room_pong);
-    // Faites quelque chose avec la salle rejoindre avec succès
-  } catch (error) {
-    console.error('Erreur lors de la tentative de rejoindre la salle:', error);
-    // Gérez l'erreur de rejoindre la salle
-  }
+function getRoomIdFromUrl()
+{
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('room_id');
 }
 
 function init_player1() {
@@ -111,7 +101,7 @@ async function connect()
 {
     Colyseus = await import("colyseus.js");
     client = new Colyseus.Client('ws://localhost:3001');
-    room = await client.joinOrCreate("Private_Room");
+    room = await client.joinById(room_id);
     room.onMessage('Player_init', (message) =>
     {
       player.pseudo = message.player1_pseudo;
