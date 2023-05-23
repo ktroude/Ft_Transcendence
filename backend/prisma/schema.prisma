@@ -50,6 +50,11 @@ model User {
   userFriends       Friend[] @relation("user")
   friendUserFriends Friend[] @relation("friend_users")
 
+  matchesWon MatchHistory[] @relation("winner")
+  matchesLost MatchHistory[] @relation("loser")
+  scoreWinner Int @relation("winner")
+  scoreLoser Int @relation("loser")
+
   // mettres toutes ces variables dans la table intermediaire ChatRoomMembers? A voir JSP
   memberOf ChatRoom[] @relation("ChatRoomMembers")
   mutedOf  ChatRoom[] @relation("ChatRoomMuted")
@@ -163,4 +168,20 @@ model DirectMessage {
   senderPseudo String
   directMessageRoomId Int
   directMessageRoom DirectMessageRoom @relation("directMessages", fields: [directMessageRoomId], references: [id])
+}
+
+model MatchHistory {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  winnerId Int
+  winner   User @relation("winner", fields: [winnerId], references: [id])
+  scoreWinner    Int @relation("winner", fields: [scoreWinner], references: [id])
+
+  scoreLoser     Int @relation("loser", fields: [scoreLoser], references: [id])
+  loserId  Int
+  loser    User @relation("loser", fields: [loserId], references: [id])
+  
+  @@map("match_history")
 }

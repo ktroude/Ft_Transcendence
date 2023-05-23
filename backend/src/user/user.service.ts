@@ -10,6 +10,50 @@ const upload = multer({ dest: 'uploads/' });
 export class UserService {
     constructor(private prisma: PrismaService) {}
     
+    async updateConnectedStatus(pseudo: string, status: string): Promise<User> {
+        if (!pseudo)
+            return null;
+        if (status == 'online')
+        {
+            const updatedUser = await this.prisma.user.update({
+                where: { pseudo: pseudo},
+                data: { connected: 1 }
+            });
+            return updatedUser;
+        }
+        else if (status == 'offline')
+        {
+            const updatedUser = await this.prisma.user.update({
+                where: { pseudo: pseudo},
+                data: { connected: 0 }
+            });
+            return updatedUser;
+        }
+        else if (status == 'ingame')
+        {
+            const updatedUser = await this.prisma.user.update({
+                where: { pseudo: pseudo},
+                data: { connected: 2 }
+            });
+            return updatedUser;
+        }
+    }
+
+    async getConnectedStatus(pseudo: string)
+    {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                pseudo: pseudo,
+            },
+            select: {
+                connected: true
+            }
+        });
+        if (!user)
+            return null;
+        return user.connected;
+    }
+
     async enable2FA(user: number, status: string): Promise<User> {
         if (status == 'enable') 
         {

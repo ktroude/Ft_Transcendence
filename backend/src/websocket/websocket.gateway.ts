@@ -5,9 +5,11 @@ import { User } from '@prisma/client';
 import { io } from 'socket.io-client';
 import { map } from 'rxjs';
 import { Socket } from 'dgram';
+import { UserService } from '../user/user.service';
 
 @WebSocketGateway()
 export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
+  constructor(private userService: UserService) {}
   @WebSocketServer()
   server: Server;
   clients: Map<string, string> = new Map();
@@ -20,6 +22,7 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
         return;
 	}
       this.clients.set(pseudo, client.id);
+      this.userService.updateConnectedStatus(pseudo, 'online');
     });
   }
 
@@ -27,11 +30,15 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 	{
 		this.clients.forEach((value, key) => {
 			if (value === client.id)
+      {
+        this.userService.updateConnectedStatus(key, 'offline');
 			  this.clients.delete(key);
+      }
 		});
 	}
   
-  async getClient() {
+  // ---------------------- DEPRECATED ----------------------
+  async getClient() { 
 	const newmap = this.clients;
 	const vector = [];
 	for (const [key, value] of newmap.entries()) {

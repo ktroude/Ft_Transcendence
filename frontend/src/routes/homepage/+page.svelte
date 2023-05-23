@@ -163,6 +163,22 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             });
           if (!response.ok)
             console.log("Error update achievements <TheDarkSide>")
+		  else
+		  {
+			anim = true;
+					const boxito = document.querySelector("body");
+					const toast = document.createElement("div");
+					toast.innerHTML = `<div class="popup">
+												<div class="popup_img">
+												</div>
+												<div class="popup_title_text_box">
+													<h4 class="popup_title">The Dark Side</h4>
+													<h5 class="popup_text">Log in as a bocal member</h5>
+												</div>
+										</div>`;
+					boxito.appendChild(toast);
+					setTimeout(() => removePopup(toast), 3000);
+		  }
         }
       }
     }
