@@ -137,12 +137,7 @@ const fletchCurrentUserData = async () => {
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			const response = await fetch('http://localhost:3000/users/userInfo', { headers });
 			const data = await response.json();
-			const user = {
-				id: data?.id,
-				pseudo: data?.pseudo,
-				status: -2,
-				room: -1
-			};
+			const user = data;
 			return user;
 		}
 	};

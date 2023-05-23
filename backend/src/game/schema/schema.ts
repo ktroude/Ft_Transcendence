@@ -14,18 +14,21 @@ export class players extends Schema {
   y: number;
   @type('number')
   score: number;
-  @type('number')
-  id: number;
+  @type('string')
+  id: string;
   @type('string')
   pseudo: string;
+  @type('boolean')
+  rdtoplay: boolean;
 
-  constructor(x = 0, y = 0, score = 0, id = 0, Pseudo = '') {
+  constructor(x = 0, y = 0, score = 0, id = '', Pseudo = '') {
     super();
     this.x = x;
     this.y = y;
     this.score = score;
     this.id = id;
     this.pseudo = Pseudo;
+    this.rdtoplay = false;
   }
 }
 

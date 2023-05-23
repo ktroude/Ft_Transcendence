@@ -38,6 +38,10 @@ model User {
   TheDarkSide Boolean @default(false) // Se log en tant que membre du bocal
   ImCurious Boolean @default(false) // Aller voir le github d'un des createurs
 
+
+
+  Match_historiques Match[] @relation("Match_User")
+
   // pitié monsieur donne un autre nom a cette variable, je m'en sers deja dans le front du chat et je fais des gros user =  donc ca va ecraser mon status du front
   // onLine c'est bien non?
   // pitié j'ai 1200 lignes de code a checker sinon
@@ -65,6 +69,7 @@ model User {
 
   ownerOneOf DirectMessageRoom[] @relation("ownerOne")
   ownerTwoOf DirectMessageRoom[] @relation("ownerTwo")
+
 
   @@map("user") // indique que le nom de la table est "user" plutôt que "User"
 }
@@ -171,6 +176,24 @@ model DirectMessage {
   directMessageRoom DirectMessageRoom @relation("directMessages", fields: [directMessageRoomId], references: [id])
 }
 
+
+model Match {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId        Int
+  user          User    @relation("Match_User", fields: [userId], references: [id])
+
+  opponentId    Int
+
+  scoreUser     Int
+  scoreOpponent Int
+  winner        String
+  loser         String
+
+  @@map("match")
+}
 // model MatchHistory {
 //   id        Int      @id @default(autoincrement())
 //   createdAt DateTime @default(now())

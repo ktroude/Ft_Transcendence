@@ -30,7 +30,7 @@ function redirectToGame() {
   return new Promise((resolve) => {
     if (room_id) {
       const url = `http://localhost:5173/game/pong_game?room_id=${room_id}`;
-      window.open(url, '_blank');
+      window.location.href = url;
       resolve();
     } else {
       // Si room_id n'est pas encore rempli, attendez 1 seconde et réessayez
@@ -43,13 +43,6 @@ function redirectToOtherURL()
 {
   navigate('http://localhost:5173/testserver');
 }
-
-function openNewTab() {
-    const url = 'http://localhost:5173/testserver'; // Remplacez par l'URL souhaitée
-    const newTab = window.open(url, '_blank');
-    newTab.focus();
-    console.log("dans open new newTab");
-  }
 
 async function joinRoomById(roomId) {
   try {
