@@ -319,6 +319,15 @@
 		}	
 	}
 
+
+	function check_array(num:any) {
+		for (let i=0; i<blocked.length; i++) {
+			if (blocked[i] === num)
+				return true;
+		}
+		return false;
+	}
+
 	async function displayDropdownMenu(): Promise<string[]> {
 		let array:string[] = [];
 		if (currentUser && selectedUser) {
@@ -503,7 +512,7 @@
 		});
 		socket.on('newMessage', (msg: any) => {
 			if (currentRoom && currentRoom?.id === msg?.chatRoomId) {
-				if (currentUser?.status != -2) {
+				if (currentUser?.status != -2 && check_array(msg.senderId) === false) {
 					messages = [...messages, msg];
 					scrollToBottom();
 				}
