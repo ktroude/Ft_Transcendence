@@ -7,17 +7,29 @@ import { Injectable } from '@nestjs/common';
 import { async } from 'rxjs';
 
 
+async function creatmatchprsima(winner, looser, prisma)
+{
+  return await prisma.match.create({
+    data: { 
+      userId: parseInt(winner.id_user, 10),
+      // user: { connnect: {id: parseInt(winner.id_user, 10) }},
+      scoreUser:  winner.score,
+      opponentId: looser.id_user ,
+      scoreOpponent: looser.score,
+      winner: winner.pseudo,
+      loser: looser.pseudo
+      }
+  })
+}
+  
 async function handleVictoryPrisma(winner, looser, prisma) {
   // push winner
+  const winner_match = await creatmatchprsima(winner, looser, prisma);
+  const looser_match = await creatmatchprsima(looser, winner, prisma);
   await prisma.user.update({
     where: {username : winner.pseudo},
     data: {
-      Match_historiques : {
-        update: {
-          where: { userId: winner.id_user },
-          data: { scoreUser:  winner.score, opponentId: looser.id_user ,scoreOpponent: looser.score, winner: winner.pseudo, loser: looser.pseudo}
-        }
-      },
+      Match_historiques : {connect : {id: winner_match.id}},
       wins: { increment: 1 }, win_streak: { increment: 1 } }
   });
 
@@ -25,12 +37,7 @@ async function handleVictoryPrisma(winner, looser, prisma) {
   await prisma.user.update({
     where: {username : looser.pseudo},
     data: {
-      Match_historiques : {
-        update: {
-          where: { userId: looser.id_user },
-          data: { scoreUser:  looser.score, opponentId: winner.id_user ,scoreOpponent: winner.score, winner: winner.pseudo, loser: looser.pseudo}
-        }
-      },
+      Match_historiques : {connect : {id: looser_match.id}},
       losses: { increment: 1 }, win_streak: 0 }
   });
 }
@@ -87,12 +94,12 @@ export class gameRoomService extends Room {
       {
         if(this.player1.score > this.player2.score)
         {
-          // handleVictoryPrisma(this.player1, this.player2, this.prisma);
+          handleVictoryPrisma(this.player1, this.player2, this.prisma);
           this.broadcast('gameFinished', { winner: this.player1.pseudo });
         }
         else
         {
-          // handleVictoryPrisma(this.player2, this.player1, this.prisma);
+          handleVictoryPrisma(this.player2, this.player1, this.prisma);
           this.broadcast('gameFinished', { winner: this.player2.pseudo });
         }
         console.log("envoie winner", this.player1.pseudo, this.player2.pseudo);
@@ -114,8 +121,8 @@ export class gameRoomService extends Room {
         this.player1.pseudo = message.player_pseudo;
         this.player1.username = message.player_username;
         this.player1.id_user = message.player_id;
-        client.send('role', { client: client.sessionId });
         this.player1.id = client.sessionId;
+        client.send('role', { client: client.sessionId });
       } else if (this.clients.length === 2 && this.player2.pseudo === 'null') {
         this.player2.pseudo = message.player_pseudo;
         this.player2.username = message.player_username;
