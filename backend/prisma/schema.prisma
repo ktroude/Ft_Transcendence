@@ -17,8 +17,8 @@ model User {
 
   firstname String
   lastname  String
-  pseudo    String @unique
-  username  String @unique
+  pseudo    String @unique //login
+  username  String @unique 
   picture   String
 
   wins      Int @default(0)

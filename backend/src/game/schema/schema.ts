@@ -17,17 +17,23 @@ export class players extends Schema {
   @type('string')
   id: string;
   @type('string')
-  pseudo: string;
+  id_user: string;
+  @type('string')
+  pseudo: string; // celui qui ne change pas
+  @type('string')
+  username: string;
   @type('boolean')
   rdtoplay: boolean;
 
-  constructor(x = 0, y = 0, score = 0, id = '', Pseudo = '') {
+  constructor(x = 0, y = 0, score = 0, id = '', id_user = '', Pseudo = '', Username = '') {
     super();
     this.x = x;
     this.y = y;
     this.score = score;
     this.id = id;
+    this.id_user = id_user;
     this.pseudo = Pseudo;
+    this.username = Username;
     this.rdtoplay = false;
   }
 }

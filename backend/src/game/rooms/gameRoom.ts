@@ -7,23 +7,33 @@ import { Injectable } from '@nestjs/common';
 import { async } from 'rxjs';
 
 
-// async function handleVictoryPrisma(winner, looser, prisma) {
-//   await prisma.user.update({
-//     where: {username : winner.pseudo},
-//     data: {
-//       Match_historiques : {
-//         update: {
-//           where: { userId: winner.id },
-//           data: { scoreUser: { increment: 1 } }
-//         }
-//       }
-//        wins: { increment: 1 }, win_streak: { increment: 1 } }
-//   });
-//   await prisma.user.update({
-//     where: {username : looser.pseudo},
-//     data: { losses: { increment: 1 }, win_streak: 0}
-//   });
-// }
+async function handleVictoryPrisma(winner, looser, prisma) {
+  // push winner
+  await prisma.user.update({
+    where: {username : winner.pseudo},
+    data: {
+      Match_historiques : {
+        update: {
+          where: { userId: winner.id_user },
+          data: { scoreUser:  winner.score, opponentId: looser.id_user ,scoreOpponent: looser.score, winner: winner.pseudo, loser: looser.pseudo}
+        }
+      },
+      wins: { increment: 1 }, win_streak: { increment: 1 } }
+  });
+
+  // push looser
+  await prisma.user.update({
+    where: {username : looser.pseudo},
+    data: {
+      Match_historiques : {
+        update: {
+          where: { userId: looser.id_user },
+          data: { scoreUser:  looser.score, opponentId: winner.id_user ,scoreOpponent: winner.score, winner: winner.pseudo, loser: looser.pseudo}
+        }
+      },
+      losses: { increment: 1 }, win_streak: 0 }
+  });
+}
 
 @Injectable()
 export class gameRoomService extends Room {
@@ -148,6 +158,7 @@ export class gameRoomService extends Room {
   }
   onLeave(client: Client, consented: boolean) {
     if (consented) {
+      console.log("Leave consented pong");
       // Le client a quitté la room volontairement
       return;
     }
