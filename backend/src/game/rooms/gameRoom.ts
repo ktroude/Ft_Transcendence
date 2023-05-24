@@ -7,23 +7,33 @@ import { Injectable } from '@nestjs/common';
 import { async } from 'rxjs';
 
 
-// async function handleVictoryPrisma(winner, looser, prisma) {
-//   await prisma.user.update({
-//     where: {username : winner.pseudo},
-//     data: {
-//       Match_historiques : {
-//         update: {
-//           where: { userId: winner.id },
-//           data: { scoreUser: { increment: 1 } }
-//         }
-//       }
-//        wins: { increment: 1 }, win_streak: { increment: 1 } }
-//   });
-//   await prisma.user.update({
-//     where: {username : looser.pseudo},
-//     data: { losses: { increment: 1 }, win_streak: 0}
-//   });
-// }
+async function handleVictoryPrisma(winner, looser, prisma) {
+  // push winner
+  await prisma.user.update({
+    where: {username : winner.pseudo},
+    data: {
+      Match_historiques : {
+        update: {
+          where: { userId: winner.id_user },
+          data: { scoreUser:  winner.score, opponentId: looser.id_user ,scoreOpponent: looser.score, winner: winner.pseudo, loser: looser.pseudo}
+        }
+      },
+      wins: { increment: 1 }, win_streak: { increment: 1 } }
+  });
+
+  // push looser
+  await prisma.user.update({
+    where: {username : looser.pseudo},
+    data: {
+      Match_historiques : {
+        update: {
+          where: { userId: looser.id_user },
+          data: { scoreUser:  looser.score, opponentId: winner.id_user ,scoreOpponent: winner.score, winner: winner.pseudo, loser: looser.pseudo}
+        }
+      },
+      losses: { increment: 1 }, win_streak: 0 }
+  });
+}
 
 @Injectable()
 export class gameRoomService extends Room {
@@ -102,10 +112,14 @@ export class gameRoomService extends Room {
     {
       if (this.clients.length === 1 && this.player1.pseudo === 'null') {
         this.player1.pseudo = message.player_pseudo;
+        this.player1.username = message.player_username;
+        this.player1.id_user = message.player_id;
         client.send('role', { client: client.sessionId });
         this.player1.id = client.sessionId;
       } else if (this.clients.length === 2 && this.player2.pseudo === 'null') {
         this.player2.pseudo = message.player_pseudo;
+        this.player2.username = message.player_username;
+        this.player2.id_user = message.player_id;
         this.player2.id = client.sessionId;
         if (this.player1.pseudo === this.player2.pseudo)
         {
@@ -129,7 +143,11 @@ export class gameRoomService extends Room {
             player2_id: this.player2.id,
             player1_color: this.p1_color,
             player2_color: this.p2_color,
-            mainclient: i === 0 // true si i est égal à 0, sinon false
+            player1_username: this.player1.username,
+            player2_username: this.player2.username,
+            player1_iD_user: this.player1.id_user,
+            player2_iD_user: this.player2.id_user,
+            mainclient: i === 0, // true si i est égal à 0, sinon false
 
             // rajouter ici pour le ingame
           });
@@ -148,6 +166,7 @@ export class gameRoomService extends Room {
   }
   onLeave(client: Client, consented: boolean) {
     if (consented) {
+      console.log("Leave consented pong");
       // Le client a quitté la room volontairement
       return;
     }
