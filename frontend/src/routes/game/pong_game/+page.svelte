@@ -1,3 +1,35 @@
+<svelte:head>
+	<link rel="preload" href="/img/bg2.jpeg" as="image">
+	<link rel="preload" href="/pong.css" as="style"/>
+	<link rel="stylesheet" href="/pong.css" />
+	<link rel="stylesheet" href="/homepage_style.css" />
+	<link rel="stylesheet" href="/navbar.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+</svelte:head>
+
+
+<!-- {#if loading == true} -->
+<body style="margin:0px; padding:0px; background-image:url('/img/bg2.jpeg');
+background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh">
+	<main class="main" role="main">
+		
+	<div class="score_bloc">
+		{#if connected == true}
+		{player.pseudo} : <div class="scores">{player.score} </div> - {player2.pseudo} : <div class="scores" id="player2-score">{player2.score}</div>
+		{/if}
+	</div>
+	{#if connected == false}
+	<button class="play_button" on:click={connect}>PLAY</button>
+	{/if}
+	<canvas id="canvas" width={setting_game.canvas_width} height={setting_game.canvas_height}>
+	</canvas>
+	</main>
+</body>
+<!-- {/if} -->
+
 <script>
 // @ts-nocheck
 
@@ -16,6 +48,8 @@
   let mainclient = false;
   let winner;
   let gameFinished = false;
+  let loading = false;
+	let connected = false;
 
   // debug
   let room_id;
@@ -119,6 +153,7 @@ async function connect()
       mainclient = message.mainclient;
       console.log(mainclient);
       showButtons = true;
+	  connected = true;
       countdown(5);
     })
   room.onMessage('role', (message) => {
@@ -154,7 +189,7 @@ function draw()
   // context.clearRect(0, 0, canvas.width, canvas.height);
   // context.fillStyle = 'black';
   // context.font = "30px Arial";
-  context.fillStyle = 'black';
+//   context.fillStyle = 'black';
   context.fillRect(0, 0, canvas.width, canvas.height);
   
   // player name
@@ -273,8 +308,8 @@ function Updatescore()
       player.score = message.player_score;
       player2.score = message.player2_score;
   })
-  document.querySelector('#player-score').textContent = player.score;
-  document.querySelector('#player2-score').textContent = player2.score;
+//   document.querySelector('#player-score').textContent = player.score;
+//   document.querySelector('#player2-score').textContent = player2.score;
 }
 
 function Updateball()
@@ -392,6 +427,7 @@ onMount(async() => {
   canvas = document.getElementById('canvas');
   currentUser = await fletchCurrentUserData();
   console.log(currentUser);
+  loading = true;
   canvas.addEventListener('mousemove', playerMove);
   canvas.addEventListener('mousemove', player2Move);
   room_id = await getRoomIdFromUrl();
@@ -401,39 +437,3 @@ onMount(async() => {
 });
 
 </script>
-
-<h1>Pong</h1>
-
-<style>
-ul {
-    list-style: none;
-    padding: 0;
-}
-li {
-    display: inline-block;
-}
-</style>
-
-<main role="main">
-<h1>
-    <button on:click={connect}>connect</button>
-    <button on:click={test}>test</button>
-
-</h1>
-<p>
-  {player.pseudo} : <em id="player-score">0</em> - {player2.pseudo} : <em id="player2-score">0</em>
-</p>
-<ul>
-  {#if showButtons}
-    <li>
-      <button on:click={play}>Start</button>
-      <!-- <button id="start-game">Start</button> -->
-    </li>
-    <li>
-      <button id="stop-game">Stop</button>
-    </li>
-  {/if}
-</ul>
-<h2>joined {room?.name} tu es {currentUser?.pseudo}</h2>
-<canvas id="canvas" width={setting_game.canvas_width} height={setting_game.canvas_height}></canvas>
-</main>
