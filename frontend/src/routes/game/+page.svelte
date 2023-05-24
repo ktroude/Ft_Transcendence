@@ -1,77 +1,132 @@
 <svelte:head>
-	<link rel="stylesheet" href="/style_profile.css" />
+	<link rel="preload" href="/img/bg2.jpeg" as="image">
+	<link rel="preload" href="/game_style.css" as="style"/>
+	<link rel="stylesheet" href="/game_style.css" />
+	<link rel="stylesheet" href="/homepage_style.css" />
+	<link rel="stylesheet" href="/navbar.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 </svelte:head>
 
 <!-- ****************************** -->
 <!-- ********** HTML CODE ********* -->
 <!-- ****************************** -->
 
-<body>
-	<div class="game_navbar">
-		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
-		<button class="button_nav" on:click={() => goto(`/profile/${user.id}`)}>Profile</button>
-		<button class="button_nav" on:click={() => goto('/chat')}>Chat</button>
-		<button class="button_nav" on:click={() => goto('/game')}>Game</button>
-	</div>
-	<div class="main_game">
-		<div class="historic_box">
-			<h2>History</h2>
+<body style="margin:0px; padding:0px; background-image:url('/img/bg2.jpeg');
+background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh">
+{#if loading == true}
+		<div class="game_navbar">
+
+			<div class="button_box">
+				<img class="button_picture" src="/img/home_icone.png">
+				<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
+			</div>
+
+			<div class="button_box">
+				<img class="button_picture" src="/img/profile_icone.png">
+				<button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
+			</div>
+
+			<div class="button_box">
+				<img class="button_picture" src="/img/game_icone.png">
+				<button class="button_nav" on:click={() => fade('/game')}>Game</button>
+			</div>
+
+			<div class="button_box">
+				<img class="button_picture" src="/img/chat_icone.png">
+				<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+			</div>
+
 		</div>
-		<div class="game_box">
-		</div>
-		<div class="friendlist_box">
-			<div class="friend-list">
-				<h2>Friendlist</h2>
-				<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
-					<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
-					<ul class="ul_friends">
-						{#if friends}
-						{#each friends as friendName}
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
-							<div class="friendBloc">
-								{friendName}
-								{#if invited === 1 }
-								<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
-								<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
+
+			<div class="full_page">
+
+				<div class="friendlist_box">
+					<div class="friend-list">
+						<div class="friendlist_title">Friendlist</div>
+						<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
+							<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
+							<ul class="ul_friends">
+								{#if friends}
+								{#each friends as friendName}
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
+									<div class="friendBloc">
+										<div class="friend_name">
+											{friendName}
+										</div>
+										{#if invited === 1 }
+										<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
+										<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
+										{/if}
+									</div>
+									{#if clickedFriend === friendName && showButtons && invited === 2}
+									<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+									<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+									<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
+									<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+									{/if}
+								</li>
+								{/each}
 								{/if}
-							</div>
-							{#if clickedFriend === friendName && showButtons && invited === 2}
-							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
-							{/if}
-						</li>
-						{/each}
-						{/if}
-					</ul>
-			</div>
-			<div class="search_profile">
-				<h1>Search profile</h1>
-				<div class="search_bloc">
-					<input class="input_friend" type="text" bind:value={searchProfile} />
-					<button class="search_button" on:click={() => handleSearchProfile(searchProfile)}>🔍</button>
+							</ul>
+						</div>
 				</div>
-				<div class="connected_users_bloc">
-					<h2>Connected Users</h2>
-					<ul class="ul_friends">
-						{#each connectedUsers as connectedUsersName}
-							<li class="friends_list">
-								<div class="friend_line">
 
-									<div class="connectedUsersName">{connectedUsersName}</div>
-									<div class="green_dot"></div>
-								</div>
-							</li>
-						{/each}
-					</ul>
+
+				<div class="lobby_box">
+					<div class="lobby_title">LOBBY</div>
+					<p>Nombre de clients en attente : {clientsCount}</p>
+
+					{#if waiting}
+					<h2>Vous êtes en attente</h2>
+					{/if}
+				  
+					{#if seatData}
+					  <h2>Vous avez obtenu une place dans une salle</h2>
+					  <p>Informations sur la place : {JSON.stringify(seatData)}</p>
+					{/if}
+				  
+					{#if room_id}
+					  <h2>Vous avez rejoint une salle</h2>
+					  <p>Informations sur la salle : {JSON.stringify(room_id)}</p>
+					{/if}
+					<button class="connect_button" on:click={connect}>SEARCH OPPONENT</button>
+
 				</div>
-			</div>
-		</div>
+
+
+
+			<div class="connected_box">
+				<div class="search_profile">
+					<!-- <div class="search_title">Search profile</div>
+					<div class="search_bloc">
+						<input class="input_friend" type="text" bind:value={searchProfile} />
+						<button class="search_button" on:click={() => handleSearchProfile(searchProfile)}>🔍</button>
+					</div> -->
+					<div class="connected_users_bloc">
+						<div class="connected_title">Connected users</div>
+
+						<ul class="ul_friends">
+							{#each connectedUsers as connectedUsersName}
+								<li class="friends_list">
+									<div class="friend_line">
+										<div class="green_dot"></div>
+										<div class="connectedUsersName">{connectedUsersName}</div>
+										
+									</div>
+								</li>
+							{/each}
+						</ul>
+					</div>
+					</div>
+					</div>
 	</div>
-</body>
 
+	{/if}
+</body>
 <!-- ****************************** -->
 <!-- **********   SCRIPT  ********* -->
 <!-- ****************************** -->
@@ -84,16 +139,86 @@
     import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../API/api';
 	import { page } from '$app/stores';
 
+
+
+
+	import { navigate } from 'svelte-routing';
+
+	let Colyseus;
+	let client;
+	let room;
+	let clientsCount = 0;
+	let seatData = null;
+	let room_id = null;
+	let room_pong;
+	let first_connection = true;
+	let waiting = false;
+	let mess = null;
+
+	function redirectToGame() {
+  	return new Promise((resolve) => {
+    if (room_id) {
+      const url = `http://localhost:5173/game/pong_game?room_id=${room_id}`;
+      window.location.href = url;
+      resolve();
+    } else {
+      // Si room_id n'est pas encore rempli, attendez 1 seconde et réessayez
+      setTimeout(() => redirectToGame().then(resolve), 1000);
+    }
+  });
+}
+
+
+async function connect()
+{
+  if (waiting == false)
+  {
+    waiting = true;
+    Colyseus = await import("colyseus.js");
+  
+    client = new Colyseus.Client('ws://localhost:3001');
+    // console.log("client created");
+    room = await client.joinOrCreate("ranked");
+    // console.log("created room lobby");
+
+    room.onMessage('test', (message) => {
+      mess = message.test_i;
+    //   console.log("dans room Onmessage");
+    });
+    room.onMessage('waiting', (message) => { waiting = true; });
+    room.onMessage('seat', (message) => {
+      room_id = message;
+    //   console.log("dans seatttt");
+      redirectToGame();
+    });
+  }
+  else{
+	waiting = false;
+	room.send('waiting',  { waiting : false});
+  }
+}
+
+
+
+
+
+
+
+
+
+
 	let socket: Socket;
 
     let previousFriend: string;
     let showButtons = false;
     let clickedFriend: string;
-    let friends = [];
+    let friends: any[] = [];
     let friendNameAdd: string = '';
     let searchProfile: string = '';
     let connectedUsers = [];
 
+
+	let loading = false;
 	let friendUser: User;
     let user: User;
     interface User {
@@ -112,7 +237,7 @@
 		 2 -> prevents buttons from showing up when accepting/denying invitation
 	*/
 
-	let invited = 1;
+	let invited = 0;
 
 	async function getConnectedUsers() {
 	const accessToken = await fetchAccessToken();
@@ -133,6 +258,16 @@
 	} else {
 		console.log('Error: Could not get users');
 	}
+	}
+
+	function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
 	}
 
 	async function handleSearchProfile(searchProfile: string) {
@@ -188,7 +323,7 @@
 		}
 	}
 
-    async function handleMessageFriend(friendName) {
+    async function handleMessageFriend(friendName: any) {
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
@@ -208,7 +343,7 @@
 			console.log('Error: Could not get users');
 	}
 
-    async function handleProfileFriend(friendName) {
+    async function handleProfileFriend(friendName: any) {
         const accessToken = await fetchAccessToken();
 		friendUser = await fetchDataOfUser(friendName);
         if (accessToken)
@@ -217,7 +352,7 @@
             console.log('Error: Could not get profile');
     }
 
-    async function handleDeleteFriend(friendName) {
+    async function handleDeleteFriend(friendName: any) {
         const accessToken = await fetchAccessToken();
         if (accessToken) {
             const response = await fetch(`http://localhost:3000/users/${user.pseudo}/deletefriend`, {
@@ -238,7 +373,7 @@
 			goto('/');
     }
 
-    function handleInviteFriend(friendName) {
+    function handleInviteFriend(friendName: any) {
         console.log(`Inviting ${friendName} to play`);
 		/*If accepted -> goto(`/game/${roomid}`); */
     }
@@ -310,6 +445,7 @@
 			friends = await fetchFriend(user.pseudo);
 			getConnectedUsers();
 		}
+		loading = true;
     });
 
     export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, imageURL, user, newUsername, handleUpdateUsername };

@@ -1,185 +1,154 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Signika+Negative:wght@500&display=swap');
-
 /* <!-- ****************************** -->
    <!-- ***********  GAME  *********** -->
    <!-- ****************************** --> */
 
-.main_game{
-	margin:0px;
-	padding:0px;
-	height:100vh;
-	width:100vw;
-	display: flex;
-	flex-direction: row;
-}
-.historic_box{
-	padding:5px;
-	height:100%;
-	width:15%;
-	text-align: center;
-}
-.game_box{
-	height:100%;
-	background:rgb(56, 56, 56);
-	width:70%;
-}
-.friendlist_box{
-	margin: 0;
-	padding:0px;
-	width:15%;
-	height:50%;
-	text-align: center;
-}
+
 .game_navbar{
-	height:50px;
-	width:100%;
-	background:#201207;
+	border-bottom: 1px solid rgb(93, 215, 255) !important;
+}
+
+.button_nav:hover{
+	color: rgb(93, 215, 255)  !important;
+	text-shadow: 3px 3px 20px rgb(93, 215, 255),
+	-2px 1px 30px rgb(93, 215, 255)  !important;
+}
+
+.button_nav:hover::before {
+	border-bottom: 10px solid rgb(93, 215, 255) !important;
+}
+
+.full_page{
 	display: flex;
 	flex-direction: row;
-	align-items: center;
+	width: 100%;
+	height: 100%;
 }
-.friend_button{
-	padding:0px;
-	width:100px;
-	height:30px;
-	align-items: center;
-	text-align: center;
-	font-size: 12px;
+
+.friendlist_box{
+	width: 15%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-right: 1px solid  rgba(0, 0, 0, 0.275);
 }
-.friend-list{
-	font-size: 20px;
-	display:flex;
-	flex-direction: column;
-	align-items: center;
-	text-align: center;
+
+.friendlist_title{
+	color:rgb(93, 215, 255);
+	font-size: 40px;
 }
-.input_friend{
-	background:rgb(174, 174, 174);
-	border:none;
-	margin: 0;
-	border-radius: 3px;
-	height:10px;
-	padding: 0;
-	font-size: 0;
-	width:200px;
-}
-.ul_friends{
-	align-items: center;
-	text-align: center;
-	list-style: none;
-	display: flex;
-	flex-direction: column;
-}
-.ul_friends:hover{
-	cursor: pointer;
-}
-.addfriend_button {
-	width: 20px;
-	height: 30px;
-	margin: 5px;
-	font-size: 15px;
-	color:black;
-	align-items: center;
-	text-align: center;
-	display: flex; 
-	justify-content: center;
-	align-items: center;
-	background:greenyellow;
-}
-.addfriend_button:hover {
-	background:rgb(215, 254, 206);
-}
+
 .addfriend_bloc{
-	text-align: center;
-	display: flex;
-	align-items: center;
-}
-.accept_invite{
-	background:black;
-	color:rgb(92, 255, 47);
-	width: 10px;
-	height: 20px;
-	margin: 5px;
-	font-size: 16px;
-	align-items: center;
-	text-align: center;
-	display: flex; 
 	justify-content: center;
 	align-items: center;
-}
-.accept_invite:hover{
-	color:green;
-	background: white;
-	outline:2px solid greenyellow;
-}
-.deny_invite{
-	color:red;
-	width: 20px;
-	height: 20px;
-	margin: 5px;
-	font-size: 16px;
-	background-color: rgb(0, 0, 0);
-	align-items: center;
-	text-align: center;
-	display: flex; 
-	justify-content: center;
-	align-items: center;
-}
-.friendBloc{
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
-	align-items: center;
+	padding: 5px;
 }
-.search_profile{
-	border-top: 1px solid black;
-	padding:5px;
-	height: auto;
-	text-align: center;
-	margin: 0;
-}
-.friend-list{
-	height:100%;
-}
-.search_bloc{
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-.search_button{
-	width: 20px;
-	height: 20px;
-	font-size: 15px;
-	color:black;
-	align-items: center;
-	text-align: center;
-	display: flex; 
-	justify-content: center;
-	align-items: center;
-	background: transparent;
+
+.input_friend{
+	width: 160px;
+	height: 30px;
+	background-color: rgba(204, 204, 204, 0.323);
 	border: none;
+	color: white;
+	font-size: 20px;
+	padding: 1px;
 }
-.search_button:hover{
-	transform: rotate(-10deg)
+
+.input_friend:focus{
+	outline: none;
 }
-.connected_users_bloc{
-	border-top: 1px solid black;
-	padding:5px;
-	height: auto;
-	text-align: center;
-	margin: 0;
+
+.addfriend_button{
+	width: 30px;
+	border: none;
+	height: 30px;
+	color: white;
+	background-color: transparent;
+	font-size: 25px;
 }
-.green_dot{
-	border-radius: 100%;
-	background-color: greenyellow;
-	width:8px;
-	height:8px;
-	margin: 4px;
+
+.addfriend_button:hover{
+	cursor: pointer;
+	color: rgb(93, 215, 255);
 }
+
+.friend_name{
+	font-size: 20px;
+}
+
+.friend_name:hover{
+	cursor: pointer;
+	color: rgb(93, 215, 255);
+}
+
+.lobby_box{
+	width: 70%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.lobby_title{
+	font-size: 200px;
+	margin-bottom:450px;
+	text-shadow: 6px 6px 0px rgba(0,0,0,0.2);
+}
+
+.connect_button{
+	width: 250px;
+	height: 80px;
+	font-size: 40px;
+	border: none;
+	color: white;
+	background: rgba(0, 0, 0, 0.482);
+	transition: all 0.1s ease-in-out;
+}
+
+.connect_button:hover{
+	background: rgba(0, 0, 0, 0.482);
+	border-radius: 18px;
+	cursor: pointer;
+	/* color:rgb(93, 215, 255); */
+	text-shadow: 3px 3px 20px rgba(93, 215, 255, 0.799),
+	-2px 3px 20px rgba(93, 215, 255, 0.747);
+	border: 3px solid rgb(93, 215, 255);
+}
+
+.connected_box{
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	width: 15%;
+	height: 100%;
+	border-left: 1px solid rgba(0, 0, 0, 0.257);
+}
+
+.connected_title{
+	color:rgb(93, 215, 255);
+	font-size: 40px;
+}
+
+.friends_list{
+	list-style: none;
+}
+
 .friend_line{
 	display: flex;
 	flex-direction: row;
+	justify-content: center;
 	align-items: center;
-	text-align: center;
+}
+.connectedUsersName{
+	font-size: 20px;
+}
+
+.green_dot{
 	margin: 2px;
+	width: 5px;
+	border-radius: 100%;
+	height: 5px;
+	border-radius: 100%;
+	background-color: greenyellow;
 }

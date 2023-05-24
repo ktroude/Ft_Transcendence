@@ -1,0 +1,44 @@
+.main{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.play_button{
+	width: 250px;
+	height: 80px;
+	font-size: 40px;
+	border: none;
+	color: white;
+	background: rgba(0, 0, 0, 0.482);
+	transition: all 0.1s ease-in-out;
+	margin: 5px;
+}
+.play_button:hover{
+	background: rgba(0, 0, 0, 0.482);
+	border-radius: 18px;
+	cursor: pointer;
+	/* color:rgb(93, 215, 255); */
+	text-shadow: 3px 3px 20px rgba(93, 215, 255, 0.799),
+	-2px 3px 20px rgba(93, 215, 255, 0.747);
+	border: 3px solid rgb(93, 215, 255);
+}
+.score_bloc{
+	height: 50px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	font-size: 40px;
+}
+.scores{
+	font-size: 40px;
+}
+
+
+#canvas{
+	margin: auto;
+	background-color: rgba(35, 35, 35, 0.283) !important;
+	border-radius: 20px;
+}
