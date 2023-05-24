@@ -112,10 +112,14 @@ export class gameRoomService extends Room {
     {
       if (this.clients.length === 1 && this.player1.pseudo === 'null') {
         this.player1.pseudo = message.player_pseudo;
+        this.player1.username = message.player_username;
+        this.player1.id_user = message.player_id;
         client.send('role', { client: client.sessionId });
         this.player1.id = client.sessionId;
       } else if (this.clients.length === 2 && this.player2.pseudo === 'null') {
         this.player2.pseudo = message.player_pseudo;
+        this.player2.username = message.player_username;
+        this.player2.id_user = message.player_id;
         this.player2.id = client.sessionId;
         if (this.player1.pseudo === this.player2.pseudo)
         {
@@ -139,7 +143,11 @@ export class gameRoomService extends Room {
             player2_id: this.player2.id,
             player1_color: this.p1_color,
             player2_color: this.p2_color,
-            mainclient: i === 0 // true si i est égal à 0, sinon false
+            player1_username: this.player1.username,
+            player2_username: this.player2.username,
+            player1_iD_user: this.player1.id_user,
+            player2_iD_user: this.player2.id_user,
+            mainclient: i === 0, // true si i est égal à 0, sinon false
 
             // rajouter ici pour le ingame
           });

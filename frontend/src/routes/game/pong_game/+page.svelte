@@ -112,6 +112,10 @@ async function connect()
       player2.score = message.player2_score;
       player.color = message.player1_color;
       player2.color = message.player2_color;
+      player.id_user = message.player1_iD_user;
+      player2.id_user = message.player2_iD_user;
+      player.username = message.player1_username;
+      player2.username = message.player2_username;
       mainclient = message.mainclient;
       console.log(mainclient);
       showButtons = true;
@@ -120,7 +124,7 @@ async function connect()
   room.onMessage('role', (message) => {
     clientId = message.client;
   });
-  room.send('player_name', {player_pseudo : currentUser.pseudo});
+  room.send('player_name', {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
   console.log('Joined succefuly', room);
 }
     
