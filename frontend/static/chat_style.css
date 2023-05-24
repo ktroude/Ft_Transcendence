@@ -1,0 +1,520 @@
+
+/***************************************************/
+/*****************BODY / NAVBAR TWEAKS*************/
+/*************************************************/
+
+.game_navbar{
+	height:50px;
+}
+.chat_body{
+	width: 100%;
+	height: 95%;
+	display: flex;
+	flex-direction: row;
+	background-color: rgba(0, 0, 0, 0.267);
+	margin-bottom: -50px;
+	animation: fade-in 0.6s linear;
+}
+@keyframes fade-in{
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 100;
+	}
+}
+
+/***************************************************/
+/*****************LEFT BLOC************************/
+/*************************************************/
+.left_bloc{
+	height:100vh;
+	width: 20vw;
+}
+.create-room{
+	height:15vh;
+	width: 20vw;
+	background-color: rgba(122, 122, 122, 0.084);
+	backdrop-filter: blur(5px);
+	display: flex;
+	flex-direction: column;
+	border-bottom: 1px solid white;
+	align-items: center;
+	padding: 10px;
+}
+.room-form-title{
+	color: greenyellow;
+}
+.private_room{
+	font-size: 14px;
+}
+.create_room_form{
+	display: flex;
+	flex-direction: column;
+}
+.form_button{
+	color: white;
+	width:120px;
+	height:40px;
+	font-size: 18px;
+	background-color: transparent;
+	cursor: pointer;
+	border: none;
+}
+.form_button:hover{
+	color: greenyellow;
+	animation: squeeze_text_chat 0.4s ease-in-out;
+	text-shadow: 3px 3px 20px #00b309,
+	-2px 1px 30px #00b309;
+	font-size: 18px;
+}
+@keyframes squeeze_text_chat {
+	0% {
+		font-size: 18px;
+	}
+	30% {
+		font-size: 20px;
+	}
+	100% {
+		font-size: 18px;
+	}
+}
+::-webkit-scrollbar{
+    width: 6px;
+	height: 100%;
+}
+::-webkit-scrollbar-thumb{
+	background: transparent;
+    background-clip: content-box; 
+    border-radius: 50px;
+    border: 6px #e2dad0 solid;
+}
+.public_room_list {
+    height: 35vh;
+    width: 20vw;
+    display: flex;
+    background-color: rgba(122, 122, 122, 0.084);
+    backdrop-filter: blur(5px);
+    flex-direction: column;
+    border-bottom: 1px solid white;
+    align-items: center;
+    padding: 10px;
+    overflow-y: auto;
+}
+.room-title{
+    color: greenyellow;
+    margin-bottom: 10px;
+}
+.chatroom-button {
+    width: 116px;
+    min-height: 30px;
+    max-height: 30px;
+    font-size: 16px;
+    margin: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.447);
+    background: transparent;
+    color: white;
+    text-align: center;
+    align-items: center;
+    white-space: nowrap;
+    padding: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.chatroom-button:hover{
+    cursor: pointer;
+    color: greenyellow;
+    text-shadow: 3px 3px 20px #00B309,
+    -2px 1px 30px #00B309;
+    font-size: 16px;
+}
+.chatroom-button-connected{
+	width: 116px;
+    min-height: 30px;
+    max-height: 30px;
+    font-size: 16px;
+	text-shadow: 3px 3px 20px #00B309,
+	-2px 1px 30px #00B309;
+    margin: 2px;
+	color: greenyellow;
+    border: 1px solid greenyellow;
+    background: transparent;
+    color: white;
+    text-align: center;
+    align-items: center;
+    white-space: nowrap;
+    padding: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.chatroom-button-failed{
+	width: 116px;
+    min-height: 30px;
+    max-height: 30px;
+    font-size: 16px;
+	text-shadow: 3px 3px 20px #00B309,
+	-2px 1px 30px #00B309;
+    margin: 2px;
+	color: greenyellow;
+    border: 1px solid rgba(255, 255, 255, 0.447);
+    background: transparent;
+    color: white;
+    text-align: center;
+    align-items: center;
+    white-space: nowrap;
+    padding: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	animation: shake_button_fail 0.3s ease;
+}
+@keyframes shake_button_fail{
+	0% {
+		border: 1px solid red;
+		transform: rotate(0deg);
+	}
+	30% {
+		transform: rotate(-3deg);
+	}
+	70% {
+		transform: rotate(3deg);
+	}
+	100% {
+		transform: rotate(0deg);
+		border: 1px solid red;
+	}
+}
+.chatroom-button-failed:hover{
+    cursor: pointer;
+    color: greenyellow;
+    text-shadow: 3px 3px 20px #00B309,
+    -2px 1px 30px #00B309;
+    font-size: 16px;
+}
+.wrap_button{
+	overflow-y: hidden;
+}
+.lock{
+	z-index: 0;
+	align-items: center;
+}
+.private_room_list{
+	border-bottom: 1px solid white;
+	height:30vh;
+	width: 20vw;
+	display: flex;
+	background-color: rgba(122, 122, 122, 0.084);
+	flex-direction: column;
+	align-items: center;
+	padding: 10px;
+	overflow-x: scroll;
+}
+
+/***********************************************************/
+/*****************SETTINGS LEFT BLOC************************/
+/***********************************************************/
+
+.room_settings{
+	display: flex;
+	background-color: rgba(122, 122, 122, 0.084);
+	flex-direction: column;
+	align-items: center;
+	padding: 5px;
+	overflow-x: scroll;
+	height:20vh;
+}
+.settings_button{
+	color: white;
+	width:120px;
+	height:40px;
+	font-size: 15px;
+	background-color: transparent;
+	cursor: pointer;
+	border: none;
+}
+.settings_button:hover{
+	color: greenyellow;
+	text-shadow: 3px 3px 20px #00b309,
+	-2px 1px 30px #00b309;
+}
+.room_name{
+	color: rgb(255, 238, 47);
+	font-size: 22px;
+}
+.password_change_input{
+	margin: 3px;
+}
+.input_box_settings{
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	height: 60px;
+	width: 100%;
+	align-items: center;
+	/* background-color: red; */
+	justify-content: center;
+}
+.password_change_bloc{
+	display: flex;
+	margin: 3px;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.useradd_bloc{
+	/* background-color: blue; */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-top: auto;
+	margin-bottom: 10px;
+}
+.delete_password:hover{
+	color: rgb(255, 47, 47);
+	text-shadow: 3px 3px 20px #b30000,
+	-2px 1px 30px #b30000;
+}
+.delete_password{
+	background-color: transparent;
+	cursor: pointer;
+	margin: auto;
+	border: none;
+	color: white;
+	font-size: 15px;
+}
+.leave_chat{
+	background-color: transparent;
+	cursor: pointer;
+	border: none;
+	color: white;
+	font-size: 18px;
+}
+.leave_chat:hover{
+	color: rgb(255, 47, 47);
+	text-shadow: 3px 3px 20px #b30000,
+	-2px 1px 30px #b30000;
+	animation: shake_button 0.6s infinite;
+}
+@keyframes shake_button{
+	0% {
+		transform: rotate(0deg);
+	}
+	30% {
+		transform: rotate(-5deg);
+	}
+	70% {
+		transform: rotate(5deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+/****************************************************/
+/*****************MIDDLE BLOC************************/
+/****************************************************/
+
+.message_container{
+	width: 60vw;
+	height:100vh;
+	background-color: transparent;
+	display: flex;
+	flex-direction: column;
+	text-align: left;
+	padding: 30px;
+}
+.chat-messages{
+	height:85vh;
+	overflow: scroll;
+	margin: 5px;
+	word-wrap: break-word;
+}
+.message_text{
+	font-size: 20px;
+	margin: 5px;
+}
+.pseudo-button-message{
+	background-color: transparent;
+	color: yellow;
+	border: none;
+	font-size: 20px;
+	animation: wiggle_text 0.3s ease-in-out;
+}
+.pseudo-button-message_owner{
+	background-color: transparent;
+	color: rgb(255, 0, 47);
+	border: none;
+	font-size: 20px;
+	animation: wiggle_text 0.3s ease-in-out;
+}
+.pseudo-button-message_owner:hover{
+	cursor: pointer;
+	background-color: transparent;
+	color: rgb(255, 0, 47);
+	text-shadow: 3px 3px 10px rgba(255, 0, 0, 0.353),
+	-2px 1px 10px rgba(255, 0, 0, 0.357);
+}
+@keyframes wiggle_text {
+	0% {
+		transform: rotate(5deg);
+	}
+	30% {
+		transform: rotate(-5deg);
+	}
+	80% {
+		transform: rotate(5deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+  }
+.pseudo-button-message:hover{
+	cursor: pointer;
+	background-color: transparent;
+	color: yellow;
+	text-shadow: 3px 3px 10px rgba(255, 255, 0, 0.353),
+	-2px 1px 10px rgba(255, 255, 0, 0.357);
+}
+.message_input_container{
+	animation: appear_input 0.5s ease-in-out;
+}
+.send_message_form{
+	display:flex;
+	flex-direction:row;
+	padding:1px;
+}
+.send-message-button{
+	background: white;
+	border: none;
+}
+.send-message-button:hover{
+	cursor: pointer;
+}
+.message_input:focus{
+	outline: none;
+}
+.message_input{
+	width: 100%;
+	padding:6px;
+	min-height: 30px;
+	border: none;
+	font-size: 20px;
+}
+@keyframes appear_input {
+	0% {
+		background: transparent;
+		transform: translatey(500px);
+	}
+	100% {
+		background: white;
+		transform: translateX(0px);
+	}
+}
+.sent_icone{
+	width: 40px;
+	height: 40px;
+	/* animation: appear_input 0.5s ease-in-out; */
+}
+.sent_icone:hover{
+	animation: wiggle_pen 0.3s ease-in-out;
+}
+.sent_icone:active{
+	animation: shake_pen 0.3s ease-in-out;
+}
+@keyframes wiggle_pen {
+	0% {
+		transform: rotate(20deg);
+	}
+	30% {
+		transform: rotate(40deg);
+	}
+	80% {
+		transform: rotate(20deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+@keyframes shake_pen {
+	0% {
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+/***************************************************/
+/*****************RIGHT BLOC************************/
+/*************************************************/
+
+.right_bloc{
+	background-color: rgba(122, 122, 122, 0.084);
+	backdrop-filter: blur(5px);
+	height:100vh;
+	color: white;
+	width: 20vw;
+	animation: appear_div 0.5s ease-in-out;
+}
+@keyframes appear_div {
+	0% {
+		transform: translateX(500px);
+	}
+	100% {
+		transform: translateX(0px);
+	}
+}
+.user_list{
+	padding-top: 10px;
+	width: 20vw;
+	height: 70vh; 
+	background-color: rgba(122, 122, 122, 0.084);
+	backdrop-filter: blur(5px);
+	border-bottom: 1px solid white;
+	display: flex;
+	flex-direction: column;
+}
+.menu{
+	padding-top: 10px;
+	height:30vh;
+	width: 20vw;
+	/* background-color: rgba(122, 122, 122, 0.084); */
+	backdrop-filter: blur(5px);
+	display: flex;
+	flex-direction: column;
+}
+.public_room{
+	padding-top: 10px;
+	height: 20vh;
+	border-bottom: 1px solid white;
+}
+.member_list{
+	border-bottom: 1px solid white;
+	height: 30vh;
+	display: flex;
+	flex-direction: column;
+	overflow: scroll;
+}
+.pseudo_button{
+	background-color: transparent;
+	color: yellow;
+	border: none;
+	font-size: 18px;
+}
+.server_message{
+	background: transparent;
+	border: none;
+	color: red;
+	font-size: 20px;
+}
+.button_show_profile{
+	background-color: transparent;
+	color: yellow;
+	border: none;
+	font-size: 18px;
+}
+.button_show_profile:hover{
+	cursor: pointer;
+	background-color: transparent;
+	color: yellow;
+	text-shadow: 3px 3px 10px rgba(255, 255, 0, 0.353),
+	-2px 1px 10px rgba(255, 255, 0, 0.357);
+}

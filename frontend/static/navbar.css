@@ -1,0 +1,134 @@
+  
+  /* <!-- ****************************** -->
+	 <!-- **********  NAVBAR  ********** -->
+	 <!-- ****************************** --> */
+  
+	 .game_navbar {
+		height:50px;
+		width:100%;
+		background: rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(5px);
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		text-align: center;
+		border-bottom: 1px solid greenyellow;
+	  }
+	  /*.navbar_image {
+		background: url("Dofus_emeraude.png") no-repeat center;
+		background-size: contain;
+		position: absolute;
+		top: -5;
+		left: 10px;
+		width: 50px;
+		height: 50px;
+		cursor: pointer;
+		transition: all .1s ease-in-out;
+	  }*/
+	  .navbar_image:hover {
+		animation: squeeze .5s ease;
+		top: 10;
+		left: 5px;
+		width: 60px;
+		height: 60px;
+	  }
+	  .navbar_image:active {
+		background: url("Dolmanax.png") no-repeat center;
+		background-size: contain;
+		border: none;
+	}
+	  .game_button_box{
+		background-color: transparent;
+		border-radius: 5px;
+	  }
+	  .game_button{
+		color: white;
+		width:120px;
+		height:40px;
+		font-size: 22px;
+		background-color: transparent;
+		cursor: pointer;
+		border: none;
+	  }
+	  .game_button:hover{
+		color: greenyellow;
+		animation: squeeze_text 0.4s ease-in-out;
+		text-shadow: 3px 3px 20px #00b309,
+		-2px 1px 30px #00b309;
+	  }
+	  @keyframes appear_triangle {
+		  0% {
+			  border-bottom: 0px solid greenyellow;
+		  }
+		  100% {
+			  border-bottom: 10px solid greenyellow;
+		  }
+	  }
+	  .button_nav {
+		  display: block;
+		  margin: 0 auto;
+		  background-color: transparent;
+		  color:white;
+		  border: none;
+		  width:120px;
+		  height:40px;
+		  border-radius: 5px;
+		  font-size: 25px;
+		  cursor: pointer;
+		  line-height: 10px;
+		  position: relative;
+		  display: flex;
+		  flex-direction: row;
+		  align-items: center;
+		  border: none;
+	  }
+	  .button_nav:hover{
+		  color: greenyellow;
+		  animation: squeeze_text 0.5s ease-in-out;
+		  text-shadow: 3px 3px 20px #00b309,
+		  -2px 1px 30px #00b309;
+	  }
+	  @keyframes squeeze_text {
+		0% {
+			font-size: 25px;
+		}
+		30% {
+			font-size: 28px;
+		}
+		100% {
+			font-size: 25px;
+		}
+	  }
+	  .button_nav:hover::before {
+		  content: '';
+		  position: absolute;
+		  bottom: -5px;
+		  left: 50%;
+		  transform: translateX(-50%);
+		  animation: appear_triangle 0.2s ease-in-out;
+		  border-bottom: 10px solid greenyellow;
+		  border-left: 10px solid transparent;
+		  border-right: 10px solid transparent;
+	  }
+	.button_picture{
+		height:40px;
+		margin: 0;
+	}
+	.button_box{
+		width: 80px;
+		margin: auto;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	  }
+	  .loading_screen{
+		height: 100%;
+		width: 100%;
+		background:black;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		display: flex;
+	}

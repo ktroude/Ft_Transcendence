@@ -1,44 +1,224 @@
-<script>
+<svelte:head>
+	<title>Homepage</title>
+	<link rel="preload" href="/img/bg1.jpg" as="image">
+	<link rel="preload" href="/homepage_style.css" as="style"/>
+	<link rel="stylesheet" href="/homepage_style.css" />
+	<link rel="stylesheet" href="/navbar.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+</svelte:head>
 
-import { onMount } from 'svelte';
-import { unsign } from 'cookie-signature';
+<!-- ****************************** -->
+<!-- ********** HTML CODE ********* -->
+<!-- ****************************** -->
 
-function checkCookie() {
+<body style="margin:0px; padding:0px; background-image:url('/img/bg1.jpg');
+background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh;">
+{#if loading === true}
 
-    // trouver un moyen de cacher cette variable secret, sinon ce n'est plus un secret
-    const secret = 'bfe54f6e335fv4r4fv5wqcF#RCr4CVr4VR#4cr4286Vr342v4@#$4V6C2V#46V4$28'; // Clé de signature
+    <div class="game_navbar">
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/home_icone.png">
+            <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
+        </div>
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/profile_icone.png">
+            <button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
+        </div>
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/game_icone.png">
+            <button class="button_nav" on:click={() => fade('/game')}>Game</button>
+        </div>
+
+        <div class="button_box">
+            <img class="button_picture" src="/img/chat_icone.png">
+            <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+        </div>
+
+    </div>
+
+    <h1 class="Ft-Transcendence">Ft-Transcendence</h1>
+      
+	<div class="welcome_box">
+		<h1 class="welcome_h1">
+            <span class="Bienvenue">Bienvenue,</span>
+            <span class="typewriter">{user?.username}</span>
+        </h1>
+        <img class="boune" src="/img/Bounejump.gif" alt="">
+	</div>
+
+    <footer class="footer">
+        <p>Un projet de 
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('ktroude')}>Ktroude</span>,
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Krokmouuu')}>Bleroy</span>,
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Lmaujean')}>Lmaujean</span>,
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('PKLB')}>Ple-berr</span> et
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('venum78160')}>vl-hotel</span>
+        </p>
+      </footer>
+	  {/if}
+	</body>
+
+<!-- ****************************** -->
+<!-- **********   SCRIPT  ********* -->
+<!-- ****************************** -->
+
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { goto } from "$app/navigation";
+    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../API/api';
+	import { redirect } from '@sveltejs/kit';
+	import {io, Socket} from 'socket.io-client';
+	import * as dotenv from 'dotenv';
+  	dotenv.config();
+	
+	let socket: Socket;
+	let anim = false;
+
+	let all_achievements = {};
+
+
+	let loading = false;
+	let user: User;
+    interface User {
+        id: number;
+        pseudo: string;
+        firstName: string;
+        lastName: string;
+        username: string;
+    }
+
+    async function redirectToGithub(username) {
+      	const accessToken = await fetchAccessToken();
+      	const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
+			method: 'PUT',
+			headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`
+			},
+			body: JSON.stringify({achievement: 'ImCurious' })
+            });
+		if (!response.ok)
+            console.log("Error update achievements <ImCurious>")
+		else if (anim == false){
+			for (const [key, value] of Array.from(all_achievements)) {
+				if (key == "ImCurious" && value == false)
+				{
+					anim = true;
+					const boxito = document.querySelector("body");
+					const toast = document.createElement("div");
+					toast.innerHTML = `<div class="popup">
+												<div class="popup_img">
+												</div>
+												<div class="popup_title_text_box">
+													<h4 class="popup_title">I'm Curious</h4>
+													<h5 class="popup_text">Check one of our Githubs.</h5>
+												</div>
+										</div>`;
+					boxito.appendChild(toast);
+					setTimeout(() => removePopup(toast), 3000);
+				}
+			}
+		}
+		window.open(`https://github.com/${username}`, '_blank');
+}
+
+
+	const removePopup = (toast) => {
+    if(toast.timeoutId) clearTimeout(toast.timeoutId); 
+    setTimeout(() => toast.remove(), 3000);
+	getAllAchievements();
+	anim = false;
+	}
+
+    onMount(async function() {
+		user = await fetchData();
+		const FA2 = await fetch2FA(user.id)
+    if (!user)
+      await goto('/');
+	if (FA2 == true)
+		await goto('/auth/2fa');
+    else
+    {
+      const socket = io(`http://${process.env.LOCALHOST}:3000`);
+      socket.on('connect', async function() {			
+        socket.emit('userConnected', { pseudo: user.pseudo });
+      });
     
-    const cookieValue = document.cookie.match('(^|;)\\s*access_token\\s*=\\s*([^;]+)')?.pop() || '';
-    // Ok la ligne du dessus est degueu et est si mYsTeRiEuSe, voici comment cette ligne fonctionne en détail :
-// document.cookie renvoie une chaîne contenant tous les cookies stockés pour le domaine actuel, séparés par des points-virgules.
-// match est une méthode JavaScript pour les chaînes de caractères qui recherche une correspondance dans la chaîne en utilisant une expression régulière. La regex utilisée ici est /(^|;)\s*access_token\s*=\s*([^;]+)/, qui correspond à :
-// (^|;) : soit le début de la chaîne, soit un point-virgule, pour assurer que nous récupérons la valeur correcte du cookie.
-// \s* : zéro ou plusieurs espaces blancs pour gérer les espaces éventuels avant ou après le nom du cookie ou sa valeur.
-// access_token : le nom du cookie que nous voulons extraire.
-// \s*=\s* : zéro ou plusieurs espaces blancs autour du signe "égal" pour gérer les espaces éventuels autour de la valeur du cookie.
-// ([^;]+) : un groupe de capture pour la valeur du cookie, qui ne doit pas contenir de point-virgule.
-// ?.pop() extrait la dernière occurrence de la chaîne de caractères qui correspond à la regex. L'opérateur ? permet de gérer le cas où match ne trouve aucune correspondance. Dans ce cas, match renvoie null et ?. permet d'éviter une erreur de référence sur une valeur nulle.
-// || '' permet de gérer le cas où la valeur du cookie est undefined ou null. Dans ce cas, pop() renvoie undefined, mais nous voulons une chaîne vide à la place.
+      if (user.pseudo === 'yoshi' || user.pseudo === 'tac' || user.pseudo === 'mboy' || user.pseudo === 'palmi')
+      {
+        const accessToken = await fetchAccessToken();
+        if (accessToken)
+        {
+          const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+              },
+              body: JSON.stringify({achievement: 'TheDarkSide' })
+            });
+          if (!response.ok)
+            console.log("Error update achievements <TheDarkSide>")
+		  else
+		  {
+			anim = true;
+					const boxito = document.querySelector("body");
+					const toast = document.createElement("div");
+					toast.innerHTML = `<div class="popup">
+												<div class="popup_img">
+												</div>
+												<div class="popup_title_text_box">
+													<h4 class="popup_title">The Dark Side</h4>
+													<h5 class="popup_text">Log in as a bocal member</h5>
+												</div>
+										</div>`;
+					boxito.appendChild(toast);
+					setTimeout(() => removePopup(toast), 3000);
+		  }
+        }
+      }
+    }
+	await getAllAchievements();
+	loading = true;
+	});
+
+	function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
 
 
-const unsignedValue = unsign(cookieValue, secret); // Vérification de la signature
+	async function getAllAchievements() {
+		const accessToken = await fetchAccessToken();
+		if (accessToken) {
+			const url = `http://${process.env.LOCALHOST}:3000/users/achievements/${user.id}/getAchievements`;
+			const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			},
+			});
+			const data = await response.json();
+			if (data)
+				all_achievements = new Map(data);
+			}
+		else 
+			console.log('Error: Could not get achievements');
+	}
 
-if (unsignedValue === false) {
-  // La signature n'est pas valide
-} else {
-  // La signature est valide
-  // Extraire la valeur du cookie ici
-  // Verifier la signature du jwt Token
-  // Traduire le jwt Token
-  // et voila on a toute les infos du user.
-}
-}
 
-// permet de laisser la page se charger
-// on a besoin dátt que la page soit chargée pour pouvoir recuperer le cookie et checker sa signature.
-if (typeof window !== 'undefined') {
-  window.addEventListener('load', checkCookie);
-}
+
+
+
 </script>
-
-<h1>Ceci est la homepage</h1>

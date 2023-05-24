@@ -1,0 +1,55 @@
+.edit_box {
+	margin:auto;
+	max-width: 600px;
+	padding: 20px;
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-radius: 3px;
+	width: 500px;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	margin: auto;
+	justify-content: top;
+	font-family: 'Bebas Neue', cursive;
+	box-shadow: 10px 10px 50px black;
+	color: greenyellow;
+}
+.edit_main {
+	display:flex;
+	flex-direction: column;
+	width:100vw;
+	height:100vh
+}
+label {
+	display: block;
+	margin-bottom: 10px;
+	font-weight: bold;
+}
+input[type="text"] {
+	width: 80%;
+	padding: 10px;
+	margin-bottom: 20px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	margin: 15px;
+	font-size: 16px;
+}
+.upload-button {
+	display: none;
+}
+.upload-button{
+	display: block;
+	margin-top: 10px;
+	padding: 10px 20px;
+	background-color: #000000;
+	color: #fff;
+	border: none;
+	border-radius: 5px;
+	font-size: 16px;
+	cursor: pointer;
+	width: max-content;
+	margin: 0 auto;
+}
