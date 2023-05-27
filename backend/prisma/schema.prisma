@@ -26,8 +26,6 @@ model User {
   rank      Int @default(0)
   level     Int @default(0)
 
-
-
   //2FA
   FA2       Boolean @default(false)
   FA2lock   Boolean @default(false)

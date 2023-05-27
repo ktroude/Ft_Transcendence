@@ -50,17 +50,26 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<h1 class="profile_h1"><span><img class="friend_profile_icone" src="/img/friend_icone.png"></span>Friends</h1>
 				<ul class="ul_friends">
 					{#if friends}
-					{#each friends as friendName}
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
+					{#each friends as [friendName, connected]}
+					  <!-- svelte-ignore a11y-click-events-have-key-events -->
+					  <li class="friends_list" on:click={() => handleFriendClick(friendName)}>
 						<div class="friendBloc">
-							<span class="friendname">{friendName}</span>
+							{#if connected == 0}
+								<div class="red_dot"></div>
+							{/if}
+							{#if connected == 1}
+								<div class="green_dot"></div>
+							{/if}
+							{#if connected == 2}
+								<div class="blue_dot"></div>
+							{/if}
+						  	<span class="friendname">{friendName}</span>
 						</div>
 						{#if clickedFriend === friendName && showButtons && invited === 2}
-						<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
 						{/if}
 					</li>
 					{/each}
@@ -313,7 +322,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				});
 				const userExists = await response.json(); // Parse response body as JSON
 				if (userExists) { // Check if user exists
-					await goto(`/chat/dm/${userExists.id}`);
+					await goto(`/dm/${userExists.id}`);
 				}
 		}
 		else 
@@ -349,7 +358,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 body: JSON.stringify({ friend: friendName })
             });
             if (response.ok)
-                friends = friends.filter(friend => friend !== friendName);
+				friends = friends.filter(friend => friend[0] !== friendName);
             else
                 console.log('Error: Could not delete friend');
         } 

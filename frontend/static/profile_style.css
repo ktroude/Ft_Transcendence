@@ -10,7 +10,6 @@
 	color: greenyellow;
 	margin:auto;
 }
-
 .main_box {
 	margin:auto;
 	max-width: 600px;
@@ -37,7 +36,6 @@
 	flex-direction: column;
 	justify-content: center;
 }
-
 .update_button{
 	color: white;
 	width:120px;
@@ -90,21 +88,6 @@
 	cursor: pointer;
 	border: none;
 }
-
-/* .edit_button {
-	display: block;
-	margin: 0 auto;
-	padding: 10px 20px;
-	background-color: #000000;
-	color: #fff;
-	border: none;
-	width:120px;
-	height:40px;
-	border-radius: 5px;
-	font-size: 16px;
-	cursor: pointer;
-	margin-top: 5px;
-} */
 .edit_icone{
 	margin: auto;
 	width: 30px;
@@ -138,7 +121,6 @@ img {
 	border-radius: 5px;
 	align-items: center;
 }
-
 .profile_img{
 	border: 10px solid rgba(204, 204, 204, 0.298);
 
@@ -194,6 +176,7 @@ img {
 	list-style: none;
 }
 .friendname{
+	margin-left: 5px;
 	font-size: 20px;
 	color: white;
 }
@@ -233,7 +216,6 @@ img {
 .input_friend{
 	outline: none;
 }
-
 
 .block_button:hover{
 	cursor: pointer;
@@ -441,4 +423,37 @@ img {
 	width: 120px;
 	color: white;
 	text-align: left;
+}
+
+.green_dot{
+	margin: 2px;
+	width: 5px;
+	border-radius: 100%;
+	height: 5px;
+	border-radius: 100%;
+	background-color: greenyellow;
+}
+ 
+.red_dot{
+	margin: 2px;
+	width: 5px;
+	border-radius: 100%;
+	height: 5px;
+	border-radius: 100%;
+	background-color: red;
+}
+
+.blue_dot{
+	margin: 2px;
+	width: 5px;
+	border-radius: 100%;
+	height: 5px;
+	border-radius: 100%;
+	background-color: cyan;
+}
+
+.friendBloc{
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
