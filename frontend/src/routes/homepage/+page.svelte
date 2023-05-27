@@ -123,7 +123,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				}
 			}
 		}
-		window.open(`https://github.com/${username}`, '_blank');
+		// window.open(`https://github.com/${username}`, '_blank');
 }
 
 
