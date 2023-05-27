@@ -55,10 +55,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
 						<div class="friendBloc">
 							<span class="friendname">{friendName}</span>
-							{#if invited === 1 }
-							<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
-							<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
-							{/if}
 						</div>
 						{#if clickedFriend === friendName && showButtons && invited === 2}
 						<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
@@ -202,7 +198,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     let previousFriend: string;
     let showButtons = false;
     let clickedFriend: string;
-    let friends = [];
+    let friends = {};
     let friendNameAdd: string = '';
     let searchProfile: string = '';
     let connectedUsers = [];
@@ -274,51 +270,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		isFriend = checkFrienship(user.id, realUserId);
     }
-
-	async function getConnectedUsers() {
-	const accessToken = await fetchAccessToken();
-	if (accessToken) {
-		const response = await fetch(`http://localhost:3000/websocket/getClient`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${accessToken}`
-		},
-		});
-		if (response.ok) {
-			connectedUsers =  await response.json();
-		}
-		else{
-			console.log("Error: Could not get users")
-		}
-	} else {
-		console.log('Error: Could not get users');
-	}
-	}
-
-	async function handleSearchProfile(searchProfile: string) {
-		if (!searchProfile) {
-			return;
-		}
-		const accessToken = await fetchAccessToken();
-		if (accessToken) {
-			const url = `http://localhost:3000/users/${searchProfile}/search`;
-			const response = await fetch(url, {
-				method: 'GET',
-				headers: {
-				'Authorization': `Bearer ${accessToken}`,
-				},
-			});
-			const userExists = await response.json(); // Parse response body as JSON
-			if (userExists) { // Check if user exists
-				goto(`/profile/${userExists.id}`);
-			} else {
-				return;
-			}
-		}
-		else 
-			console.log('Error: Could not get users');
-	}
 
 	async function acceptInvitation() {
 		console.log("Accepted the invitation");
@@ -440,39 +391,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     }
 
     let imageURL: string = '';
-    let newUsername: string = '';
-
-
-    async function handleUpdateUsername() {
-        if (!newUsername) {
-            console.log('New username not set');
-            return;
-        }
-		const accessToken = await fetchAccessToken();
-            if (accessToken) {
-                const response = await fetch(`http://localhost:3000/users/${user.pseudo}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({ username: newUsername })
-                });
-                if (response.ok) {
-                    user.username = newUsername;
-                    newUsername = '';
-                } else {
-                    console.log('Error: Could not update username');
-                }
-            } else {
-                console.log('Error: Could not update username');
-            }
-	}
 
 /***********************************************************************************/
-
-
-	let blockedusers: any[] = [];
 
 	async function getImageURL() {
 		const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
@@ -623,6 +543,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			await getAllAchievements();
 		}
 	}
+
+	async function friendRequest()
+	{
+		friends = await fetchFriend(user.pseudo);
+		console.log(friends);
+	}
+
 	onMount(async function() {
 		user = await fetchData(); // Catch the user
 		if (!user)
@@ -638,8 +565,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
 			});
 		}
-		friends = await fetchFriend(user.pseudo);
-		await getConnectedUsers();
+		setInterval(friendRequest, 10000);
 		loading = true;
 	});
 

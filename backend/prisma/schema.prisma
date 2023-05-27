@@ -26,6 +26,8 @@ model User {
   rank      Int @default(0)
   level     Int @default(0)
 
+  connected   Int @default(0) // 0 = offline, 1 = online, 2 = in game
+
   //2FA
   FA2       Boolean @default(false)
   FA2lock   Boolean @default(false)
@@ -37,8 +39,6 @@ model User {
   ImTheBoss Boolean @default(false) // Win vs un des 5 createurs
   TheDarkSide Boolean @default(false) // Se log en tant que membre du bocal
   ImCurious Boolean @default(false) // Aller voir le github d'un des createurs
-
-
 
   Match_historiques Match[] @relation("Match_User")
 
