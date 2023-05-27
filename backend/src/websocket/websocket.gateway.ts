@@ -6,10 +6,11 @@ import { io } from 'socket.io-client';
 import { map } from 'rxjs';
 import { Socket } from 'dgram';
 import { UserService } from '../user/user.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway()
 export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private prisma: PrismaService) {}
   @WebSocketServer()
   server: Server;
   clients: Map<string, string> = new Map();
@@ -37,14 +38,27 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 		});
 	}
   
-  // ---------------------- DEPRECATED ----------------------
-  async getClient() { 
-	const newmap = this.clients;
-	const vector = [];
-	for (const [key, value] of newmap.entries()) {
-	  vector.push(key);
-	}
-	return vector;
+  async getClient() 
+  { 
+    const newmap = this.clients;
+    const vector = [];
+  
+    for (const [key, value] of newmap.entries()) {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          pseudo: key
+        },
+        select: {
+          username: true,
+          connected: true,
+        }
+      });
+      if (user)
+      vector.push( {
+        username: user.username,
+        connected: user.connected,
+      });
+    }
+    return vector;
   }
-
 }

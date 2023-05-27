@@ -20,7 +20,7 @@ export class FriendController {
 
     @UseGuards(JwtGuard)
     @Get(':pseudo/getallfriends') // Get all friends
-    async getAllFriend(@Param('pseudo') pseudo: string): Promise<[string, boolean][]>
+    async getAllFriend(@Param('pseudo') pseudo: string): Promise<[string, number][]>
     {
         return this.friendService.getAllFriend(pseudo);
     }
