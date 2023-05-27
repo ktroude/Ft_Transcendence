@@ -92,7 +92,6 @@
         width: 600px;
     }
 }
-
 @media (max-width: 700px) {
     #canvas {
         width: 450px;

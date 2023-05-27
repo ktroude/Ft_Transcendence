@@ -36,10 +36,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 <script>
 // @ts-nocheck
-	import { Ball } from './ball';
-	import { Player } from './player';
-	import { onMount } from 'svelte';
-	import * as setting_game from "./GameConfig" 
+
+  import { Ball } from './ball';
+  import { Player } from './player';
+  import { onMount } from 'svelte';
+  import * as setting_game from "./GameConfig" 
 
 	let currentUser;
 	let Colyseus;
@@ -445,6 +446,7 @@ function updatePos(){
 }
 
 onMount(async() => {
+  loading = true;
   canvas = document.getElementById('canvas');
   currentUser = await fletchCurrentUserData();
   console.log(currentUser);
