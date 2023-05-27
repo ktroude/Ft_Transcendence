@@ -12,7 +12,8 @@
     let messages:any[] = [];
     let loading = false;
     let contactList:any[] = [];
-
+	let blocked:any[] = [];
+	let notif = false;
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
@@ -29,6 +30,7 @@
     }
 
     function handleCheckProfileButton() {
+		console.log('SU =======', selectedUser);
 		goto(`/profile/${selectedUser.id}`);
     }
 
@@ -151,15 +153,22 @@
         socket.on('newDirectMessage', async(data) => {
             console.log('CU ==', currentRoom);
             console.log('data ==', data)
-            if (currentRoom.id === data.message.directMessageRoomId) {
-                messages = [...messages, data.message];
+            if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
+                	messages = [...messages, data.message];
             }
+            else if (data.blocked === true && data.user.id === currentUser.id) {
+				messages = [...messages, data.message];
+			}
         });
         socket.on('DirectMessageRoomData', async(data) => {
             if (data.user.id === currentUser.id) {
                 roomList = data.rooms;
             }
         });
+		socket.on('InvitedNotif', async(data) => {
+			if (data.invited.id === currentUser.id)
+				notif = true;
+		});
         socket.on('returnDirectMessage', async(data) => {
             console.log('data ================', data);
             if (currentUser.id === data.user.id) {

@@ -1,6 +1,7 @@
 <svelte:head>
 	<link rel="preload" href="/img/bg2.jpeg" as="image">
 	<link rel="preload" href="/game_style.css" as="style"/>
+	<link rel="stylesheet" href="/profile_style.css" />
 	<link rel="stylesheet" href="/game_style.css" />
 	<link rel="stylesheet" href="/homepage_style.css" />
 	<link rel="stylesheet" href="/navbar.css" />
@@ -50,26 +51,29 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 							<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
 							<ul class="ul_friends">
 								{#if friends}
-								{#each friends as friendName}
+								{#each friends as [friendName, connected]}
 								<!-- svelte-ignore a11y-click-events-have-key-events -->
 								<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
 									<div class="friendBloc">
-										<div class="friend_name">
-											{friendName}
-										</div>
-										{#if invited === 1 }
-										<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
-										<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
+										{#if connected == 0}
+											<div class="red_dot"></div>
 										{/if}
-									</div>
-									{#if clickedFriend === friendName && showButtons && invited === 2}
-									<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-									<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-									<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
-									<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
-									{/if}
-								</li>
-								{/each}
+										{#if connected == 1}
+											<div class="green_dot"></div>
+										{/if}
+										{#if connected == 2}
+											<div class="blue_dot"></div>
+										{/if}
+										<span class="friendname">{friendName}</span>
+ 									</div>
+ 									{#if clickedFriend === friendName && showButtons && invited === 2}
+ 									<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+ 									<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+ 									<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
+ 									<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+ 									{/if}
+ 								</li>
+ 								{/each}
 								{/if}
 							</ul>
 						</div>
@@ -101,13 +105,18 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					</div> -->
 					<div class="connected_users_bloc">
 						<div class="connected_title">Connected users</div>
-
 						<ul class="ul_friends">
-							{#each connectedUsers as connectedUsersName}
+							{#each connectedUsers as x }
 								<li class="friends_list">
 									<div class="friend_line">
-										<div class="green_dot"></div>
-										<div class="connectedUsersName">{connectedUsersName}</div>
+										{#if x.connected == 1}
+											<div class="green_dot"></div>
+										{/if}
+										{#if x.connected == 2}
+											<div class="red_dot"></div>
+										{/if}
+										<div class="connectedUsersName">{x.username}</div>
+										<!-- <div class="connectedUsersName">{x.connected}</div> -->
 										
 									</div>
 								</li>
@@ -136,6 +145,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 
 	import { navigate } from 'svelte-routing';
+	import { xlink_attr } from 'svelte/internal';
 
 	let Colyseus;
 	let client;
@@ -220,16 +230,6 @@ async function connect()
 	room.send('waiting',  { waiting : false});
   }
 }
-
-
-
-
-
-
-
-
-
-
 	let socket: Socket;
 
     let previousFriend: string;
@@ -272,10 +272,11 @@ async function connect()
 			'Authorization': `Bearer ${accessToken}`
 		},
 		});
-		if (response.ok) {
-			connectedUsers =  await response.json();
+		if (response.ok){
+			connectedUsers = await response.json();
+			console.log('CU ===', connectedUsers);
 		}
-		else{
+			else{
 			console.log("FRONT NOT WORKIGN HOHO")
 		}
 	} else {
@@ -452,6 +453,11 @@ async function connect()
             }
 	}
 
+	async function friendrequest() 
+	{
+		friends = await fetchFriend(user.pseudo);	
+	}
+
     onMount(async () => {
         user = await fetchData();
 		if (!user)
@@ -465,8 +471,10 @@ async function connect()
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo });
 			});
-			friends = await fetchFriend(user.pseudo);
-			getConnectedUsers();
+			await friendrequest();
+			setInterval(friendrequest, 10000);
+			await getConnectedUsers();
+			setInterval(getConnectedUsers, 10000);
 		}
 		loading = true;
     });

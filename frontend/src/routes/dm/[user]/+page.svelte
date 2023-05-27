@@ -12,6 +12,7 @@
     let messages:any[] = [];
     let loading = false;
     let contactList = [];
+	let notif = false;
 
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
@@ -27,7 +28,13 @@
     }
 
     function handleInviteGameButton() {
-
+		const url = '' // get url de val pour le jeu ici meme
+		const data = {
+			invited: selectedUser,
+			invitedBy: currentUser.username,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data)
     }
 
     function handleConnectedUserButton() {
@@ -168,9 +175,12 @@
         socket.on('newDirectMessage', async(data) => {
             console.log('CU ==', currentRoom);
             console.log('data ==', data)
-            if (currentRoom.id === data.message.directMessageRoomId) {
-                messages = [...messages, data.message];
+            if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
+                	messages = [...messages, data.message];
             }
+            else if (data.blocked === true && data.user.id === currentUser.id) {
+				messages = [...messages, data.message];
+			}
         });
         socket.on('DirectMessageRoomData', async(data) => {
             if (data.user.id === currentUser.id) {
@@ -184,6 +194,11 @@
                 selectedUser = data.selectedUser;
             }
         });
+		socket.on('InvitedNotif', async(data) => {
+			if (data.invited.id === currentUser.id)
+				notif = true;
+		});
+
         await isExist();
         await fetchContactList();
         await fletchDirectMessageRoomData();

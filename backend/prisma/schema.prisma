@@ -26,8 +26,6 @@ model User {
   rank      Int @default(0)
   level     Int @default(0)
 
-  connected   Int @default(0) // 0 = offline, 1 = online, 2 = in game
-
   //2FA
   FA2       Boolean @default(false)
   FA2lock   Boolean @default(false)

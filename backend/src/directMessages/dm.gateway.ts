@@ -75,6 +75,24 @@ async handleDmNotification(@ConnectedSocket() client: Socket, @MessageBody() dat
 @SubscribeMessage('sendDirectMessage')
 async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:any) {
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
+	const room = await this.prisma.directMessageRoom.findUnique({
+        where: {id: parseInt(data.roomId, 10)}});
+	if (await this.DmService.check_blocked(room) === true) {
+			this.server.emit('newDirectMessage',{
+				room: data.roomId,
+				message: {
+					id: 0,
+					content: 'You blocked this contact or have been blocked by this contact',
+					senderId: 0,
+					senderPseudo: 'server',
+					directMessageRoomId:0,
+					directMessageRoom:0,
+				},
+				blocked: true,
+				user:user,
+			});
+			return ;
+	}
     const newMsg = await this.DmService.createMessage(user, data.content, parseInt(data.roomId, 10));
     await this.prisma.directMessageRoom.update({
         where: {id: parseInt(data.roomId, 10)},
@@ -85,6 +103,8 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
     this.server.emit('newDirectMessage',{
         room: data.roomId,
         message: newMsg,
+		blocked: false,
+		user:user,
     });
 }
 
@@ -109,7 +129,7 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
     @SubscribeMessage('getMessagesOfRoom')
     async handleGetMessagesOfRoom(@ConnectedSocket() client:Socket, @MessageBody() data:any) {
         const user = this.clients.find(([, socket]) => socket === client)?.[0];
-        const room = await this.prisma.directMessageRoom.findUnique({
+        let room = await this.prisma.directMessageRoom.findUnique({
             where: {id: parseInt(data, 10)},
             select: { 
                 messages:true,
@@ -118,7 +138,15 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
                 id:true,
             }
         });
-        const selectedUser= this.DmService.otherUser(user, room)
+		let SU_id;
+		if (room.ownerOne.id === user.id)
+			SU_id = room.ownerTwo.id;
+		else
+			SU_id = room.ownerOne.id;
+		console.log(room.ownerTwo.id, 'num')
+        const selectedUser = await this.prisma.user.findUnique({
+			where: {id: SU_id}
+		});
         this.server.emit('returnDirectMessage', {
             user: user,
             room: room,

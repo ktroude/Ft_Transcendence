@@ -56,7 +56,7 @@ export class gameRoomService extends Room {
     super();
   }
   maxClients: number = 2;
-  max_score: number = 2;
+  max_score: number = 5;
   prisma = new PrismaService();
   player1: players = new players();
   player2: players = new players();

@@ -11,7 +11,7 @@ export class FriendService{
     constructor(private prisma: PrismaService) {}
 
     // Finding user
-    async getAllFriend(pseudo: string): Promise<[string, boolean][]> {
+    async getAllFriend(pseudo: string): Promise<[string, number][]> {
         const user = await this.prisma.user.findUnique({
           where: {
             pseudo: pseudo,
