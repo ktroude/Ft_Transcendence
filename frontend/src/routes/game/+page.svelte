@@ -1,6 +1,7 @@
 <svelte:head>
 	<link rel="preload" href="/img/bg2.jpeg" as="image">
 	<link rel="preload" href="/game_style.css" as="style"/>
+	<link rel="stylesheet" href="/profile_style.css" />
 	<link rel="stylesheet" href="/game_style.css" />
 	<link rel="stylesheet" href="/homepage_style.css" />
 	<link rel="stylesheet" href="/navbar.css" />
@@ -51,16 +52,19 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 							<ul class="ul_friends">
 								{#if friends}
 								{#each friends as [friendName, connected]}
- 								<!-- svelte-ignore a11y-click-events-have-key-events -->
- 								<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
- 									<div class="friendBloc">
- 										<div class="friend_name">
- 											{friendName}
- 										</div>
- 										{#if invited === 1 }
- 										<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
- 										<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
- 										{/if}
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
+									<div class="friendBloc">
+										{#if connected == 0}
+											<div class="red_dot"></div>
+										{/if}
+										{#if connected == 1}
+											<div class="green_dot"></div>
+										{/if}
+										{#if connected == 2}
+											<div class="blue_dot"></div>
+										{/if}
+										<span class="friendname">{friendName}</span>
  									</div>
  									{#if clickedFriend === friendName && showButtons && invited === 2}
  									<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
@@ -438,10 +442,10 @@ async function connect()
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo });
 			});
-			friendrequest();
-			setInterval(friendrequest, 1000);
+			await friendrequest();
+			setInterval(friendrequest, 10000);
 			await getConnectedUsers();
-			setInterval(getConnectedUsers, 1000);
+			setInterval(getConnectedUsers, 10000);
 		}
 		loading = true;
     });

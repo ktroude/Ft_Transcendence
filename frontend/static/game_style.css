@@ -131,6 +131,8 @@
 }
 
 .friends_list{
+	align-items: center;
+	justify-content: center;
 	list-style: none;
 }
 

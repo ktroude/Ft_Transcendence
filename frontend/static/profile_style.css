@@ -433,7 +433,7 @@ img {
 	border-radius: 100%;
 	background-color: greenyellow;
 }
-
+ 
 .red_dot{
 	margin: 2px;
 	width: 5px;
@@ -455,4 +455,5 @@ img {
 .friendBloc{
 	display: flex;
 	align-items: center;
+	justify-content: center;
 }
