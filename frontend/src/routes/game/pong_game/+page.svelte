@@ -30,6 +30,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<button class="waiting_button" on:click={connect}>WAITING...</button>
 			{/if}
 		{/if}
+		{#if gameFinished == true}
+			<button class="lobby_button" on:click={() => fade("/game")}>LOBBY</button>
+		{/if}
 	</div>
 </body>
 <!-- {/if} -->
@@ -41,6 +44,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   import { Player } from './player';
   import { onMount } from 'svelte';
   import * as setting_game from "./GameConfig" 
+  import { goto } from "$app/navigation";
 
 	let currentUser;
 	let Colyseus;
@@ -444,6 +448,15 @@ function updatePos(){
     })
   }
 }
+function fade(thisplace) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
 
 onMount(async() => {
   loading = true;

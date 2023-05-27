@@ -152,3 +152,12 @@
 	border-radius: 100%;
 	background-color: greenyellow;
 }
+
+.red_dot{
+	margin: 2px;
+	width: 5px;
+	border-radius: 100%;
+	height: 5px;
+	border-radius: 100%;
+	background-color: red;
+}

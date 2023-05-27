@@ -54,13 +54,22 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					  <!-- svelte-ignore a11y-click-events-have-key-events -->
 					  <li class="friends_list" on:click={() => handleFriendClick(friendName)}>
 						<div class="friendBloc">
-						  <span class="friendname">{friendName}</span>
+							{#if connected == 0}
+								<div class="red_dot"></div>
+							{/if}
+							{#if connected == 1}
+								<div class="green_dot"></div>
+							{/if}
+							{#if connected == 2}
+								<div class="blue_dot"></div>
+							{/if}
+						  	<span class="friendname">{friendName}</span>
 						</div>
 						{#if clickedFriend === friendName && showButtons && invited === 2}
-						<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
 						{/if}
 					</li>
 					{/each}

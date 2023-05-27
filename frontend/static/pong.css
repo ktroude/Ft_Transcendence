@@ -19,6 +19,27 @@
 	-2px 3px 20px rgba(93, 215, 255, 0.747);
 	border: 3px solid rgb(93, 215, 255);
 }
+.lobby_button{
+	width: 250px;
+	height: 80px;
+	font-size: 40px;
+	border: none;
+	color: white;
+	background: rgba(0, 0, 0, 0.482);
+	transition: all 0.1s ease-in-out;
+	bottom: 20px;
+	position:absolute;
+	margin: auto;
+}
+.lobby_button:hover{
+	background: rgba(0, 0, 0, 0.482);
+	border-radius: 18px;
+	cursor: pointer;
+	/* color:rgb(93, 215, 255); */
+	text-shadow: 3px 3px 20px rgba(93, 215, 255, 0.799),
+	-2px 3px 20px rgba(93, 215, 255, 0.747);
+	border: 3px solid rgb(93, 215, 255);
+}
 
 .waiting_button{
 	width: 250px;

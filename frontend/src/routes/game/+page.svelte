@@ -105,7 +105,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 							{#each connectedUsers as x }
 								<li class="friends_list">
 									<div class="friend_line">
-										<div class="green_dot"></div>
+										{#if x.connected == 1}
+											<div class="green_dot"></div>
+										{/if}
+										{#if x.connected == 2}
+											<div class="red_dot"></div>
+										{/if}
 										<div class="connectedUsersName">{x.username}</div>
 										<!-- <div class="connectedUsersName">{x.connected}</div> -->
 										
