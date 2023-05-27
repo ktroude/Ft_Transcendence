@@ -21,6 +21,14 @@ async function creatmatchprsima(winner, looser, prisma)
       }
   })
 }
+
+async function updateConnected(player, condition, prisma)
+{
+  await prisma.user.update({
+    where: {username : player.pseudo},
+    data: { connected: condition}
+  });
+}
   
 async function handleVictoryPrisma(winner, looser, prisma) {
   // push winner
@@ -56,6 +64,7 @@ export class gameRoomService extends Room {
   p1_color: string = 'green';
   p2_color: string = 'green';
   winner: User;
+  reconnectTimeout: NodeJS.Timeout;
 
   onCreate() {
     this.setState(new Game());
@@ -65,6 +74,7 @@ export class gameRoomService extends Room {
   }
   onJoin(client: Client, options?)
   {
+    clearTimeout(this.reconnectTimeout);
     console.log("une personne a la salle pong ", this.roomId,client.id);
     this.onMessage('player', (client, message) => {
       for (let i = 0; i < this.clients.length; i++) {
@@ -159,14 +169,8 @@ export class gameRoomService extends Room {
             // rajouter ici pour le ingame
           });
         }
-        await this.prisma.user.update({
-          where: {username : this.player2.pseudo},
-          data: { connected: 2}
-        });
-        await this.prisma.user.update({
-          where: {username : this.player1.pseudo},
-          data: { connected: 2}
-        });
+        updateConnected(this.player2, 2, this.prisma);
+        updateConnected(this.player1, 2, this.prisma);
         // console.log(this.userservice.getConnectedStatus(this.player1.pseudo));
       }
     });
@@ -177,20 +181,17 @@ export class gameRoomService extends Room {
       // Le client a quitté la room volontairement
       return;
     }
-
+    this.reconnectTimeout = setTimeout(() => {
+      // Supprimer le joueur de la salle après le délai d'attente
+      
+      console.log("je retire les player de la room");
+    }, 5000);
+    updateConnected(this.player2, 1, this.prisma);
+    updateConnected(this.player1, 1, this.prisma);
     // Le client a quitté la room involontairement (rafraîchissement de la page)
-    if (this.player1 && this.player1.id === client.sessionId) {
-      this.player1.pseudo = 'null';
-      this.player1.id = '';
-      // Réinitialisez toutes les autres propriétés du joueur 1 que vous devez réinitialiser
-    } else if (this.player2 && this.player2.id === client.sessionId) {
-      this.player2.pseudo = 'null';
-      this.player2.id = '';
-      // Réinitialisez toutes les autres propriétés du joueur 2 que vous devez réinitialiser
-    }
-    console.log("Leave la salle pong ", this.roomId,client.id);
+    console.log("Leave la salle pong rom_id = ", this.roomId,client.id);
   }
   OnDispose(){
-    console.log('Room is disposed', this.roomId);
+    console.log('Room Pong is disposed', this.roomId);
   }
 }

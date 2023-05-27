@@ -8,14 +8,15 @@ interface ClientStat {
 export class RankedLobbyRoom extends Room {
 
   roomToCreate = "Private_Room"; //name of the room to create
-  numClientsToMatch = 2; //number of players on each match
+  numClientsToMatch = 5; //number of players on each match
   stats: ClientStat[] = [];
+  reconnectTimeout: NodeJS.Timeout;
 
   onCreate(options: any) {
     if (options.numClientsToMatch) {
       this.numClientsToMatch = options.numClientsToMatch;
     }
-    console.log("creation du lobby");
+    console.log("creation du lobby", this.roomId);
 
     // setInterval(() => {
     //     this.checkGroupsReady();
@@ -23,15 +24,34 @@ export class RankedLobbyRoom extends Room {
   }
 
   onJoin(client: Client, options: any) {
+    const playerId = client.sessionId;
+    const isClientConnected = this.stats.some(stat => stat.client.sessionId === playerId);
+    if (isClientConnected) {
+      // reconnexion
+      console.log(`Le client ${playerId} est déjà connecté.`);
+      client.send('reconnexion", "La reconnexion a reussi');
+      clearTimeout(this.reconnectTimeout);
+      // ...
+      return;
+    }
     this.stats.push({
       client: client
     });
+    client.send("connect",
+    {
+      lobby_id : this.roomId,
+      playerId : playerId
+    });
+
+
 
     console.log("une personne a rejoins ", client.id);
-    // this.broadcast('test', { test_i: "message de test" });
-    client.send('test', { test_i: "message test client" });
     client.send("waiting", 1);
     this.checkGroupsReady();
+    this.onMessage('waiting', (client, message) => {
+      const index = this.stats.findIndex(stat => stat.client === client);
+      this.stats.splice(index, 1);
+    });
   }
 
   async checkGroupsReady() {
@@ -50,57 +70,22 @@ export class RankedLobbyRoom extends Room {
         // Retourne false pour retirer le client de la liste
         return false;
       });
-  
-      // Reserve seats for the clients in the room
-      // console.log("Reservation des sieges...");
-      // const matchDataPromises = this.stats.slice(0, this.numClientsToMatch).map(async (clientStat) => {
-      //   console.log("+1 reservations de siege");
-      //   const matchData = await matchMaker.reserveSeatFor(room, Any);
-      //   return { clientStat, matchData };
-      // });
-
-      // const matchDataResults = [];
-      // for (let i = 0; i < this.numClientsToMatch; i++) {
-      //   console.log("+1 réservation de place");
-      //   const clientStat = this.stats[i];
-      //   const matchData = await matchMaker.reserveSeatFor(room, Any);
-      //   matchDataResults.push({ clientStat, matchData });
-      // }
-
-      // console.log("Sieges reservés");
-      // // const matchDataResults = await Promise.all(matchDataPromises);
-      // console.log("Fin des promesses");
-  
-      // // Send room data to the clients
-      // console.log("Envoie des data rooms...");
-      // matchDataResults.forEach(({ clientStat, matchData }) => {
-      //   clientStat.client.send("seat", matchData);
-      //   console.log("send seat");
-      // });
-  
-      // Remove the matched clients from the lobbyroom
-      // console.log("Enlevement des clients du lobby...");
-      // matchDataResults.forEach(({ clientStat }) => {
-      //   const index = this.stats.indexOf(clientStat);
-      //   if (index !== -1) {
-      //     this.stats.splice(index, 1);
-      //   }
-      // });
-    } else {
-      // Notify all clients in the lobbyroom about the number of players in the queue
-      this.stats.forEach((clientStat) => {
-        clientStat.client.send("nbr_client", this.stats.length);
-      });
     }
   }
 
   onLeave(client: Client, consented: boolean) {
-    const index = this.stats.findIndex(stat => stat.client === client);
-    this.stats.splice(index, 1);
+    this.reconnectTimeout = setTimeout(() => {
+      // Supprimer le joueur de la salle après le délai d'attente
+      
+      const index = this.stats.findIndex(stat => stat.client === client);
+      this.stats.splice(index, 1);
+      console.log("je retire les player de la room");
+    }, 10000);
     console.log("un client est parti du lobby");
   }
 
   onDispose() {
+    console.log("destruction du lobby");
   }
 
 }

@@ -82,7 +82,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					{#if waiting}
 						<h2>Waiting for an opponent...</h2>
 					{/if}
-					{#if room_id}
+					{#if room_pong_id}
 						
 						<h2>Game found!</h2>
 					{/if}
@@ -140,9 +140,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let Colyseus;
 	let client;
 	let room;
-	let clientsCount = 0;
-	let seatData = null;
-	let room_id = null;
+	let room_pong_id = null;
 	let room_pong;
 	let first_connection = true;
 	let waiting = false;
@@ -150,12 +148,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	function redirectToGame() {
   	return new Promise((resolve) => {
-    if (room_id) {
-      const url = `http://localhost:5173/game/pong_game?room_id=${room_id}`;
+    if (room_pong_id) {
+      const url = `http://localhost:5173/game/pong_game?room_id=${room_pong_id}`;
       window.location.href = url;
       resolve();
     } else {
-      // Si room_id n'est pas encore rempli, attendez 1 seconde et réessayez
+      // Si room_pong_id n'est pas encore rempli, attendez 1 seconde et réessayez
       setTimeout(() => redirectToGame().then(resolve), 1000);
     }
   });
@@ -168,20 +166,51 @@ async function connect()
   {
     waiting = true;
     Colyseus = await import("colyseus.js");
-  
-    client = new Colyseus.Client('ws://localhost:3001');
-    // console.log("client created");
-    room = await client.joinOrCreate("ranked");
-    // console.log("created room lobby");
+	if(!client)
+		client = new Colyseus.Client('ws://localhost:3001');
 
-    room.onMessage('test', (message) => {
-      mess = message.test_i;
-    //   console.log("dans room Onmessage");
-    });
+	let playerId = localStorage.getItem("playerId");
+	let LobbyId = localStorage.getItem("LobbyId");
+	if(playerId)
+	{
+		try {
+			console.log(`Joueur ${playerId} tentative de reconexion a la salle ${LobbyId}`);
+			room = await client.reconnect(LobbyId, playerId);
+			room.onMessage('reconnexion', (message) => { console.log(message, playerId);});
+		}
+		catch (error)
+		{
+			console.log("erreur de reconnexion:", error);
+			room = await client.joinOrCreate("ranked");
+			// localStorage.setItem("LobbyId", room.roomid);
+			room.onMessage("connect", (message) => {
+			playerId = message.playerId;
+			LobbyId = message.lobby_id;
+			console.log("dans message",LobbyId, message.lobby_id);
+			console.log(`Connecté avec succès en tant que ${playerId}`);
+			// localStorage.setItem("playerId", playerId);
+		});
+		}
+	}
+	else
+	{
+		console.log("client colyseus created", client);
+		room = await client.joinOrCreate("ranked");
+		room.onMessage("connect", (message) => {
+			playerId = message.playerId;
+			LobbyId = message.lobby_id;
+			console.log("dans message",LobbyId, message.lobby_id);
+			console.log(`Connecté avec succès en tant que ${playerId}`);
+			// localStorage.setItem("playerId", playerId);
+		});
+	}
+	console.log("here", LobbyId, playerId);
+	await localStorage.setItem("LobbyId", String(LobbyId));
+	await localStorage.setItem("playerId", String(playerId));
     room.onMessage('waiting', (message) => { waiting = true; });
     room.onMessage('seat', (message) => {
-      room_id = message;
-	  waiting = false;
+		room_pong_id = message;
+		waiting = false;
     //   console.log("dans seatttt");
       redirectToGame();
     });

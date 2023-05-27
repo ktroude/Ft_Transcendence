@@ -45,7 +45,6 @@ model User {
   // pitié monsieur donne un autre nom a cette variable, je m'en sers deja dans le front du chat et je fais des gros user =  donc ca va ecraser mon status du front
   // onLine c'est bien non?
   // pitié j'ai 1200 lignes de code a checker sinon
-  connected    Int @default(0) // 0 = offline, 1 = online, 2 = in game
   win_streak   Int @default(0)
 
 
