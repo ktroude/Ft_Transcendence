@@ -12,6 +12,7 @@
     let messages:any[] = [];
     let loading = false;
     let contactList:any[] = [];
+	let blocked:any[] = [];
 
 
 	function fade(thisplace:string) {
@@ -152,9 +153,12 @@
         socket.on('newDirectMessage', async(data) => {
             console.log('CU ==', currentRoom);
             console.log('data ==', data)
-            if (currentRoom.id === data.message.directMessageRoomId) {
-                messages = [...messages, data.message];
+            if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
+                	messages = [...messages, data.message];
             }
+            else if (data.blocked === true && data.user.id === currentUser.id) {
+				messages = [...messages, data.message];
+			}
         });
         socket.on('DirectMessageRoomData', async(data) => {
             if (data.user.id === currentUser.id) {

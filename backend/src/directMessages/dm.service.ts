@@ -62,7 +62,32 @@ export class DirectMessageService {
         return room;
     }
 
-
-
+	async check_blocked(room) {
+		const user1 = await this.prisma.user.findUnique({
+			where: {id: room.ownerOneId},
+			select: {
+				id: true,
+				userBlocks: true,
+  				blockedUserBlocks: true,
+			}
+		});
+		const user2 = await this.prisma.user.findUnique({
+			where: {id: room.ownerTwoId},
+			select: {
+				id: true,
+				userBlocks: true,
+  				blockedUserBlocks: true,
+			}
+		});
+		for (let i=0; i<user1.userBlocks.length; i++) {
+			if (user1.userBlocks[i].blocked_id === user2.id)
+				return true;
+		}
+		for (let i=0; i<user1.blockedUserBlocks.length; i++) {
+			if (user1.blockedUserBlocks[i].blocked_id === user2.id)
+				return true;
+		}
+		return false;
+	}
 
 }
