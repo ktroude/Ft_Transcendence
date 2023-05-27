@@ -12,6 +12,7 @@
     let messages:any[] = [];
     let loading = false;
     let contactList = [];
+	let notif = false;
 
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
@@ -27,7 +28,13 @@
     }
 
     function handleInviteGameButton() {
-
+		const url = '' // get url de val pour le jeu ici meme
+		const data = {
+			invited: selectedUser,
+			invitedBy: currentUser.username,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data)
     }
 
     function handleConnectedUserButton() {
@@ -187,6 +194,11 @@
                 selectedUser = data.selectedUser;
             }
         });
+		socket.on('InvitedNotif', async(data) => {
+			if (data.invited.id === currentUser.id)
+				notif = true;
+		});
+
         await isExist();
         await fetchContactList();
         await fletchDirectMessageRoomData();

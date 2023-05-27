@@ -13,7 +13,7 @@
     let loading = false;
     let contactList:any[] = [];
 	let blocked:any[] = [];
-
+	let notif = false;
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
@@ -165,6 +165,10 @@
                 roomList = data.rooms;
             }
         });
+		socket.on('InvitedNotif', async(data) => {
+			if (data.invited.id === currentUser.id)
+				notif = true;
+		});
         socket.on('returnDirectMessage', async(data) => {
             console.log('data ================', data);
             if (currentUser.id === data.user.id) {

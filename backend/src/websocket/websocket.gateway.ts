@@ -1,4 +1,4 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { OnGatewayDisconnect, OnGatewayConnection } from '@nestjs/websockets';
 import { User } from '@prisma/client';
@@ -37,6 +37,15 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 		});
 	}
   
+	@SubscribeMessage('InvitedInGame')
+	handleInvitedInGame(@ConnectedSocket() client:any, @MessageBody() data) {
+		const toSend = {
+			invited: data.invited,
+			invitedBy: data.username,
+			url: data.url,
+		}
+		this.server.emit('InvitedNotif', toSend);
+	}
   // ---------------------- DEPRECATED ----------------------
   async getClient() { 
 	const newmap = this.clients;
