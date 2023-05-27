@@ -78,20 +78,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 				<div class="lobby_box">
 					<div class="lobby_title">LOBBY</div>
-					<p>Nombre de clients en attente : {clientsCount}</p>
 
 					{#if waiting}
-					<h2>Vous êtes en attente</h2>
+						<h2>Waiting for an opponent...</h2>
 					{/if}
-				  
-					{#if seatData}
-					  <h2>Vous avez obtenu une place dans une salle</h2>
-					  <p>Informations sur la place : {JSON.stringify(seatData)}</p>
-					{/if}
-				  
 					{#if room_id}
-					  <h2>Vous avez rejoint une salle</h2>
-					  <p>Informations sur la salle : {JSON.stringify(room_id)}</p>
+						
+						<h2>Game found!</h2>
 					{/if}
 					<button class="connect_button" on:click={connect}>SEARCH OPPONENT</button>
 
@@ -188,6 +181,7 @@ async function connect()
     room.onMessage('waiting', (message) => { waiting = true; });
     room.onMessage('seat', (message) => {
       room_id = message;
+	  waiting = false;
     //   console.log("dans seatttt");
       redirectToGame();
     });

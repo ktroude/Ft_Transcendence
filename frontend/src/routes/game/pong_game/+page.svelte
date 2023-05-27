@@ -14,43 +14,43 @@
 <!-- {#if loading == true} -->
 <body style="margin:0px; padding:0px; background-image:url('/img/bg2.jpeg');
 background-position: center; background-size: cover ; overflow: hidden; width: 100vw;height: 100vh">
-	<main class="main" role="main">
 		
 	<div class="score_bloc">
 		{#if connected == true}
-		{player.pseudo} : <div class="scores">{player.score} </div> - {player2.pseudo} : <div class="scores" id="player2-score">{player2.score}</div>
+			<div class="scores">
+				{player.pseudo} : {player.score} - {player2.pseudo} : {player2.score}
+			</div>
+		{/if} 
+		{#if connected == false}
+		<button class="play_button" on:click={connect}>PLAY</button>
 		{/if}
 	</div>
-	{#if connected == false}
-	<button class="play_button" on:click={connect}>PLAY</button>
-	{/if}
 	<canvas id="canvas" width={setting_game.canvas_width} height={setting_game.canvas_height}>
 	</canvas>
-	</main>
 </body>
 <!-- {/if} -->
 
 <script>
 // @ts-nocheck
 
-  import { Ball } from './ball';
-  import { Player } from './player';
-  import { onMount } from 'svelte';
-  import * as setting_game from "./GameConfig" 
+	import { Ball } from './ball';
+	import { Player } from './player';
+	import { onMount } from 'svelte';
+	import * as setting_game from "./GameConfig" 
 
-  let currentUser;
-  let Colyseus;
-  let client;
-  let room;
-  let clientId;
-  let canvas;
-  let showButtons = false;
-  let mainclient = false;
-  let winner;
-  let gameFinished = false;
-  let loading = false;
+	let currentUser;
+	let Colyseus;
+	let client;
+	let room;
+	let clientId;
+	let canvas;
+	let showButtons = false;
+	let mainclient = false;
+	let winner;
+	let gameFinished = false;
+	let loading = false;
 	let connected = false;
-
+	let touched = 0;
   // debug
   let room_id;
   let started = 0;
@@ -64,8 +64,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 function countdown(counter)
 {
   const context = canvas.getContext('2d');
-  context.font = '48px Arial';
-  context.fillStyle = 'Black';
+  context.font = '80px Bebas Neue';
+  context.fillStyle = 'rgb(93, 215, 255)';
   context.textAlign = 'center';
   context.textBaseline = 'middle';
 
@@ -78,7 +78,6 @@ function countdown(counter)
     if (counter < 0) {
       clearInterval(countdownInterval);
       play()
-      // Le compte à rebours est terminé, vous pouvez exécuter votre code ici
     }
   }, 1000);
 }
@@ -118,8 +117,8 @@ function print_win(gagnant)
   context.clearRect(0, 0, canvas.width, canvas.height);
   
   // Style du texte
-  context.font = '42px Arial';
-  context.fillStyle = 'Red';
+  context.font = '60px Bebas Neue';
+  context.fillStyle = 'rgb(93, 215, 255)';
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   
@@ -128,7 +127,7 @@ function print_win(gagnant)
   const y = canvas.height / 2;
   
   // Afficher le message de victoire
-  context.fillText(`${gagnant} a gagné ! Score : ${player.score} vs ${player2.score}`, x, y);
+  context.fillText(`${gagnant} won! Score: ${player.score} | ${player2.score}`, x, y);
 }
     
 async function connect()
@@ -154,7 +153,7 @@ async function connect()
       console.log(mainclient);
       showButtons = true;
 	  connected = true;
-      countdown(5);
+      countdown(3);
     })
   room.onMessage('role', (message) => {
     clientId = message.client;
@@ -184,83 +183,76 @@ const fletchCurrentUserData = async () => {
 
 function draw()
 {
-  const context = canvas.getContext('2d');
-  // Draw field
-  // context.clearRect(0, 0, canvas.width, canvas.height);
-  // context.fillStyle = 'black';
-  // context.font = "30px Arial";
-//   context.fillStyle = 'black';
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  
-  // player name
-  context.fillText(player.pseudo, canvas.width / 15, canvas.height / 10);
+	const context = canvas.getContext('2d');
+	// Set the background color
+	context.fillStyle = 'rgba(35, 35, 35)';
+	context.fillRect(0, 0, canvas.width, canvas.height);
 
+	// Set the color of the ball
+	context.fillStyle = 'rgb(93, 215, 255)';
+	context.beginPath();
+	context.arc(ball.x, ball.y, setting_game.ball_radius, 0, Math.PI * 2, false);
+	context.fill();
 
-  // Draw middle line
-  context.strokeStyle = 'white';
-  context.beginPath();
-  context.moveTo(canvas.width / 2, 0);
-  context.lineTo(canvas.width / 2, canvas.height);
-  context.stroke();
-  
-  // context.fillStyle = "black";
-  // context.font = "30px Arial";
+	// Set the color of the bars
+	context.fillStyle = 'rgb(93, 215, 255)';
+	context.fillRect(0, player.y, setting_game.paddle_width, setting_game.paddle_height);
+	context.fillRect(
+		canvas.width - setting_game.paddle_width,
+		player2.y,
+		setting_game.paddle_width,
+		setting_game.paddle_height
+	);
+}
 
+function draw2()
+{
+	const context = canvas.getContext('2d');
+	// Set the background color
+	context.fillStyle = 'rgba(35, 35, 35)';
+	context.fillRect(0, 0, canvas.width, canvas.height);
 
-  // player name
-  context.fillText(player2.pseudo, 10 * canvas.width / 15, canvas.height / 10);
-  //context.fillText(player2.score, 3 * canvas.current.width / 4, canvas.current.height / 2);
-  context.strokeStyle = 'black';
-  context.beginPath();
-  context.moveTo(canvas.width / 2, 0);
-  context.lineTo(canvas.width / 2, canvas.height);
-  context.stroke();
-  // console.log(player.color);
-  context.fillStyle = player.color;
-  context.fillRect(0, player.y, setting_game.paddle_width, setting_game.paddle_height);
-  context.fillRect(canvas.width - setting_game.paddle_width, player2.y, setting_game.paddle_width, setting_game.paddle_height);
-  // Draw ball
-  // context.beginPath();
-  // context.fillStyle = 'black';
-  // context.arc(ball.x, ball.y, setting_game.ball_radius, 0, Math.PI * 2, false);
-  // context.fill();
+	// Set the color of the ball
+	context.fillStyle = 'rgb(93, 215, 255)';
+	context.beginPath();
+	context.arc(ball.x, ball.y, setting_game.ball_radius, 0, Math.PI * 2, false);
+	context.fill();
 
-  // Draw ball
-  context.beginPath();
-  context.fillStyle = 'white';
-  context.arc(ball.x, ball.y, setting_game.ball_radius, 0, Math.PI * 2, false);
-  context.fill();
+	// Set the color of the bars
+	context.fillStyle = 'white';
+	context.fillRect(0, player.y, setting_game.paddle_width, setting_game.paddle_height);
+	context.fillRect(
+		canvas.width - setting_game.paddle_width,
+		player2.y,
+		setting_game.paddle_width,
+		setting_game.paddle_height
+	);
+	touched--;
 }
 
 function play()
 {
-  if (mainclient == true)
-  {
-    ballMove();
-  }
-  updatePos();
-  Updatescore();
-  Updateball();
-  // console.log(ball.x);
-  draw();
-  endGame();
-  if(!gameFinished)
-    anim = requestAnimationFrame(play);
+	if (mainclient == true)
+		ballMove();
+	updatePos();
+	Updatescore();
+	Updateball();
+	if (touched > 0)
+		draw2();
+	else
+		draw();
+	endGame();
+	if(!gameFinished)
+		anim = requestAnimationFrame(play);
 }
-
 
 function collide(playerCurrent) {
   // Le joueur ne touche pas la balle
-  if (ball.y < playerCurrent.y || ball.y > playerCurrent.y + setting_game.paddle_height)
-  {
+  if (ball.y < playerCurrent.y || ball.y > playerCurrent.y + setting_game.paddle_height){
     if (ball.x > canvas.width - setting_game.paddle_width)
-    {
       player.score++;
-    }
     else
-    {
       player2.score++;
-    }
     // Remet la balle et les joueurs au centre
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
@@ -271,13 +263,13 @@ function collide(playerCurrent) {
     // if(Math.abs(ball.velocity_x) < MAX_SPEED)
     //   ball.velocity_x *= 1.2;
   }
-  else
-  {
+  else{
     // Augmente la vitesse et change la direction
     if(Math.abs(ball.velocity_x) < MAX_SPEED)
-    ball.velocity_x *= -1.1;
+		ball.velocity_x *= -1.1;
     changeDirection(playerCurrent.y);
-  }
+	touched = 15;
+}
 }
 
 function changeDirection(playerPosition)
@@ -308,8 +300,6 @@ function Updatescore()
       player.score = message.player_score;
       player2.score = message.player2_score;
   })
-//   document.querySelector('#player-score').textContent = player.score;
-//   document.querySelector('#player2-score').textContent = player2.score;
 }
 
 function Updateball()
@@ -432,8 +422,6 @@ onMount(async() => {
   canvas.addEventListener('mousemove', player2Move);
   room_id = await getRoomIdFromUrl();
   console.log(room_id);
-  // document.querySelector('#start-game').addEventListener('click', play);
-  // document.querySelector('#stop-game').addEventListener('click', stop);
 });
 
 </script>
