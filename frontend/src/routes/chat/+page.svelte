@@ -1206,8 +1206,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 								on:click={() => unblock(selectedUser)}>unblock</button
 								>
 								{/if}
+								<button
+								class="button_show_profile"
 
-								<button on:click={delMenu}>X</button>
+								 on:click={delMenu}>X</button>
 							{/if}
 						{/if}
 					</div>
