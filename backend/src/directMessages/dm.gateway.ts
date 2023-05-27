@@ -118,7 +118,16 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
                 id:true,
             }
         });
-        const selectedUser= this.DmService.otherUser(user, room)
+		let SU_id;
+		if (room.ownerOne.id === user.id)
+			SU_id = room.ownerTwo.id;
+		else
+		SU_id = room.ownerOne.id;
+		console.log(room.ownerTwo.id, 'num')
+        const selectedUser = await this.prisma.user.findUnique({
+			where: {id: SU_id}
+		});
+		console.log('SU ==', selectedUser)
         this.server.emit('returnDirectMessage', {
             user: user,
             room: room,

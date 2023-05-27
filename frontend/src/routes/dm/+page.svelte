@@ -29,6 +29,7 @@
     }
 
     function handleCheckProfileButton() {
+		console.log('SU =======', selectedUser);
 		goto(`/profile/${selectedUser.id}`);
     }
 

@@ -18,13 +18,14 @@ export class DirectMessageService {
     }
 
     async otherUser(user:any, room:any) {
+		console.log(room);
         if (user.id === room.ownerOne.id) {
-            return room.ownerTwo;
+            return room.ownerTwoId;
         }
         if (user.id == room.ownerTwo) {
-            return room.ownerOne;
+            return room.ownerOne.id;
         }
-        return null;
+        return null
     }
 
     async findRoom(user:User, who:User) {
