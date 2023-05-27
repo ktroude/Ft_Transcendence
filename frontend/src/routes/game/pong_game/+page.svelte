@@ -36,6 +36,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   import { Ball } from './ball';
   import { Player } from './player';
   import { onMount } from 'svelte';
+  import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../../API/api';
   import * as setting_game from "./GameConfig" 
 
   let currentUser;
@@ -59,6 +60,27 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   async function test() //debug
 {
   console.log("room_id", room_id);
+}
+
+async function getConnectedUsers() {
+	const accessToken = await fetchAccessToken();
+	if (accessToken) {
+		const response = await fetch(`http://localhost:3000/websocket/getClient`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`
+		},
+		});
+		if (response.ok) {
+			connectedUsers =  await response.json();
+		}
+		else{
+			console.log("FRONT NOT WORKIGN HOHO")
+		}
+	} else {
+		console.log('Error: Could not get users');
+	}
 }
 
 function countdown(counter)
@@ -227,7 +249,7 @@ function draw()
 
   // Draw ball
   context.beginPath();
-  context.fillStyle = 'white';
+  context.fillStyle = 'black';
   context.arc(ball.x, ball.y, setting_game.ball_radius, 0, Math.PI * 2, false);
   context.fill();
 }
@@ -365,7 +387,6 @@ function playerMove(event)
       player.y = (mouseLocation / canvasLocation.height * canvas.height)
               - setting_game.paddle_height / 2;
     }
-
     // permet de limiter les players par rapport a la taille du canvas
     if (mouseLocation < setting_game.paddle_height / 2) {
       if(player?.y || player?.y === 0)
@@ -392,7 +413,6 @@ function player2Move(event)
       player2.y = (mouseLocation / canvasLocation.height * canvas.height)
               - setting_game.paddle_height / 2;
     }
-
     // permet de limiter les players par rapport a la taille du canvas
     if (mouseLocation < setting_game.paddle_height / 2) {
       if(player2?.y || player2?.y === 0)
@@ -424,6 +444,22 @@ function updatePos()
 }
 
 onMount(async() => {
+  user = await fetchData();
+  if (!user)
+    await goto('/'); 
+  const FA2 = await fetch2FA(user.id);
+  if (FA2 == true)
+    await goto('auth/2fa');
+  else
+  {
+    const socket = io('http://localhost:3000');
+    socket.on('connect', async function() {			
+      socket.emit('userConnected', { pseudo: user.pseudo });
+    });
+    friends = await fetchFriend(user.pseudo);
+    getConnectedUsers();
+  }
+  loading = true;
   canvas = document.getElementById('canvas');
   currentUser = await fletchCurrentUserData();
   console.log(currentUser);
