@@ -12,7 +12,7 @@
     let messages:any[] = [];
     let loading = false;
     let contactList = [];
-	let notif = false;
+	let notif:any = null;
 
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
@@ -196,7 +196,9 @@
         });
 		socket.on('InvitedNotif', async(data) => {
 			if (data.invited.id === currentUser.id)
-				notif = true;
+				notif.display = true;
+                notif.url = data.url;
+                notif.invitedBy = data.invitedBy;
 		});
 
         await isExist();
