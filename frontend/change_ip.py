@@ -2,8 +2,8 @@ import re
 import socket
 from pathlib import Path
 
-env_file = ".env"
-localhost_variable = "LOCALHOST"
+env_file = "./src/API/env.js"
+localhost_variable = "export const LOCALHOST"
 
 # Récupération de l'adresse IP de la machine
 ip_address = socket.gethostbyname(socket.gethostname())

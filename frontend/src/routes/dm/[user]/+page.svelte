@@ -3,8 +3,7 @@
 	import { io, Socket } from 'socket.io-client';
 	import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import * as dotenv from 'dotenv';
-    dotenv.config();
+    import { LOCALHOST } from '../../../API/env';
 	
     let socket:Socket;
     let currentUser:any = null;
@@ -81,7 +80,7 @@
 		    if (accessToken) {
                 const headers = new Headers();
                 headers.append('Authorization', `Bearer ${accessToken}`);
-                const response = await fetch(`http://${process.env.LOCALHOST}:3000/dm/who?id=${$page.params.user}`, { headers });
+                const response = await fetch(`http://${LOCALHOST}:3000/dm/who?id=${$page.params.user}`, { headers });
                 const data =  await response.json();
                 console.log('data ====', data);
                 if (!data) {
@@ -124,7 +123,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://${process.env.LOCALHOST}:3000/dm/getRoomData`, { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/dm/getRoomData`, { headers });
 			const data =  await response.json();
             currentUser = data.user;
             roomList = data.rooms;
@@ -153,7 +152,7 @@
         if (!access_token) {
                 window.location.pathname = '/';
             }
-		socket = io(`http://${process.env.LOCALHOST}:3000`, {
+		socket = io(`http://${LOCALHOST}:3000`, {
 			extraHeaders: {
 				Authorization: 'Bearer ' + access_token
 			}

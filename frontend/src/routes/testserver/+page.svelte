@@ -5,8 +5,7 @@
   import { Player } from './player';
   import { onMount } from 'svelte';
   import * as setting_game from "./GameConfig" 
-  import * as dotenv from 'dotenv';
-  dotenv.config();
+  import { LOCALHOST } from '../../API/env';
 
   let currentUser;
   let Colyseus;
@@ -87,7 +86,7 @@ function print_win(gagnant)
 async function connect()
 {
     Colyseus = await import("colyseus.js");
-    client = new Colyseus.Client(`ws://${process.env.LOCALHOST}:3001`);
+    client = new Colyseus.Client(`ws://${LOCALHOST}:3001`);
     room = await client.joinOrCreate("Private_Room");
     room.onMessage('Player_init', (message) =>
     {
@@ -122,7 +121,7 @@ const fletchCurrentUserData = async () => {
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/userInfo`, { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/users/userInfo`, { headers });
 			const data = await response.json();
 			const user = {
 				id: data?.id,

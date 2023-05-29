@@ -194,8 +194,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../../API/api';
-	import * as dotenv from 'dotenv';
-  	dotenv.config();
+	import { LOCALHOST } from '../../../API/env';
 /********************** FRIENDS ***********************************************/
 	
 	let socket: Socket;
@@ -236,7 +235,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	async function DeleteFriendButton(realUser, friendName) {
         const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${realUser}/deletefriend`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${realUser}/deletefriend`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -258,7 +257,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	{
 		const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${realUser}/friend`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${realUser}/friend`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -279,7 +278,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	async function getConnectedUsers() {
 	const accessToken = await fetchAccessToken();
 	if (accessToken) {
-		const response = await fetch(`http://${process.env.LOCALHOST}:3000/websocket/getClient`, {
+		const response = await fetch(`http://${LOCALHOST}:3000/websocket/getClient`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -303,7 +302,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-			const url = `http://${process.env.LOCALHOST}:3000/users/${searchProfile}/search`;
+			const url = `http://${LOCALHOST}:3000/users/${searchProfile}/search`;
 			const response = await fetch(url, {
 				method: 'GET',
 				headers: {
@@ -354,7 +353,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
-			const url = `http://${process.env.LOCALHOST}:3000/users/${friendName}/search`;
+			const url = `http://${LOCALHOST}:3000/users/${friendName}/search`;
 				const response = await fetch(url, {
 					method: 'GET',
 					headers: {
@@ -390,7 +389,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     async function handleDeleteFriend(friendName) {
         const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.pseudo}/deletefriend`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/deletefriend`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -424,7 +423,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             return;
         const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.pseudo}/friend`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/friend`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -451,7 +450,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         }
 		const accessToken = await fetchAccessToken();
             if (accessToken) {
-                const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.pseudo}`, {
+                const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -497,7 +496,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		const accessToken = await fetchAccessToken();
 		if (accessToken) 
 		{
-			const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${realUser}/block`, {
+			const response = await fetch(`http://${LOCALHOST}:3000/users/${realUser}/block`, {
 				method: 'PUT',
                 headers: {
 					'Content-Type': 'application/json',
@@ -516,7 +515,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     const accessToken = await fetchAccessToken();
 	if (accessToken)
 	{
-		const url = `http://${process.env.LOCALHOST}:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
+		const url = `http://${LOCALHOST}:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
 		const response = await fetch(url, {
 			method: 'GET',
 			headers: {
@@ -538,7 +537,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
-			const url = `http://${process.env.LOCALHOST}:3000/users/existingFriendship?id1=${id1}&id2=${id2}`;
+			const url = `http://${LOCALHOST}:3000/users/existingFriendship?id1=${id1}&id2=${id2}`;
 			const response = await fetch(url, {
 				method: 'GET',
 				headers: {
@@ -559,7 +558,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-			const url = `http://${process.env.LOCALHOST}:3000/users/achievements/${user.id}/getAchievements`;
+			const url = `http://${LOCALHOST}:3000/users/achievements/${user.id}/getAchievements`;
 			const response = await fetch(url, {
 			method: 'GET',
 			headers: {
@@ -577,7 +576,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	async function unblock(realUser, blockerUser) { // unblock user
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-            const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${realUser}/deleteBlock`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${realUser}/deleteBlock`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -634,7 +633,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		else
 		{
 			await loadpage();
-			const socket = io(`http://${process.env.LOCALHOST}:3000`); // Connect to the server
+			const socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
 			});

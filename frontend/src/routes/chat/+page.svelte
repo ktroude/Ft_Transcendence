@@ -3,8 +3,7 @@
 	import { io, Socket } from 'socket.io-client';
 	import { goto } from '$app/navigation';
 	import { fetchData } from '../../API/api';
-	import * as dotenv from 'dotenv';
-  	dotenv.config();
+	import { LOCALHOST } from '../../API/env';
 	// VARIABLES
 
 	let redirectUser: UserRedirect;
@@ -235,7 +234,7 @@
 				const headers = new Headers();
 				headers.append('Authorization', `Bearer ${accessToken}`);
 				const response = await fetch(
-					`http://${process.env.LOCALHOST}:3000/chat/getMembers?code=${currentRoom.id}`,
+					`http://${LOCALHOST}:3000/chat/getMembers?code=${currentRoom.id}`,
 					{
 						headers
 					}
@@ -257,7 +256,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://${process.env.LOCALHOST}:3000/chat/getRoom`, { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/chat/getRoom`, { headers });
 			return await response.json();
 		}
 		return [];
@@ -272,7 +271,7 @@
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			const response = await fetch(
-				`http://${process.env.LOCALHOST}:3000/chat/UserbyRoom?room=${currentRoom?.id}&pseudo=${pseudo}`,
+				`http://${LOCALHOST}:3000/chat/UserbyRoom?room=${currentRoom?.id}&pseudo=${pseudo}`,
 				{ headers }
 				);
 				const data = await response.json();
@@ -288,7 +287,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/userInfo`, { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/users/userInfo`, { headers });
 			const data = await response.json();
 			const user: User = {
 				id: data?.id,
@@ -314,7 +313,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/getAllBlockReturnId?id=${currentUser.id}`, { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/users/getAllBlockReturnId?id=${currentUser.id}`, { headers });
 			const data = await response.json();
 			blocked = data;
 		}	
@@ -479,7 +478,7 @@
 			cookie?.trim()?.startsWith('access_token=')
 		);
 		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
-		socket = io(`http://${process.env.LOCALHOST}:3000`, {
+		socket = io(`http://${LOCALHOST}:3000`, {
 			extraHeaders: {
 				Authorization: 'Bearer ' + access_token
 			}

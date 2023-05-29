@@ -81,8 +81,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchFriend, fetch2FA, fetch2FAstatus} from '../../../API/api';
-    import * as dotenv from 'dotenv';
-    dotenv.config();
+    import { LOCALHOST } from '../../../API/env';
 
     interface User {
         id: number;
@@ -108,7 +107,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
-        const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.id}/enable2fa`, {
+        const response = await fetch(`http://${LOCALHOST}:3000/users/${user.id}/enable2fa`, {
         method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -134,7 +133,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
-        const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.id}/enable2fa`, {
+        const response = await fetch(`http://${LOCALHOST}:3000/users/${user.id}/enable2fa`, {
           method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -167,7 +166,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         // });
         // if (response.ok)
         // {
-          const response = await fetch(`http://${process.env.LOCALHOST}:3000/${user.id}/auth/2fa/setup`, {
+          const response = await fetch(`http://${LOCALHOST}:3000/${user.id}/auth/2fa/setup`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -207,7 +206,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         const accessToken = await fetchAccessToken();
         if (accessToken)
         {
-          const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.pseudo}/newPseudo`, {
+          const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/newPseudo`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -250,7 +249,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         const accessToken = await fetchAccessToken();
         if (accessToken)
         {
-          const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.pseudo}/picture`, { // Send the base64-encoded string to the server
+          const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/picture`, { // Send the base64-encoded string to the server
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

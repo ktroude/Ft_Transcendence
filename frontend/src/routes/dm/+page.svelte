@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { io, Socket } from 'socket.io-client';
-    import * as dotenv from 'dotenv';
-    dotenv.config();
+    import { LOCALHOST } from '../../API/env';
 	import { onMount } from 'svelte';
 
 	let socket:Socket;
@@ -106,7 +105,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://${process.env.LOCALHOST}:3000/dm/getRoomData`, { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/dm/getRoomData`, { headers });
 			const data =  await response.json();
             currentUser = data.user;
             roomList = data.rooms;
@@ -135,7 +134,7 @@
         if (!access_token) {
                 window.location.pathname = '/';
             }
-		socket = io(`http://${process.env.LOCALHOST}:3000`, {
+		socket = io(`http://${LOCALHOST}:3000`, {
 			extraHeaders: {
 				Authorization: 'Bearer ' + access_token
 			}

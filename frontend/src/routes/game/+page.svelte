@@ -83,7 +83,8 @@
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../API/api';
 	import { page } from '$app/stores';
-
+	import { LOCALHOST } from '../../API/env';
+	
 	let socket: Socket;
 
     let previousFriend: string;
@@ -117,7 +118,7 @@
 	async function getConnectedUsers() {
 	const accessToken = await fetchAccessToken();
 	if (accessToken) {
-		const response = await fetch(`http://${process.env.LOCALHOST}:3000/websocket/getClient`, {
+		const response = await fetch(`http://${LOCALHOST}:3000/websocket/getClient`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -141,7 +142,7 @@
 		}
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-			const url = `http://${process.env.LOCALHOST}:3000/users/${searchProfile}/search`;
+			const url = `http://${LOCALHOST}:3000/users/${searchProfile}/search`;
 			const response = await fetch(url, {
 				method: 'GET',
 				headers: {
@@ -192,7 +193,7 @@
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
-			const url = `http://${process.env.LOCALHOST}:3000/users/${friendName}/search`;
+			const url = `http://${LOCALHOST}:3000/users/${friendName}/search`;
 				const response = await fetch(url, {
 					method: 'GET',
 					headers: {
@@ -220,7 +221,7 @@
     async function handleDeleteFriend(friendName) {
         const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.pseudo}/deletefriend`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/deletefriend`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -248,7 +249,7 @@
             return;
         const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.pseudo}/friend`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/friend`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -275,7 +276,7 @@
         }
 		const accessToken = await fetchAccessToken();
             if (accessToken) {
-                const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/${user.pseudo}`, {
+                const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -303,7 +304,7 @@
 			await goto('auth/2fa');
 		else
 		{
-			const socket = io(`http://${process.env.LOCALHOST}:3000`);
+			const socket = io(`http://${LOCALHOST}:3000`);
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo });
 			});

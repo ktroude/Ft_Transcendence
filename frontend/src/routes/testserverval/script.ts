@@ -1,8 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import Colyseus from 'colyseus.js';
-  import * as dotenv from 'dotenv';
-  dotenv.config();
+  import { LOCALHOST } from '../../API/env';
 
   let canvas;
   let game;
@@ -151,7 +150,7 @@
       },
     };
 
-    client = new Colyseus.Client(`ws://${process.env.LOCALHOST}:2567`);
+    client = new Colyseus.Client(`ws://${LOCALHOST}:2567`);
     room = await client.joinOrCreate('pong');
 
     room.onStateChange((state) => {

@@ -3,8 +3,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { navigate } from 'svelte-routing';
-  import * as dotenv from 'dotenv';
-  dotenv.config();
+  import { LOCALHOST } from '../../../API/env';
 
   let Colyseus;
   let client;
@@ -31,7 +30,7 @@ async function test()
 function redirectToGame() {
   return new Promise((resolve) => {
     if (room_id) {
-      const url = `http://${process.env.LOCALHOST}:5173/game/pong_game?room_id=${room_id}`;
+      const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${room_id}`;
       window.location.href = url;
       resolve();
     } else {
@@ -43,7 +42,7 @@ function redirectToGame() {
 
 function redirectToOtherURL()
 {
-  navigate(`http://${process.env.LOCALHOST}:5173/testserver`);
+  navigate(`http://${LOCALHOST}:5173/testserver`);
 }
 
 async function joinRoomById(roomId) {
@@ -64,7 +63,7 @@ async function connect()
     first_connection = false;
     Colyseus = await import("colyseus.js");
   
-    client = new Colyseus.Client(`ws://${process.env.LOCALHOST}:3001`);
+    client = new Colyseus.Client(`ws://${LOCALHOST}:3001`);
     console.log("client created");
     room = await client.joinOrCreate("ranked");
     console.log("created room lobby");

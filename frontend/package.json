@@ -39,7 +39,6 @@
 		"buffer": "^6.0.3",
 		"colyseus": "^0.14.0",
 		"colyseus.js": "^0.14.13",
-		"dotenv": "^16.0.3",
 		"pg": "^8.10.0",
 		"qrcode": "^1.5.3",
 		"socket.io": "^4.6.1",

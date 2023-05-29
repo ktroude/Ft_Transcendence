@@ -2,8 +2,7 @@
 
 <script lang=ts>
   import { onMount } from 'svelte';
-  import * as dotenv from 'dotenv';
-  dotenv.config();
+  import { LOCALHOST } from '../../API/env';
   // import { Room, Client } from "colyseus";
   // import Colyseus from 'colyseus.js';
 
@@ -21,7 +20,7 @@
   async function connect()
   {
     Colyseus = await import("colyseus.js");
-    client = new Colyseus.Client(`ws://${process.env.LOCALHOST}:3001`);
+    client = new Colyseus.Client(`ws://${LOCALHOST}:3001`);
     room = await client.joinOrCreate("Private_Room");
     // room.onMessage('Player_init', (message) => {
     // player.pseudo = message.player1_pseudo;

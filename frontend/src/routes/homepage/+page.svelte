@@ -74,8 +74,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../API/api';
 	import { redirect } from '@sveltejs/kit';
 	import {io, Socket} from 'socket.io-client';
-	import * as dotenv from 'dotenv';
-  	dotenv.config();
+	import { LOCALHOST } from '../../API/env';
 	
 	let socket: Socket;
 	let anim = false;
@@ -95,7 +94,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     async function redirectToGithub(username) {
       	const accessToken = await fetchAccessToken();
-      	const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
+      	const response = await fetch(`http://${LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
 			method: 'PUT',
 			headers: {
 			'Content-Type': 'application/json',
@@ -145,7 +144,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		await goto('/auth/2fa');
     else
     {
-      const socket = io(`http://${process.env.LOCALHOST}:3000`);
+      const socket = io(`http://${LOCALHOST}:3000`);
       socket.on('connect', async function() {			
         socket.emit('userConnected', { pseudo: user.pseudo });
       });
@@ -155,7 +154,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         const accessToken = await fetchAccessToken();
         if (accessToken)
         {
-          const response = await fetch(`http://${process.env.LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
+          const response = await fetch(`http://${LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -202,7 +201,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-			const url = `http://${process.env.LOCALHOST}:3000/users/achievements/${user.id}/getAchievements`;
+			const url = `http://${LOCALHOST}:3000/users/achievements/${user.id}/getAchievements`;
 			const response = await fetch(url, {
 			method: 'GET',
 			headers: {
