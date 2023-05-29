@@ -38,7 +38,6 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 		});
 	}
   
-<<<<<<< HEAD
 	@SubscribeMessage('InvitedInGame')
 	handleInvitedInGame(@ConnectedSocket() client:any, @MessageBody() data) {
 		const toSend = {
@@ -49,14 +48,7 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 		this.server.emit('InvitedNotif', toSend);
 	}
   // ---------------------- DEPRECATED ----------------------
-  async getClient() { 
-	const newmap = this.clients;
-	const vector = [];
-	for (const [key, value] of newmap.entries()) {
-	  vector.push(key);
-	}
-	return vector;
-=======
+  
   async getClient() 
   { 
     const newmap = this.clients;
@@ -79,6 +71,5 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
       });
     }
     return vector;
->>>>>>> 8c02b9ed3abd62fbc311cb205190fbeb7221b295
   }
 }

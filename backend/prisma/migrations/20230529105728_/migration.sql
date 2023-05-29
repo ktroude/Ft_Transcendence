@@ -12,7 +12,6 @@ CREATE TABLE "user" (
     "losses" INTEGER NOT NULL DEFAULT 0,
     "rank" INTEGER NOT NULL DEFAULT 0,
     "level" INTEGER NOT NULL DEFAULT 0,
-    "connected" INTEGER NOT NULL DEFAULT 0,
     "FA2" BOOLEAN NOT NULL DEFAULT false,
     "FA2lock" BOOLEAN NOT NULL DEFAULT false,
     "FA2secret" TEXT,
@@ -21,10 +20,7 @@ CREATE TABLE "user" (
     "ImTheBoss" BOOLEAN NOT NULL DEFAULT false,
     "TheDarkSide" BOOLEAN NOT NULL DEFAULT false,
     "ImCurious" BOOLEAN NOT NULL DEFAULT false,
-<<<<<<< HEAD:backend/prisma/migrations/20230527112852_/migration.sql
-=======
     "connected" INTEGER NOT NULL DEFAULT 0,
->>>>>>> 8d5e6c2f76a48c0e4bca8cc0ee417fcb574a913e:backend/prisma/migrations/20230527155528_/migration.sql
     "win_streak" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
