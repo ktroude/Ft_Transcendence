@@ -12,7 +12,7 @@
     let messages:any[] = [];
     let loading = false;
     let contactList = [];
-	let notif:any = null;
+	let notif:any = {url:'', display:false, invitedBy:''};
 	let anim = false;
 
     async function handleClickRoomButton(roomId: number) {
@@ -29,7 +29,7 @@
     }
 
     async function fetchRoomGameId() {
-        try {
+
 			const cookies = document.cookie.split(';');
 			const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 			const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -43,16 +43,16 @@
 					}
 				);
 				const data = await response.json();
+                console.log('retour fetch ==', data);
                 return data;
 			}
-		} catch {
-            return null;
-        }
+
 	}
 
     async function handleInviteGameButton() {
         const id = await fetchRoomGameId();
-        const url = `http://localhost:5173/game/pong_game?room_id=${id}`;
+        console.log('ID ====', id);
+        const url = `http://localhost:5173/game/pong_game?room_id=${id.response}`;
 		const data = {
 			invited: selectedUser,
 			invitedBy: currentUser.username,
@@ -240,10 +240,12 @@
             }
         });
 		socket.on('InvitedNotif', async(data) => {
+            console.log("data ==", data);
 			if (data.invited.id === currentUser.id)
 				notif.display = true;
                 notif.url = data.url;
                 notif.invitedBy = data.invitedBy;
+                console.log('je susi invite a url ==', notif.url);
 				createPopup(true);
 		});
 
@@ -389,7 +391,7 @@
                 </div>
                 <div class="selctedUser_button_settings">
                     <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
-                    <button on:click={createPopup}>Proposer une partie</button>
+                    <button on:click={handleInviteGameButton}>Proposer une partie</button>
                 </div>
             </div>
         </div>

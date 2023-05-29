@@ -55,7 +55,9 @@ export class UserController {
     @UseGuards(JwtGuard)
     @Get('getRoomId')
     async handleGetRoomId() {
-        return await this.userService.handleGetRoomId();
+        const resp = await this.userService.handleGetRoomId();
+        console.log(resp);
+        return {response:resp};
     }
 
     @UseGuards(JwtGuard)
@@ -63,7 +65,6 @@ export class UserController {
     async enable2fa(@Param('id') id: string, @Body() body: {status : string, codestring: string}): Promise<User> {
         return await this.userService.enable2FA(parseInt(id,10), body.status, body.codestring);
     }
-
 
     @UseGuards(JwtGuard)
     @Get(':user/search')

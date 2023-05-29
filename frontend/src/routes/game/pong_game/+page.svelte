@@ -464,26 +464,26 @@ function fade(thisplace) {
 	}
 
 onMount(async() => {
-		user = await fetchData();
-		if (!user)
-		{
-			await goto('/');
-			return ;
-		}
-		const FA2 = await fetch2FA(user.id);
-		if (FA2 == true)
-		{
-			await goto('auth/2fa');
-			return ;
-		}
-		else
-		{
-			const socket = io('http://localhost:3000');
-			socket.on('connect', async function() {
-				socket.emit('userConnected', { pseudo: user.pseudo });
-			});
-		}
-  loading = true;
+		// user = await fetchData();
+		// if (!user)
+		// {
+		// 	await goto('/');
+		// 	return ;
+		// }
+		// const FA2 = await fetch2FA(user.id);
+		// if (FA2 == true)
+		// {
+		// 	await goto('auth/2fa');
+		// 	return ;
+		// }
+		// else
+		// {
+		// 	const socket = io('http://localhost:3000');
+		// 	socket.on('connect', async function() {
+		// 		socket.emit('userConnected', { pseudo: user.pseudo });
+		// 	});
+		// }
+//   loading = true;
   canvas = document.getElementById('canvas');
   currentUser = await fletchCurrentUserData();
   console.log(currentUser);
