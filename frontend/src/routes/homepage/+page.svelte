@@ -123,7 +123,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				}
 			}
 		}
-		// window.open(`https://github.com/${username}`, '_blank');
+		window.open(`https://github.com/${username}`, '_blank');
 }
 
 
@@ -135,12 +135,18 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
 
     onMount(async function() {
-		user = await fetchData();
-		const FA2 = await fetch2FA(user.id)
+	user = await fetchData();
+	const FA2 = await fetch2FA(user.id)
     if (!user)
+	{
       await goto('/');
+	  return;
+	}
 	if (FA2 == true)
+	{
 		await goto('/auth/2fa');
+		return;
+	}
     else
     {
       const socket = io('http://localhost:3000');
@@ -214,9 +220,4 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		else 
 			console.log('Error: Could not get achievements');
 	}
-
-
-
-
-
 </script>
