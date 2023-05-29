@@ -1,3 +1,8 @@
+<script>
+  const serverUrl = '<%= serverUrl %>';
+  console.log('serverUrl===', serverUrl);
+</script>
+
 
 <h1>Ft Transcendence</h1>
 <h2>
