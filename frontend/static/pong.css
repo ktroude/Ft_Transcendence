@@ -108,16 +108,6 @@
 	transition: width 0.5s ease-in-out;
 }
 
-@media (max-width: 1000px) {
-    #canvas {
-        width: 600px;
-    }
-}
-@media (max-width: 700px) {
-    #canvas {
-        width: 450px;
-    }
-}
 .canvas-container{
 	display: flex;
 	align-items: center;
@@ -162,4 +152,16 @@
 		transform: translateY(-100px);
 		color: transparent;
 	}
+}
+
+
+@media (max-width: 1000px) {
+    #canvas {
+        width: 600px;
+    }
+}
+@media (max-width: 700px) {
+    #canvas {
+        width: 450px;
+    }
 }
