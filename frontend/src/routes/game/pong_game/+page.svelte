@@ -45,6 +45,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   import { onMount } from 'svelte';
   import * as setting_game from "./GameConfig" 
   import { goto } from "$app/navigation";
+  import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../../API/api';
 
 	let currentUser;
 	let Colyseus;
@@ -60,6 +61,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let touched_player_1 = false;
 	let touched_player_2 = false;
 	let waiting_game = false;
+	let user;
   // debug
 	let room_id;
 	let started = 0;
@@ -462,6 +464,26 @@ function fade(thisplace) {
 	}
 
 onMount(async() => {
+		user = await fetchData();
+		if (!user)
+		{
+			await goto('/');
+			return ;
+		}
+		const FA2 = await fetch2FA(user.id);
+		if (FA2 == true)
+		{
+			await goto('auth/2fa');
+			return ;
+		}
+		else
+		{
+			const socket = io('http://localhost:3000');
+			socket.on('connect', async function() {
+				socket.emit('userConnected', { pseudo: user.pseudo });
+			});
+		}
+  loading = true;
   canvas = document.getElementById('canvas');
   currentUser = await fletchCurrentUserData();
   console.log(currentUser);

@@ -43,11 +43,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		</div>
 
 			<div class="full_page">
-
 				<div class="friendlist_box">
 					<div class="friend-list">
 						<div class="friendlist_title">Friendlist</div>
-						<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
+						<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} on:keydown={(event) => handleEnter(event)}/>
 							<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
 							<ul class="ul_friends">
 								{#if friends}
@@ -67,10 +66,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 										<span class="friendname">{friendName}</span>
  									</div>
  									{#if clickedFriend === friendName && showButtons && invited === 2}
- 									<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
- 									<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
- 									<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
- 									<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+ 										<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
+ 										<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
+ 										<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
+ 										<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
  									{/if}
  								</li>
  								{/each}
@@ -84,27 +83,21 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					<div class="lobby_title">LOBBY</div>
 
 					{#if waiting}
-						<h2>Waiting for an opponent...</h2>
+						<button class="connect_button" on:click={connect}><span class="button_text_anim">WAITING...</span></button>
+					{:else}
+						{#if room_pong_id}
+							<button class="connect_button">GAME FOUND</button>
+							{:else}
+							<button class="connect_button" on:click={connect}><span class="button_text_anim">SEARCH OPPONENT</span></button>
+						{/if}
 					{/if}
-					{#if room_pong_id}
-						
-						<h2>Game found!</h2>
-					{/if}
-					<button class="connect_button" on:click={connect}>SEARCH OPPONENT</button>
 
 				</div>
 
-
-
 			<div class="connected_box">
 				<div class="search_profile">
-					<!-- <div class="search_title">Search profile</div>
-					<div class="search_bloc">
-						<input class="input_friend" type="text" bind:value={searchProfile} />
-						<button class="search_button" on:click={() => handleSearchProfile(searchProfile)}>🔍</button>
-					</div> -->
 					<div class="connected_users_bloc">
-						<div class="connected_title">Connected users</div>
+						<div class="connected_title">Connected</div>
 						<ul class="ul_friends">
 							{#each connectedUsers as x }
 								<li class="friends_list">
@@ -116,18 +109,15 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 											<div class="red_dot"></div>
 										{/if}
 										<div class="connectedUsersName">{x.username}</div>
-										<!-- <div class="connectedUsersName">{x.connected}</div> -->
-										
 									</div>
 								</li>
 							{/each}
 						</ul>
+						</div>
 					</div>
-					</div>
-					</div>
-	</div>
-
-	{/if}
+				</div>
+		</div>
+{/if}
 </body>
 <!-- ****************************** -->
 <!-- **********   SCRIPT  ********* -->
@@ -140,10 +130,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../API/api';
 	import { page } from '$app/stores';
-
-
-
-
 	import { navigate } from 'svelte-routing';
 	import { xlink_attr } from 'svelte/internal';
 
@@ -170,6 +156,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   });
 }
 
+async function handleEnter(event:any)
+	{
+		if (event.key === 'Enter') {
+			handleAddFriend();
+		}
+	}
 
 async function connect()
 {
@@ -200,7 +192,6 @@ async function connect()
   }
 }
 	let socket: Socket;
-
     let previousFriend: string;
     let showButtons = false;
     let clickedFriend: string;
@@ -208,8 +199,6 @@ async function connect()
     let friendNameAdd: string = '';
     let searchProfile: string = '';
     let connectedUsers = [];
-
-
 	let loading = false;
 	let friendUser: User;
     let user: User;
@@ -241,17 +230,13 @@ async function connect()
 			'Authorization': `Bearer ${accessToken}`
 		},
 		});
-		if (response.ok){
+		if (response.ok)
 			connectedUsers = await response.json();
-			// console.log('CU ===', connectedUsers);
-		}
-			else{
+		else
 			console.log("FRONT NOT WORKIGN HOHO")
-		}
-	} else {
+	} else 
 		console.log('Error: Could not get users');
-	}
-	}
+}
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
@@ -357,13 +342,15 @@ async function connect()
                 body: JSON.stringify({ friend: friendName })
             });
             if (response.ok)
-                friends = friends.filter(friend => friend !== friendName);
+				friends = friends.filter(friend => friend[0] !== friendName);
             else
                 console.log('Error: Could not delete friend');
         } 
 		else
+		{
             console.log('Error: Could not delete friend');
 			goto('/');
+		}
     }
 
     function handleInviteFriend(friendName: any) {
@@ -430,10 +417,16 @@ async function connect()
     onMount(async () => {
         user = await fetchData();
 		if (!user)
+		{
 			await goto('/'); 
+			return ;
+		}
 		const FA2 = await fetch2FA(user.id);
 		if (FA2 == true)
+		{
 			await goto('auth/2fa');
+			return ;
+		}
 		else
 		{
 			const socket = io('http://localhost:3000');

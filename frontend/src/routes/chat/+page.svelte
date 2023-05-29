@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { io, Socket } from 'socket.io-client';
 	import { goto } from '$app/navigation';
-	import { fetchData } from '../../API/api';
+	import { fetchData, fetch2FA } from '../../API/api';
 
 	// VARIABLES
 
@@ -473,9 +473,10 @@
 	}
 
 	onMount(async () => {
+		
 		const cookies = document?.cookie?.split(';');
 		const accessTokenCookie = cookies?.find((cookie) =>
-			cookie?.trim()?.startsWith('access_token=')
+		cookie?.trim()?.startsWith('access_token=')
 		);
 		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
 		socket = io('http://localhost:3000', {
@@ -486,10 +487,19 @@
 		if (!access_token || !socket) {
 			window.location.pathname = '/';
 		}
+		currentUser = await fetchData();
+		if (!currentUser) {
+			goto('/')
+			return ;
+		}
+		const FA2 = await fetch2FA(currentUser.id)
+		if (FA2 === true) {
+			await goto('auth/2fa');
+			return ;
+		}
 		socket.on('connect', async function () {
 			console.log('Connected to server');
-			redirectUser = await fetchData();
-			socket.emit('userConnected', { pseudo: redirectUser.pseudo });
+			socket.emit('userConnected', { pseudo: currentUser.pseudo });
 		});
 		socket.on('roomCreated', async (newRoom: ChatRoom) => {
 			chatRooms = await fletchChatRoomsData();

@@ -11,6 +11,8 @@ import { User } from '@prisma/client';
 import { authenticator } from 'otplib';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Controller({})
 export class AuthController {
@@ -75,4 +77,5 @@ export class AuthController {
     const isVerified = authenticator.check(code, user.FA2secret);
     return res.json({ isVerified });
   }
+
 }
