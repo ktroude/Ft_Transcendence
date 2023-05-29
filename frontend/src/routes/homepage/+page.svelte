@@ -136,12 +136,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     onMount(async function() {
 	user = await fetchData();
-	const FA2 = await fetch2FA(user.id)
     if (!user)
 	{
-      await goto('/');
-	  return;
+		await goto('/');
+		return;
 	}
+	const FA2 = await fetch2FA(user.id)
 	if (FA2 == true)
 	{
 		await goto('/auth/2fa');
