@@ -43,15 +43,15 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     </div>
 	<div class="main_profile">
-		<div class="edit_box">
-			<h1>{displayUsername}</h1>
+    <div class="edit_box">
+      <h1>{displayUsername}</h1>
+      {#if FAstatus === false}
+        <button  class="edit_button" on:click={enable2fa}>Enable 2FA 🔒</button>
+      {:else if FAstatus === true}
+        <button  class="edit_button" on:click={disable2fa}>Disable 2FA 🔓</button>
+      {/if}
 			<label for="username-input">New Username:</label>
 			<input type="text" id="username-input" bind:value={newUsername} />
-      {#if FAstatus === false}
-        <button  class="edit_button" on:click={enable2fa}>ACTIVATE</button>
-      {:else if FAstatus === true}
-        <button  class="edit_button" on:click={disable2fa}>DESACTIVATE</button>
-      {/if}
 			<button  class="edit_button" on:click={handleUpdateUsername}>Update</button>
 			<!-- svelte-ignore a11y-img-redundant-alt -->
 			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
@@ -77,7 +77,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <script lang="ts">
 	let loading = false;
   	
-	import { goto } from "$app/navigation";
+	  import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchFriend, fetch2FA, fetch2FAstatus} from '../../../API/api';
@@ -155,16 +155,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
-        // const response = await fetch(`http://localhost:3000/users/${user.id}/enable2fa`, {
-        // method: 'PUT',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //       'Authorization': `Bearer ${accessToken}`
-        //     },
-        //   body: JSON.stringify({status : 'enable'})
-        // });
-        // if (response.ok)
-        // {
           const response = await fetch(`http://localhost:3000/${user.id}/auth/2fa/setup`, {
           method: 'GET',
           headers: {
@@ -174,16 +164,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           const data = await response.json();
           qrImage = data.image;
           FAstatus = true;
-        // }
-        // else
-        //   console.log('Error: Could not update the 2fa');
+        }
+        else
+          console.log('Error: Could not update the 2fa');
       }
-      else {
-        console.log('Error: Could not update the 2fa');
-      }
-    }
 
         async function getImageURL() {
+        user = await fetchData();
         const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
         const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
         imageURL = URL.createObjectURL(blob); // Create a URL for the blob
@@ -269,14 +256,20 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     onMount(async function() {
         user = await fetchData();
         if (!user)
+        {
           await goto('/');
+          return ;
+        }
         const FA2 = await fetch2FA(user.id);
         if (FA2 == true)
+        {
           await goto('auth/2fa');
+          return ;
+        }
         else
         {
           FAstatus = await fetch2FAstatus(user.id);
-          getImageURL()
+          await getImageURL()
           displayUsername = user.username;
         }
 		loading = true;

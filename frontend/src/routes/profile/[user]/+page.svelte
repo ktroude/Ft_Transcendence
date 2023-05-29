@@ -192,7 +192,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <!-- ****************************** -->
 
 <script lang="ts">
-  	
+
 	import {io, Socket} from 'socket.io-client';
 	import { page } from '$app/stores';
 	import { goto } from "$app/navigation";
@@ -523,7 +523,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let is_blocked: any;
 	let realUserId: any;
 	let realUserPseudo: any;
-	
+
 	async function loadpage() {
 		if (!user)
 			goto('/');
@@ -556,7 +556,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	async function friendRequest()
 	{
 		friends = await fetchFriend(user.pseudo);
-		console.log(friends);
 	}
 
 	onMount(async function() {
