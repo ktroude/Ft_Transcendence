@@ -460,33 +460,6 @@ function fade(thisplace) {
 		}, 400);
 	}
 
-	async function friendrequest() 
-	{
-		friends = await fetchFriend(user.pseudo);	
-	}
-
-	async function getConnectedUsers() {
-	const accessToken = await fetchAccessToken();
-	if (accessToken) {
-		const response = await fetch(`http://localhost:3000/websocket/getClient`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${accessToken}`
-		},
-		});
-		if (response.ok){
-			connectedUsers = await response.json();
-			console.log('CU ===', connectedUsers);
-		}
-			else{
-			console.log("FRONT NOT WORKIGN HOHO")
-		}
-	} else {
-		console.log('Error: Could not get users');
-	}
-	}
-
 onMount(async() => {
 		user = await fetchData();
 		if (!user)
@@ -496,17 +469,16 @@ onMount(async() => {
 		}
 		const FA2 = await fetch2FA(user.id);
 		if (FA2 == true)
+		{
 			await goto('auth/2fa');
+			return ;
+		}
 		else
 		{
 			const socket = io('http://localhost:3000');
 			socket.on('connect', async function() {
 				socket.emit('userConnected', { pseudo: user.pseudo });
 			});
-			await friendrequest();
-			setInterval(friendrequest, 10000);
-			await getConnectedUsers();
-			setInterval(getConnectedUsers, 10000);
 		}
   loading = true;
   canvas = document.getElementById('canvas');
