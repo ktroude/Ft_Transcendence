@@ -5,5 +5,3 @@
         ici 
     </a> pour te connecter 
 </h2>
-
-<!-- https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-fbca848ccb6f0757b4c503e49b4c9541f26f62ac877036ed0f6c44afd5e91dfe&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Ftoken&response_type=code -->

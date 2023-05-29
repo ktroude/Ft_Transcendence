@@ -46,7 +46,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<div class="friendlist_box">
 					<div class="friend-list">
 						<div class="friendlist_title">Friendlist</div>
-						<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} />
+						<div class="addfriend_bloc"> <input class="input_friend" type="text" bind:value={friendNameAdd} on:keydown={(event) => handleEnter(event)}/>
 							<button class="addfriend_button" on:click={handleAddFriend}>+</button></div>
 							<ul class="ul_friends">
 								{#if friends}
@@ -154,6 +154,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     }
   });
 }
+
+async function handleEnter(event:any)
+	{
+		if (event.key === 'Enter') {
+			handleAddFriend();
+		}
+	}
 
 async function connect()
 {
@@ -370,13 +377,15 @@ async function connect()
                 body: JSON.stringify({ friend: friendName })
             });
             if (response.ok)
-                friends = friends.filter(friend => friend !== friendName);
+				friends = friends.filter(friend => friend[0] !== friendName);
             else
                 console.log('Error: Could not delete friend');
         } 
 		else
+		{
             console.log('Error: Could not delete friend');
 			goto('/');
+		}
     }
 
     function handleInviteFriend(friendName: any) {
@@ -443,10 +452,16 @@ async function connect()
     onMount(async () => {
         user = await fetchData();
 		if (!user)
+		{
 			await goto('/'); 
+			return ;
+		}
 		const FA2 = await fetch2FA(user.id);
 		if (FA2 == true)
+		{
 			await goto('auth/2fa');
+			return ;
+		}
 		else
 		{
 			const socket = io('http://localhost:3000');
