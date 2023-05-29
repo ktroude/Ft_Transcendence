@@ -278,17 +278,13 @@ async function connect()
 			'Authorization': `Bearer ${accessToken}`
 		},
 		});
-		if (response.ok){
+		if (response.ok)
 			connectedUsers = await response.json();
-			console.log('CU ===', connectedUsers);
-		}
-			else{
+		else
 			console.log("FRONT NOT WORKIGN HOHO")
-		}
-	} else {
+	} else 
 		console.log('Error: Could not get users');
-	}
-	}
+}
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
