@@ -125,7 +125,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       else {
         console.log('Error: Could not update the 2fa');
       }
-    }
+  }
+
 
     async function handleSubmit2fa()
     {
@@ -138,16 +139,37 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
               },
-            body: JSON.stringify({status : 'enable'})
+            body: JSON.stringify({status : 'enable', codestring: code})
           });
-          if (response.ok)
-          {
-            ;
-          }
-          else
-            console.log('Error: Could not update the 2fa');
-      }
+          if (!response.ok) {
+      console.log('Error:', response.status);
+      return null;
     }
+
+        const responseData = await response.text();
+
+        let data;
+        if (responseData) {
+          try 
+          {
+            data = JSON.parse(responseData);
+          }
+          catch (error) {
+            console.log('Error parsing JSON:', error);
+            return null;
+          }
+        } else {
+          console.log('Empty response');
+          return null;
+        }
+        if (data === null)
+          return null;
+        else
+          qrImage = '';
+      }
+      else
+        console.log('Error: Could not update the 2fa');
+  }
 
 
     async function enable2fa() // Update the 2fa

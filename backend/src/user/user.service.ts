@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { authenticator } from 'otplib';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrimaryColumnCannotBeNullableError } from 'typeorm';
 const jwt = require('jsonwebtoken');
@@ -54,9 +55,20 @@ export class UserService {
         return user.connected;
     }
 
-    async enable2FA(user: number, status: string): Promise<User> {
+    async enable2FA(user: number, status: string, code: string): Promise<User> {
         if (status == 'enable') 
         {
+            const findUser = await this.prisma.user.findUnique({
+                where: {
+                    id: user,
+                },
+            });
+            const isVerified = authenticator.check(code, findUser.FA2secret)
+            if (!isVerified)
+            {
+                console.log('Invalid code');
+                return null;
+            }
             const updatedUser = await this.prisma.user.update({ // update user
             where: { id: user }, // where id = user
             data: { FA2: true } // set FA2 to true
