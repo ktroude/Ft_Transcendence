@@ -13,6 +13,7 @@
     let loading = false;
     let contactList = [];
 	let notif:any = null;
+	let anim = false;
 
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
@@ -149,6 +150,27 @@
     }
     }
 
+	function createPopup()
+	{
+		const boxito = document.querySelector("body");
+		const toast = document.createElement("div");
+		toast.innerHTML = `<div class="popup">
+									<div class="popup_img">
+									</div>
+									<div class="popup_title_text_box">
+										<h4 class="popup_title">Invited by:</h4>
+										<button class="popup_button" on:click=>Accept</button>
+										<button class="popup_button" on:click=>Deny</button>
+									</div>
+							</div>`
+		boxito.appendChild(toast);
+	}
+
+	function removePopup() {
+		const boxito = document.querySelector("popup");
+		toast.remove();
+	}
+
 	onMount(async() => {
 		const cookies = document?.cookie?.split(';');
 		const accessTokenCookie = cookies?.find((cookie) =>
@@ -199,6 +221,7 @@
 				notif.display = true;
                 notif.url = data.url;
                 notif.invitedBy = data.invitedBy;
+				createPopup(true);
 		});
 
         await isExist();
@@ -217,6 +240,8 @@
 			document.body.classList.remove('fade-out');
 		}, 400);
 	}
+
+
 
 </script>
 
@@ -341,7 +366,7 @@
                 </div>
                 <div class="selctedUser_button_settings">
                     <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
-                    <button>Proposer une partie</button>
+                    <button on:click={createPopup}>Proposer une partie</button>
                 </div>
             </div>
         </div>

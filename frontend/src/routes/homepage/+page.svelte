@@ -126,7 +126,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		window.open(`https://github.com/${username}`, '_blank');
 }
 
-
 	const removePopup = (toast) => {
     if(toast.timeoutId) clearTimeout(toast.timeoutId); 
     setTimeout(() => toast.remove(), 3000);
