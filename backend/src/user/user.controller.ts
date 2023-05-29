@@ -53,6 +53,12 @@ export class UserController {
     }
 
     @UseGuards(JwtGuard)
+    @Get('getRoomId')
+    async handleGetRoomId() {
+        return await this.userService.handleGetRoomId();
+    }
+
+    @UseGuards(JwtGuard)
     @Put(':id/enable2fa')
     async enable2fa(@Param('id') id: string, @Body() body: {status : string}): Promise<User> {
         return await this.userService.enable2FA(parseInt(id,10), body.status);

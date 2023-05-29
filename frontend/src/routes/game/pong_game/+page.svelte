@@ -25,9 +25,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		</canvas>
 		{#if connected == false}
 			{#if waiting_game == false}
-				<button class="play_button" on:click={connect}>PLAY</button>
+				<button class="play_button" on:click={ready_to_play}>PLAY</button>
 			{:else}
-				<button class="waiting_button" on:click={connect}>WAITING...</button>
+				<button class="waiting_button">WAITING...</button>
 			{/if}
 		{/if}
 		{#if gameFinished == true}
@@ -52,11 +52,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let room;
 	let clientId;
 	let canvas;
-	let showButtons = false;
 	let mainclient = false;
 	let winner;
 	let gameFinished = false;
-	let loading = false;
 	let connected = false;
 	let touched = 0;
 	let touched_player_1 = false;
@@ -70,6 +68,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   async function test() //debug
 {
   console.log("room_id", room_id);
+}
+
+function ready_to_play()
+{
+	room.send("rdtoplay", true);
 }
 
 function countdown(counter)
@@ -96,14 +99,13 @@ function getRoomIdFromUrl(){
   return urlParams.get('room_id');
 }
 
-function init_player1() {
-  let player = new Player(0, setting_game.canvas_height / 2, 0, 0);
+function init_player(num) {
+	let player;
+	if(num == 1)
+		player = new Player(0, setting_game.canvas_height / 2, 0, 0);
+	else
+		player = new Player(setting_game.canvas_width - setting_game.paddle_width, setting_game.canvas_height / 2, 0, 0);		
   return player;
-}
-
-function init_player2() {
-  let player2 = new Player(setting_game.canvas_width - setting_game.paddle_width, setting_game.canvas_height / 2, 0, 0);
-  return player2;
 }
 
 function init_ball(){
@@ -111,8 +113,8 @@ function init_ball(){
   return ball;
 }
 
-let player = init_player1();
-let player2 = init_player2();
+let player = init_player(1);
+let player2 = init_player(2);
 let ball = init_ball();
 
 // Fonction pour afficher le message de victoire
@@ -143,7 +145,7 @@ function print_win(gagnant){
 async function connect(){
     Colyseus = await import("colyseus.js");
     client = new Colyseus.Client('ws://localhost:3001');
-    room = await client.joinById(room_id);
+    room = await client.joinById(room_id, {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
 	waiting_game = true;
     room.onMessage('Player_init', (message) =>
     {
@@ -159,16 +161,16 @@ async function connect(){
 		player2.id_user = message.player2_iD_user;
 		player.username = message.player1_username;
 		player2.username = message.player2_username;
-		mainclient = message.mainclient;
+		if(clientId == player.id)
+			mainclient = true;
 		console.log(mainclient);
-		showButtons = true;
 		connected = true;
-		countdown(3);
+		countdown(5);
     })
 	room.onMessage('role', (message) => {
 		clientId = message.client;
 	});
-	room.send('player_name', {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
+	// room.send('player_name', {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
 	console.log('Joined succefuly', room);
 }
     
@@ -448,6 +450,7 @@ function updatePos(){
     })
   }
 }
+
 function fade(thisplace) {
 		document.body.classList.add('fade-out');
 		console.log("switching page....");
@@ -459,14 +462,13 @@ function fade(thisplace) {
 	}
 
 onMount(async() => {
-  loading = true;
   canvas = document.getElementById('canvas');
   currentUser = await fletchCurrentUserData();
   console.log(currentUser);
-  loading = true;
   canvas.addEventListener('mousemove', playerMove);
   canvas.addEventListener('mousemove', player2Move);
   room_id = await getRoomIdFromUrl();
+  await connect();
   console.log(room_id);
 });
 

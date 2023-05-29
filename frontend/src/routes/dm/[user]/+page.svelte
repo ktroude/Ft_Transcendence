@@ -27,14 +27,37 @@
 
     }
 
-    function handleInviteGameButton() {
-		const url = '' // get url de val pour le jeu ici meme
+    async function fetchRoomGameId() {
+        try {
+			const cookies = document.cookie.split(';');
+			const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+			const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+			if (accessToken) {
+				const headers = new Headers();
+				headers.append('Authorization', `Bearer ${accessToken}`);
+				const response = await fetch(
+					`http://localhost:3000/users/getRoomId`,
+					{
+						headers
+					}
+				);
+				const data = await response.json();
+                return data;
+			}
+		} catch {
+            return null;
+        }
+	}
+
+    async function handleInviteGameButton() {
+        const id = await fetchRoomGameId();
+        const url = `http://localhost:5173/game/pong_game?room_id=${id}`;
 		const data = {
 			invited: selectedUser,
 			invitedBy: currentUser.username,
 			url: url,
 		}
-		socket.emit(`InvitedInGame`, data)
+		socket.emit(`InvitedInGame`, data);
     }
 
     function handleConnectedUserButton() {

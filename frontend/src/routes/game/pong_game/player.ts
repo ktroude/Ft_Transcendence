@@ -17,6 +17,8 @@ export class Player extends Schema {
 	nickname : string;
 	@type ('string')
 	color : string;
+	@type ('boolean')
+	rdtoplay : boolean;
   
 	constructor(x = 0, y = 0, score = 0, id = 0, id_user = '', Pseudo = "", nickname = "", color = "red") {
 	  super();
@@ -28,5 +30,6 @@ export class Player extends Schema {
 	  this.nickname = nickname;
 	  this.color = color;
 	  this.id_user = id_user;
+	  this.rdtoplay = false;
 	}
   }

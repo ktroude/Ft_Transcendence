@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrimaryColumnCannotBeNullableError } from 'typeorm';
+import { Room, Client, Delayed, matchMaker } from "colyseus";
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
@@ -37,6 +38,13 @@ export class UserService {
             });
             return updatedUser;
         }
+    }
+
+    async handleGetRoomId()
+    {
+        const roomToCreate = "Private_Room"; //name of the room to create
+        const room = await matchMaker.createRoom(roomToCreate, {});
+        return (room.roomId);
     }
 
     async getConnectedStatus(pseudo: string)

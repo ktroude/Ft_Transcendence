@@ -154,6 +154,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let room_pong;
 	let first_connection = true;
 	let waiting = false;
+	let playerId;
 	let mess = null;
 
 	function redirectToGame() {
@@ -179,49 +180,17 @@ async function connect()
 	if(!client)
 		client = new Colyseus.Client('ws://localhost:3001');
 
-	let playerId = localStorage.getItem("playerId");
-	let LobbyId = localStorage.getItem("LobbyId");
-	if(playerId)
-	{
-		try {
-			console.log(`Joueur ${playerId} tentative de reconexion a la salle ${LobbyId}`);
-			room = await client.reconnect(LobbyId, playerId);
-			room.onMessage('reconnexion', (message) => { console.log(message, playerId);});
-		}
-		catch (error)
-		{
-			console.log("erreur de reconnexion:", error);
-			room = await client.joinOrCreate("ranked");
-			// localStorage.setItem("LobbyId", room.roomid);
-			room.onMessage("connect", (message) => {
-			playerId = message.playerId;
-			LobbyId = message.lobby_id;
-			console.log("dans message",LobbyId, message.lobby_id);
-			console.log(`Connecté avec succès en tant que ${playerId}`);
-			// localStorage.setItem("playerId", playerId);
-		});
-		}
-	}
-	else
-	{
-		console.log("client colyseus created", client);
-		room = await client.joinOrCreate("ranked");
-		room.onMessage("connect", (message) => {
-			playerId = message.playerId;
-			LobbyId = message.lobby_id;
-			console.log("dans message",LobbyId, message.lobby_id);
-			console.log(`Connecté avec succès en tant que ${playerId}`);
-			// localStorage.setItem("playerId", playerId);
-		});
-	}
-	console.log("here", LobbyId, playerId);
-	await localStorage.setItem("LobbyId", String(LobbyId));
-	await localStorage.setItem("playerId", String(playerId));
+	console.log("client colyseus created", client);
+	room = await client.joinOrCreate("ranked");
+	room.onMessage("connect", (message) => {
+		playerId = message.playerId;
+		console.log(`Connecté avec succès en tant que `);
+		// localStorage.setItem("playerId", playerId);
+	});
     room.onMessage('waiting', (message) => { waiting = true; });
     room.onMessage('seat', (message) => {
 		room_pong_id = message;
 		waiting = false;
-    //   console.log("dans seatttt");
       redirectToGame();
     });
   }
@@ -274,7 +243,7 @@ async function connect()
 		});
 		if (response.ok){
 			connectedUsers = await response.json();
-			console.log('CU ===', connectedUsers);
+			// console.log('CU ===', connectedUsers);
 		}
 			else{
 			console.log("FRONT NOT WORKIGN HOHO")
