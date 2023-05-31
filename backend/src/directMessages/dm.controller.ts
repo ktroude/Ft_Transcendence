@@ -30,8 +30,18 @@ async handleRoomData(@Headers('Authorization') cookie: String) {
           id: true,
         }
       });
+      let customRoom = [];
+      for (let i = 0; i < rooms.length; i++) {
+        customRoom[i] = rooms[i];
+        if (user.id === customRoom[i].ownerOne.id) {
+          customRoom[i].name = customRoom[i].ownerTwo.username;
+        }
+        else {
+          customRoom[i].name = customRoom[i].ownerOne.username;
+      }
+    }
     return {
-            rooms: rooms,
+            rooms: customRoom,
             user: user,
         };
 }

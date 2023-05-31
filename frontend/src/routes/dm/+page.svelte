@@ -100,27 +100,18 @@
     }
 
     async function fletchDirectMessageRoomData() {
-        try{
+    try {
             const cookies = document.cookie.split(';');
             const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
-		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-		if (accessToken) {
-			const headers = new Headers();
-			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch('http://localhost:3000/dm/getRoomData', { headers });
-			const data =  await response.json();
-            currentUser = data.user;
-            roomList = data.rooms;
-            for (let i = 0; i < roomList.length; i++) {
-                if (currentUser.id === roomList[i].ownerOne.id) {
-                    roomList[i].name = roomList[i].ownerTwo.username;
-                }
-                else if (currentUser.id == roomList[i].ownerTwo) {
-                    roomList[i].name = roomList[i].ownerOne.username;
-                }            
+		    const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		    if (accessToken) {
+			    const headers = new Headers();
+                headers.append('Authorization', `Bearer ${accessToken}`);
+                const response = await fetch('http://localhost:3000/dm/getRoomData', { headers });
+                const data =  await response.json();
+                currentUser = data.user;
+                roomList = data.rooms;
             }
-        }
-            console.log('RL ==', roomList);
     }
     catch {
         console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');

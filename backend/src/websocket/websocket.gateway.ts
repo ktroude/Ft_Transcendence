@@ -42,9 +42,10 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 	handleInvitedInGame(@ConnectedSocket() client:any, @MessageBody() data) {
 		const toSend = {
 			invited: data.invited,
-			invitedBy: data.username,
+			invitedBy: data.invitedBy,
 			url: data.url,
 		}
+    console.log('to send ==', toSend.invitedBy);
 		this.server.emit('InvitedNotif', toSend);
 	}
   // ---------------------- DEPRECATED ----------------------
