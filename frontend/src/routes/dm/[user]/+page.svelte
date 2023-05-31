@@ -157,17 +157,7 @@
 			const data =  await response.json();
             currentUser = data.user;
             roomList = data.rooms;
-            for (let i = 0; i < roomList.length; i++) {
-                if (currentUser.id === roomList[i].ownerOne.id) {
-                    roomList[i].name = roomList[i].ownerTwo.username;
-                }
-                else if (currentUser.id == roomList[i].ownerTwo) {
-                    roomList[i].name = roomList[i].ownerOne.username;
-                }            
-            }
-        }
-            console.log('RL ==', roomList);
-    }
+    }}
     catch {
         console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
     }
