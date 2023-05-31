@@ -148,10 +148,14 @@ img {
 	overflow: hidden;
 	display: flex;
 	flex: row;
+	width: 300px;
+	will-change: transform;
+	height: 500px;
 }
 .achievements_bloc{
+	position: absolute;
+
 	margin:0;
-	transform: translateX(0px);
 	padding: 20px;
 	background-color: rgba(0, 0, 0, 0.267);
 	backdrop-filter: blur(5px);
@@ -167,8 +171,12 @@ img {
 	box-shadow: 10px 10px 50px black;
 	color: greenyellow;
 	transform: translateX(0px);
+	animation: div_slide_right 0.2s ease-in-out;
+
 }
 .history_bloc{
+	position: absolute;
+
 	margin:0;
 	padding: 20px;
 	background-color: rgba(0, 0, 0, 0.267);
@@ -184,8 +192,12 @@ img {
 	font-family: 'Bebas Neue', cursive;
 	box-shadow: 10px 10px 50px black;
 	color: greenyellow;
+	transform: translateX(-500px);
+	animation: div_slide_left 0.2s ease-in-out;
 }
+
 .history_bloc_switched{
+	position: absolute;
 	padding: 20px;
 	background-color: rgba(0, 0, 0, 0.267);
 	backdrop-filter: blur(5px);
@@ -200,10 +212,12 @@ img {
 	font-family: 'Bebas Neue', cursive;
 	box-shadow: 10px 10px 50px black;
 	color: greenyellow;
-	transform: translateX(500px);
+	transform: translateX(0px);
+	animation: div_slide_right 0.2s ease-in-out;
 }
 
 .achievements_bloc_switched{
+	position: absolute;
 	margin:auto;
 	padding: 20px;
 	background-color: rgba(0, 0, 0, 0.267);
@@ -219,7 +233,8 @@ img {
 	font-family: 'Bebas Neue', cursive;
 	box-shadow: 10px 10px 50px black;
 	color: greenyellow;
-	transform: translateX(-1000px);
+	transform: translateX(-500px);
+	animation: div_slide_left 0.2s ease-in-out;
 }
 
 @keyframes div_slide_left {
@@ -227,13 +242,13 @@ img {
 		transform: translateX(0px);
 	}
 	100% {
-		transform: translateX(-1000px);
+		transform: translateX(-500px);
 	}
 }
 
 @keyframes div_slide_right {
 	0% {
-		transform: translateX(1000px);
+		transform: translateX(-500px);
 	}
 	100% {
 		transform: translateX(0px);
@@ -560,4 +575,20 @@ img {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.history_button{
+	margin-top: 40px;
+	font-size: 40px;
+	color:greenyellow;
+}
+
+.history_button:hover{
+	color:yellow;
+}
+
+.history_line{
+	font-size: 18px;
+	margin: 2px;
+	color: white;
 }

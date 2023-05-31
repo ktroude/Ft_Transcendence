@@ -54,14 +54,14 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					  <!-- svelte-ignore a11y-click-events-have-key-events -->
 					  <li class="friends_list" on:click={() => handleFriendClick(friendName)}>
 						<div class="friendBloc">
-							{#if connected == 2}
+							{#if connected == 0}
 								<div class="red_dot"></div>
 							{/if}
 							{#if connected == 1}
-								<div class="blue_dot"></div>
+							<div class="green_dot"></div>
 							{/if}
-							{#if connected == 0}
-								<div class="green_dot"></div>
+							{#if connected == 2}
+							<div class="blue_dot"></div>
 							{/if}
 						  	<span class="friendname">{friendName}</span>
 						</div>
@@ -120,15 +120,34 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				</button>
 			{/if}
 		</div>
+
+
+
+
+
+
+
+
+
+
+
+
 		<div class="right_bloc">
-			<div class="history_bloc">
-				<h1 class="profile_h1">History</h1>
-				<button class="history_button" on:click={() => switchToHistory()}>Achievements</button>
-				aloooo
+			<div class="history_bloc" id="history_bloc_id">
+				<h1 class="profile_h1"><span><img class="profile_icone" src="/img/time_icone.png"></span>History</h1>
+				{#each Array.from(history) as hist}
+					<h5 class="history_line">{hist.winner} - {hist.loser} <span style="color:greenyellow">[{hist.scoreUser} - {hist.scoreOpponent}]</span></h5>
+				{/each}
+
+
+
+
+
+
+
 			</div>
 			<div class="achievements_bloc" id="achievements_bloc_id">
 				<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png"></span>Achievements</h1>
-				<button class="history_button" on:click={() => switchToHistory()}>History⏩</button>
 				{#each Array.from(all_achievements) as [key, value]}
 					{#if value === false}
 							<div class="achievement_div">
@@ -191,6 +210,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			</div>
 
 		</div>
+		<div class="button_switch_div"><button class="history_button" on:click={() => switchToHistory()}>➜</button></div>
 				</div> 
 	{/if}
 </body>
@@ -511,7 +531,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			console.log('Error: Could not check if user is friend');
 	}
 
-
 	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
@@ -586,6 +605,55 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		friends = await fetchFriend(user.pseudo);
 	}
 
+
+
+
+
+
+
+	let history: any[];
+	history = [];
+
+	async function getHistory() {
+		const accessToken = await fetchAccessToken();
+		if (accessToken)
+		{
+			const url = `http://localhost:3000/users/history`;
+				const response = await fetch(url, {
+					method: 'GET',
+					headers: {
+					'Authorization': `Bearer ${accessToken}`,
+					},
+				});
+				return await response.json(); // Parse response body as JSON
+		}
+		else 
+			console.log('Error: Could not get history');
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	async function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			loadpage();
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
+
+
 	onMount(async function() {
 		user = await fetchData(); // Catch the user
 		if (!user)
@@ -602,17 +670,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			});
 		}
 		setInterval(friendRequest, 10000);
+		history = await getHistory();
+		console.log("HISTOTYYYY===", history);
 		loading = true;
 	});
 
-	async function fade(thisplace:string) {
-		document.body.classList.add('fade-out');
-		console.log("switching page....");
-		setTimeout(() => {
-		// window.location.href = href;
-			goto(thisplace);
-			loadpage();
-			document.body.classList.remove('fade-out');
-		}, 400);
-	}
+
 </script>
