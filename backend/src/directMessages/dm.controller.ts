@@ -40,7 +40,6 @@ async handleRoomData(@Headers('Authorization') cookie: String) {
           customRoom[i].name = customRoom[i].ownerOne.username;
       }
     }
-    console.log('custom ===', customRoom);            
     return {
             rooms: customRoom,
             user: user,

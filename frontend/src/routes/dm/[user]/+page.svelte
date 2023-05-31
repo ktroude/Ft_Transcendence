@@ -23,9 +23,12 @@
         goto(`/profile/${selectedUser.id}`);
     }
 
+
     function handleBlockButton() {
 
     }
+
+
 
     function handleConnectedUserButton() {
 
@@ -78,7 +81,7 @@
                 headers.append('Authorization', `Bearer ${accessToken}`);
                 const response = await fetch(`http://localhost:3000/dm/who?id=${$page.params.user}`, { headers });
                 const data =  await response.json();
-                // console.log('data ====', data);
+                console.log('data ====', data);
                 if (!data) {
                     goto('/dm');
                     return ;
@@ -125,16 +128,15 @@
             roomList = data.rooms;
     }}
     catch {
-        // console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
+        console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
     }
     }
-	
 
 /****************************************************/
 /*****************GAME INVITATION********************/
 /****************************************************/
 
-	let toast;
+let toast;
 	let pending_invitation = false;
 
     async function fetchRoomGameId() {
@@ -190,7 +192,7 @@
 			<div class="popup_img">
 			</div>
 			<div class="popup_title_text_box">
-			<h4 class="popup_title">Invited by:`+notif.invitedBy+`</h4>
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
 			<button class="popup_button" id="acceptButton">Accept</button>
 			<button class="popup_button" id="denyButton">Deny</button>
 			</div>
@@ -233,8 +235,8 @@
             }
         });
         socket.on('newDirectMessage', async(data) => {
-            // console.log('CU ==', currentRoom);
-            // console.log('data ==', data)
+            console.log('CU ==', currentRoom);
+            console.log('data ==', data)
             if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
                 	messages = [...messages, data.message];
             }
@@ -254,19 +256,22 @@
                 selectedUser = data.selectedUser;
             }
         });
-		socket.on('InvitedNotif', async(data) => {
-            // console.log("data ==", data);
-			if (data.invited.id === currentUser.id)
-				notif.display = true;
+        socket.on('InvitedNotif', async(data) => {
+            if (data.invitedBy === currentUser.username) {
+                goto(data.url);
+            }
+			if (data.invited.id === currentUser.id) {
+                notif.display = true;
                 notif.url = data.url;
                 notif.invitedBy = data.invitedBy;
                 console.log('je suis invité par ==', notif.invitedBy);
                 console.log('je suis invité à l\'url ==', notif.url);
 				if (pending_invitation == false)
 				{
-					pending_invitation = true;
+                    pending_invitation = true;
 					createPopupDM(notif);
 				}
+            }
 		});
 
         await isExist();
@@ -278,7 +283,7 @@
 
     function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		// console.log("switching page....");
+		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
 			goto(thisplace);
@@ -410,8 +415,8 @@
                     {/each} -->
                 </div>
                 <div class="selctedUser_button_settings">
-                    <button on:click={handleCheckProfileButton}>Profile</button>
-                    <button on:click={handleInviteGameButton}>Invite to game</button>
+                    <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
+                    <button on:click={handleInviteGameButton}>Proposer une partie</button>
                 </div>
             </div>
         </div>
