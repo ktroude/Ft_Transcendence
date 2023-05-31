@@ -40,16 +40,21 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             <img class="button_picture" src="/img/chat_icone.png">
             <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
         </div>
-
+		<div class="button_box">
+			<button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
+		</div>
     </div>
 	<div class="main_profile">
-    <div class="edit_box">
-      <h1>{displayUsername}</h1>
-      {#if FAstatus === false}
-        <button  class="edit_button" on:click={enable2fa}>Enable 2FA 🔒</button>
-      {:else if FAstatus === true}
-        <button  class="edit_button" on:click={disable2fa}>Disable 2FA 🔓</button>
-      {/if}
+		<div class="left_bloc"></div>
+		<div class="edit_box">
+			<div class="username_bloc_edit">
+				<h1 class="username_bloc_username">{displayUsername}</h1>
+				{#if FAstatus === false}
+					<span><button  class="twofa_button" on:click={enable2fa}>🔒</button></span>
+				{:else if FAstatus === true}
+					<span><button  class="twofa_button" on:click={disable2fa}>🔓</button></span>
+				{/if}
+			</div>
 			<label for="username-input">New Username:</label>
 			<input type="text" id="username-input" bind:value={newUsername} />
 			<button  class="edit_button" on:click={handleUpdateUsername}>Update</button>
@@ -57,17 +62,21 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
 			<input type="file" on:change={handleFileUpload} />
 		</div>
+		<div class="right_bloc_twofa">
+			<div class="twofa_bloc" id="twofa_bloc_id">
+				{#if qrImage}
+				<img src="{qrImage}" alt="QR Code" />
+				<p>Please scan this QR code with Google Authenticator and enter the code to activate.</p>
+				<form on:submit="{handleSubmit2fa}">
+					<label>
+					  Verification Code:
+					  <input type="text" bind:value="{code}" />
+					</form>
+			  {/if}
+			</div>
+		</div>
 	</div>
 	{/if}
-  {#if qrImage}
-  <img src="{qrImage}" alt="QR Code" />
-  <p>Please scan this QR code with Google Authenticator and enter the code to activate.</p>
-  <form on:submit="{handleSubmit2fa}">
-      <label>
-        Verification Code:
-        <input type="text" bind:value="{code}" />
-      </form>
-{/if}
 </body>
 
 <!-- ****************************** -->
@@ -103,6 +112,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     async function disable2fa()
     {
+
+	const div1 = document.getElementById('twofa_bloc_id');
+
+	div1.classList.toggle('twofa_bloc');
+	div1.classList.toggle('twofa_bloc_switched');
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
@@ -174,6 +188,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     async function enable2fa() // Update the 2fa
     {
+
+	const div1 = document.getElementById('twofa_bloc_id');
+
+	div1.classList.toggle('twofa_bloc');
+	div1.classList.toggle('twofa_bloc_switched');
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {

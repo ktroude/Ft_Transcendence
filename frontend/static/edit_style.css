@@ -1,3 +1,15 @@
+.main_profile{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.left_bloc{
+	width: 300px;
+	height: 500px;
+}
+
 .edit_box {
 	margin:auto;
 	max-width: 600px;
@@ -52,4 +64,92 @@ input[type="text"] {
 	cursor: pointer;
 	width: max-content;
 	margin: 0 auto;
+}
+
+.right_bloc_twofa{
+	overflow: hidden;
+	display: flex;
+	flex: row;
+	width: 300px;
+	will-change: transform;
+	height: 500px;
+}
+
+.username_bloc_edit{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+.username_bloc_username{
+	margin: 0;
+	padding: 0;
+}
+
+.twofa_bloc{
+	margin:0;
+	padding: 20px;
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-radius: 3px;
+	width: 300px;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+	font-family: 'Bebas Neue', cursive;
+	box-shadow: 10px 10px 50px black;
+	color: greenyellow;
+	transform: translateX(-500px);
+	animation: div_slide_left 0.2s ease-in-out;
+}
+
+.twofa_bloc_switched{
+	margin:0;
+	padding: 20px;
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-radius: 3px;
+	width: 300px;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+	font-family: 'Bebas Neue', cursive;
+	box-shadow: 10px 10px 50px black;
+	color: greenyellow;
+	transform: translateX(0px);
+	animation: div_slide_right 0.2s ease-in-out;
+}
+
+.twofa_button{
+	margin:0;
+	background-color: transparent;
+	border: none;
+	font-size: 25px;
+}
+
+.twofa_button:hover{
+	cursor: pointer;
+}
+@keyframes div_slide_right {
+	0% {
+		transform: translateX(-500px);
+	}
+	100% {
+		transform: translateX(0px);
+	}
+}
+
+@keyframes div_slide_left {
+	0% {
+		transform: translateX(0px);
+	}
+	100% {
+		transform: translateX(-500px);
+	}
 }

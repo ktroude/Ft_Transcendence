@@ -43,6 +43,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<img class="button_picture" src="/img/chat_icone.png">
 				<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
 			</div>
+			<div class="button_box">
+				<button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
+			</div>
 		</div>
 		<div class="main_profile">
 			{#if user?.username == currentUser}
@@ -58,10 +61,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 								<div class="red_dot"></div>
 							{/if}
 							{#if connected == 1}
-							<div class="green_dot"></div>
+								<div class="green_dot"></div>
 							{/if}
 							{#if connected == 2}
-							<div class="blue_dot"></div>
+								<div class="blue_dot"></div>
 							{/if}
 						  	<span class="friendname">{friendName}</span>
 						</div>
@@ -134,14 +137,15 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 		<div class="right_bloc">
 			<div class="history_bloc" id="history_bloc_id">
-				<h1 class="profile_h1"><span><img class="profile_icone" src="/img/time_icone.png"></span>History</h1>
+				<div class="history_title_bloc">
+					<h1 class="profile_h1"><span><img class="profile_icone" src="/img/time_icone.png"></span>History</h1>
+				</div>
+				{#if history.length == 0}
+					<h5 class="history_line">Feels empty...</h5>
+					{/if}
 				{#each Array.from(history) as hist}
 					<h5 class="history_line">{hist.winner} - {hist.loser} <span style="color:greenyellow">[{hist.scoreUser} - {hist.scoreOpponent}]</span></h5>
 				{/each}
-
-
-
-
 
 
 
