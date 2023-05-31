@@ -15,9 +15,75 @@
 	let notif:any = {url:'', display:false, invitedBy:''};
 	let anim = false;
 
+
+
+/****************************************************/
+/*****************LIST CONNECTED USERS***************/
+/****************************************************/
+
+
+    let connectedUsers:any[] = [];
+
+
+    async function getConnectedUsers() {
+	const accessToken = await fetchAccessToken();
+	if (accessToken) {
+		const response = await fetch(`http://localhost:3000/websocket/getClient`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`
+		},
+		});
+		if (response.ok)
+			connectedUsers = await response.json();
+		else
+			console.log("FRONT NOT WORKIGN HOHO")
+	} else 
+		console.log('Error: Could not get users');
+        console.log("co users===", connectedUsers);
+}
+
+const fetchAccessToken = async () => {
+    const cookies = document.cookie.split(';');
+    if (cookies.length === 0)
+        return null;
+    const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
+    if (!accessTokenCookie)
+        return null;
+    const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+    if (!accessToken)
+        return null;
+    return accessToken;
+ }
+
+ const fetchData = async () => {
+    const accessToken = await fetchAccessToken();
+    if (accessToken) {
+        const headers = new Headers();
+        headers.append('Authorization', `Bearer ${accessToken}`);
+        const response = await fetch('http://localhost:3000/users/userInfo', { headers });
+        const data = await response.json();
+        return data;
+    } else {
+        console.log('Access token not found');
+        goto('/');
+        return null;
+    }
+}
+/****************************************************/
+/****************************************************/
+/****************************************************/
+
+
+    
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
     }
+
+    async function handleClickConnectedUserButton(userId:number) {
+        socket.emit('getMessagesOfConnectedUser', userId);
+    } 
 
     function handleCheckProfileButton() {
         goto(`/profile/${selectedUser.id}`);
@@ -229,6 +295,7 @@ let toast;
         if (!socket) {
             window.location.pathname = '/'; 
         }
+        let user = await fetchData();
         socket.on('DmRoomCreated', async(data) => {
             if (currentUser.id === data.user1.id || currentUser.id === data.user2.id) {
                 roomList = [...roomList, data.room]
@@ -273,11 +340,15 @@ let toast;
 				}
             }
 		});
-
+        // const socket = io('http://localhost:3000');
+			socket.on('connect', async function() {			
+				socket.emit('userConnected', { pseudo: user.pseudo });
+			});
         await isExist();
         await fetchContactList();
         await fletchDirectMessageRoomData();
-        
+        await getConnectedUsers();
+        setInterval(getConnectedUsers, 5000);
         loading = true;
     });
 
@@ -406,13 +477,23 @@ let toast;
             <div class="right_bloc">
                 <div class="connected_users">
                     <h2 class="connected_users_title">Utilisateurs connectés:</h2>
-                    <!-- {#each contactList as contact}
-                        {#if contact?.connected == true}
-                            <button class="connected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
-                        {:else}
-                            <button class="disconnected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
-                        {/if}
-                    {/each} -->
+                    <div class="connected_users_bloc">
+						<div class="connected_title">Connected</div>
+						<ul class="ul_friends">
+							{#each connectedUsers as x }
+								<li class="friends_list">
+									<div class="friend_line">
+										{#if x.connected == 2}
+											<div class="red_dot"></div>
+										{:else}
+											<div class="green_dot"></div>
+										{/if}
+										<button on:click={handleClickConnectedUserButton(x.id)}>{x.username}</button>
+									</div>
+								</li>
+							{/each}
+						</ul>
+						</div>
                 </div>
                 <div class="selctedUser_button_settings">
                     <buton on:click={handleCheckProfileButton}>Voir le profil</buton>

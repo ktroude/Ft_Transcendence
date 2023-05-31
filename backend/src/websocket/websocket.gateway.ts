@@ -61,16 +61,19 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
           pseudo: key
         },
         select: {
+          id: true,
           username: true,
           connected: true,
         }
       });
       if (user)
       vector.push( {
+        id: user.id,
         username: user.username,
         connected: user.connected,
       });
     }
+    console.log('vec ==', vector);
     return vector;
   }
 }
