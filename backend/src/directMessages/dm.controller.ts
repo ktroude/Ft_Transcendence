@@ -49,7 +49,7 @@ async handleRoomData(@Headers('Authorization') cookie: String) {
 
 @Get('who')
 async handleWho(@Headers('Authorization') cookie: String, @Query('id') userId) {
-  console.log("JE SUIS ICI")
+//   console.log("JE SUIS ICI")
   try {
 
     let existe = true;

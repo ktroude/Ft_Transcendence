@@ -23,42 +23,8 @@
         goto(`/profile/${selectedUser.id}`);
     }
 
-
     function handleBlockButton() {
 
-    }
-
-    async function fetchRoomGameId() {
-
-			const cookies = document.cookie.split(';');
-			const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
-			const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-			if (accessToken) {
-				const headers = new Headers();
-				headers.append('Authorization', `Bearer ${accessToken}`);
-				const response = await fetch(
-					`http://localhost:3000/users/getRoomId`,
-					{
-						headers
-					}
-				);
-				const data = await response.json();
-                console.log('retour fetch ==', data);
-                return data;
-			}
-
-	}
-
-    async function handleInviteGameButton() {
-        const id = await fetchRoomGameId();
-        console.log('ID ====', id);
-        const url = `http://localhost:5173/game/pong_game?room_id=${id.response}`;
-		const data = {
-			invited: selectedUser,
-			invitedBy: currentUser.username,
-			url: url,
-		}
-		socket.emit(`InvitedInGame`, data);
     }
 
     function handleConnectedUserButton() {
@@ -112,7 +78,7 @@
                 headers.append('Authorization', `Bearer ${accessToken}`);
                 const response = await fetch(`http://localhost:3000/dm/who?id=${$page.params.user}`, { headers });
                 const data =  await response.json();
-                console.log('data ====', data);
+                // console.log('data ====', data);
                 if (!data) {
                     goto('/dm');
                     return ;
@@ -159,30 +125,89 @@
             roomList = data.rooms;
     }}
     catch {
-        console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
+        // console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
     }
+    }
+	
+
+/****************************************************/
+/*****************GAME INVITATION********************/
+/****************************************************/
+
+	let toast;
+	let pending_invitation = false;
+
+    async function fetchRoomGameId() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(
+				`http://localhost:3000/users/getRoomId`,
+				{
+					headers
+				}
+			);
+			const data = await response.json();
+			// console.log('retour fetch ==', data);
+			return data;
+		}
+	}
+
+    async function handleInviteGameButton() {
+        const id = await fetchRoomGameId();
+        // console.log('ID ====', id);
+        const url = `http://localhost:5173/game/pong_game?room_id=${id.response}`;
+		const data = {
+			invited: selectedUser,
+			invitedBy: currentUser.username,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data);
     }
 
-	function createPopup()
-	{
+	function removePopup() {
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			goto(notif.url);
+		}
+	}
+
+	function createPopupDM(notif:any) {
 		const boxito = document.querySelector("body");
 		const toast = document.createElement("div");
 		toast.innerHTML = `<div class="popup">
-									<div class="popup_img">
-									</div>
-									<div class="popup_title_text_box">
-										<h4 class="popup_title">Invited by:</h4>
-										<button class="popup_button" on:click=>Accept</button>
-										<button class="popup_button" on:click=>Deny</button>
-									</div>
-							</div>`
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by:`+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
 		boxito.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton.addEventListener("click", () => acceptInvitation(notif));
+		denyButton.addEventListener("click", removePopup);
 	}
 
-	function removePopup() {
-		const boxito = document.querySelector("popup");
-		toast.remove();
-	}
+
+/****************************************************/
+/****************************************************/
+/****************************************************/
 
 	onMount(async() => {
 		const cookies = document?.cookie?.split(';');
@@ -208,8 +233,8 @@
             }
         });
         socket.on('newDirectMessage', async(data) => {
-            console.log('CU ==', currentRoom);
-            console.log('data ==', data)
+            // console.log('CU ==', currentRoom);
+            // console.log('data ==', data)
             if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
                 	messages = [...messages, data.message];
             }
@@ -230,13 +255,18 @@
             }
         });
 		socket.on('InvitedNotif', async(data) => {
-            console.log("data ==", data);
+            // console.log("data ==", data);
 			if (data.invited.id === currentUser.id)
 				notif.display = true;
                 notif.url = data.url;
                 notif.invitedBy = data.invitedBy;
-                console.log('je susi invite a url ==', notif.url);
-				createPopup(true);
+                console.log('je suis invité par ==', notif.invitedBy);
+                console.log('je suis invité à l\'url ==', notif.url);
+				if (pending_invitation == false)
+				{
+					pending_invitation = true;
+					createPopupDM(notif);
+				}
 		});
 
         await isExist();
@@ -248,7 +278,7 @@
 
     function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		console.log("switching page....");
+		// console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
 			goto(thisplace);
@@ -380,8 +410,8 @@
                     {/each} -->
                 </div>
                 <div class="selctedUser_button_settings">
-                    <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
-                    <button on:click={handleInviteGameButton}>Proposer une partie</button>
+                    <button on:click={handleCheckProfileButton}>Profile</button>
+                    <button on:click={handleInviteGameButton}>Invite to game</button>
                 </div>
             </div>
         </div>
