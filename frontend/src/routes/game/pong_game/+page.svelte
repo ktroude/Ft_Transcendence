@@ -46,6 +46,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   import * as setting_game from "./GameConfig" 
   import { goto } from "$app/navigation";
   import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../../API/api';
+  import { LOCALHOST } from "../../../API/env";
 
 	let currentUser;
 	let Colyseus;
@@ -147,7 +148,7 @@ function print_win(gagnant){
 
 async function connect(){
     Colyseus = await import("colyseus.js");
-    client = new Colyseus.Client('ws://localhost:3001');
+    client = new Colyseus.Client(`ws://${LOCALHOST}:3000`);
     room = await client.joinById(room_id, {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
 	waiting_game = true;
     room.onMessage('Player_init', (message) =>
@@ -166,7 +167,6 @@ async function connect(){
 		player2.username = message.player2_username;
 		if(clientId == player.id)
 			mainclient = true;
-		console.log(mainclient);
 		connected = true;
 		countdown(5);
     })
@@ -189,7 +189,7 @@ const fletchCurrentUserData = async () => {
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch('http://localhost:3000/users/userInfo', { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/users/userInfo`, { headers });
 			const data = await response.json();
 			const user = data;
 			return user;
@@ -364,7 +364,6 @@ function ballMove()
 	room.onMessage("break", (message) => {break_r = message});
 	if(break_r == true)
 	{
-		console.log("JEEUUUUUUU mis en pause");
 		ball.x = canvas.width / 2;
 		ball.y = canvas.height / 2;
 		ball.velocity_y = 2;
@@ -494,7 +493,7 @@ onMount(async() => {
 		// }
 		// else
 		// {
-		// 	const socket = io('http://localhost:3000');
+		// 	const socket = io('http://${LOCALHOST}:3000');
 		// 	socket.on('connect', async function() {
 		// 		socket.emit('userConnected', { pseudo: user.pseudo });
 		// 	});
@@ -502,12 +501,10 @@ onMount(async() => {
 //   loading = true;
   canvas = document.getElementById('canvas');
   currentUser = await fletchCurrentUserData();
-  console.log(currentUser);
   canvas.addEventListener('mousemove', playerMove);
   canvas.addEventListener('mousemove', player2Move);
   room_id = await getRoomIdFromUrl();
   await connect();
-  console.log(room_id);
 });
 
 </script>

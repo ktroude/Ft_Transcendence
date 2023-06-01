@@ -3,6 +3,7 @@
 	import { io, Socket } from 'socket.io-client';
 	import { goto } from '$app/navigation';
 	import { fetchData, fetch2FA } from '../../API/api';
+	import { LOCALHOST } from "../../API/env";
 
 	// VARIABLES
 
@@ -76,7 +77,6 @@
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
 			goto(thisplace);
@@ -234,7 +234,7 @@
 				const headers = new Headers();
 				headers.append('Authorization', `Bearer ${accessToken}`);
 				const response = await fetch(
-					`http://localhost:3000/chat/getMembers?code=${currentRoom.id}`,
+					`http://${LOCALHOST}:3000/chat/getMembers?code=${currentRoom.id}`,
 					{
 						headers
 					}
@@ -256,14 +256,13 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch('http://localhost:3000/chat/getRoom', { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/chat/getRoom`, { headers });
 			return await response.json();
 		}
 		return [];
 	};
 
 	const fletchUserByRoom = async (pseudo: string) => {
-		console.log('pseudo == ', pseudo);
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -271,7 +270,7 @@
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			const response = await fetch(
-				`http://localhost:3000/chat/UserbyRoom?room=${currentRoom?.id}&pseudo=${pseudo}`,
+				`http://${LOCALHOST}:3000/chat/UserbyRoom?room=${currentRoom?.id}&pseudo=${pseudo}`,
 				{ headers }
 				);
 				const data = await response.json();
@@ -287,7 +286,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch('http://localhost:3000/users/userInfo', { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/users/userInfo`, { headers });
 			const data = await response.json();
 			const user: User = {
 				id: data?.id,
@@ -313,7 +312,7 @@
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch(`http://localhost:3000/users/getAllBlockReturnId?id=${currentUser.id}`, { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/users/getAllBlockReturnId?id=${currentUser.id}`, { headers });
 			const data = await response.json();
 			blocked = data;
 		}	
@@ -376,7 +375,6 @@
 	}
 
 	function findBlocked(array: any[], toFind:any) {
-		console.log('blocked ==',blocked)
 		for (let i = 0 ; i < array.length; i++) {
 			if (array[i] === toFind)
 				return true;
@@ -479,7 +477,7 @@
 		cookie?.trim()?.startsWith('access_token=')
 		);
 		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
-		socket = io('http://localhost:3000', {
+		socket = io(`http://${LOCALHOST}:3000`, {
 			extraHeaders: {
 				Authorization: 'Bearer ' + access_token
 			}
@@ -629,11 +627,8 @@
 			}
 		});
 		socket.on('failed', (data) => {
-			console.log('CU ID =', currentUser.id);
-			console.log('DATA MOERTO ==', data);
 			if (currentUser.id == data.user.id) {
 				animation = data.animation;
-				console.log("animation =", animation);
 				currentRoom = {
 					name: '',
 					id: -1
@@ -706,8 +701,6 @@
 		socket.on('UserAdded', async (data) => {
 			if (!data) {
 				animation = data.animation;
-					console.log("animation =", animation);
-
 					messages = [
 						...messages,
 						{ senderPseudo: 'server', content: "Cet utilisateur EST BAN, pas de ca chez moi" }
@@ -718,7 +711,6 @@
 			if (data.sucess === false && !data.userToAdd) {
 				if (currentUser.id === data.user.id) {
 					animation = data.animation;
-					console.log("animation =", animation);
 
 					messages = [
 						...messages,
@@ -795,23 +787,23 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <!----------------------------------------------->
 	<div class="game_navbar">
 		<div class="button_box">
-			<img class="button_picture" src="/img/home_icone.png" />
+			<img class="button_picture" src="/img/home_icone.png" alt=""/>
 			<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
 		</div>
 
 		<div class="button_box">
-			<img class="button_picture" src="/img/profile_icone.png" />
+			<img class="button_picture" src="/img/profile_icone.png" alt="" />
 			<button class="button_nav" on:click={() => fade(`/profile/${currentUser.id}`)}>Profile</button
 			>
 		</div>
 
 		<div class="button_box">
-			<img class="button_picture" src="/img/game_icone.png" />
+			<img class="button_picture" src="/img/game_icone.png" alt="" />
 			<button class="button_nav" on:click={() => fade('/game')}>Game</button>
 		</div>
 
 		<div class="button_box">
-			<img class="button_picture" src="/img/chat_icone.png" />
+			<img class="button_picture" src="/img/chat_icone.png" alt="" />
 			<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
 		</div>
 	</div>
@@ -1064,7 +1056,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 											sendMessage(event, messageInput, currentRoom);
 											messageInput.value = '';
 										}
-									}}><img class="sent_icone" src="/img/edit_profile.png" /></button
+									}}><img class="sent_icone" src="/img/edit_profile.png" alt="" /></button
 								>
 							</form>
 						</div>

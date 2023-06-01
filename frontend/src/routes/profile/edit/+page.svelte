@@ -22,22 +22,22 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	{#if loading === true}
     <div class="game_navbar">
         <div class="button_box">
-            <img class="button_picture" src="/img/home_icone.png">
+            <img class="button_picture" src="/img/home_icone.png" alt="">
             <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
         </div>
 
 		<div class="button_box">
-			<img class="button_picture" src="/img/profile_icone.png">
+			<img class="button_picture" src="/img/profile_icone.png" alt="">
 			<button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
 		</div>
 
         <div class="button_box">
-            <img class="button_picture" src="/img/game_icone.png">
+            <img class="button_picture" src="/img/game_icone.png" alt="">
             <button class="button_nav" on:click={() => fade('/game')}>Game</button>
         </div>
 
         <div class="button_box">
-            <img class="button_picture" src="/img/chat_icone.png">
+            <img class="button_picture" src="/img/chat_icone.png" alt="">
             <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
         </div>
 		<div class="button_box">
@@ -90,6 +90,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchFriend, fetch2FA, fetch2FAstatus} from '../../../API/api';
+    import { LOCALHOST } from "../../../API/env";
 
     interface User {
         id: number;
@@ -115,12 +116,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	const div1 = document.getElementById('twofa_bloc_id');
 
-	div1.classList.toggle('twofa_bloc');
-	div1.classList.toggle('twofa_bloc_switched');
+	div1?.classList.toggle('twofa_bloc');
+	div1?.classList.toggle('twofa_bloc_switched');
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
-        const response = await fetch(`http://localhost:3000/users/${user.id}/enable2fa`, {
+        const response = await fetch(`http://${LOCALHOST}:3000/users/${user.id}/enable2fa`, {
         method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -147,7 +148,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
-        const response = await fetch(`http://localhost:3000/users/${user.id}/enable2fa`, {
+        const response = await fetch(`http://${LOCALHOST}:3000/users/${user.id}/enable2fa`, {
           method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -191,12 +192,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	const div1 = document.getElementById('twofa_bloc_id');
 
-	div1.classList.toggle('twofa_bloc');
-	div1.classList.toggle('twofa_bloc_switched');
+	div1?.classList.toggle('twofa_bloc');
+	div1?.classList.toggle('twofa_bloc_switched');
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
-          const response = await fetch(`http://localhost:3000/${user.id}/auth/2fa/setup`, {
+          const response = await fetch(`http://${LOCALHOST}:3000/${user.id}/auth/2fa/setup`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -233,7 +234,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         const accessToken = await fetchAccessToken();
         if (accessToken)
         {
-          const response = await fetch(`http://localhost:3000/users/${user.pseudo}/newPseudo`, {
+          const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/newPseudo`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -252,7 +253,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         newUsername = '';
       }
 
-      async function handleFileUpload(event) { // Upload a new profile picture
+      async function handleFileUpload(event:any) { // Upload a new profile picture
       // Get the file from the input
       const file = event.target.files[0];
 
@@ -272,11 +273,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = async () => {
-        const base64 = reader.result.replace(/^data:image\/[a-z]+;base64,/, "");
+        const base64 = (reader.result as string).replace(/^data:image\/[a-z]+;base64,/, "");
         const accessToken = await fetchAccessToken();
         if (accessToken)
         {
-          const response = await fetch(`http://localhost:3000/users/${user.pseudo}/picture`, { // Send the base64-encoded string to the server
+          const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/picture`, { // Send the base64-encoded string to the server
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

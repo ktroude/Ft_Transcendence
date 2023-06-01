@@ -56,7 +56,6 @@ export class UserController {
     @Get('getRoomId')
     async handleGetRoomId() {
         const resp = await this.userService.handleGetRoomId();
-        console.log(resp);
         return {response:resp};
     }
 

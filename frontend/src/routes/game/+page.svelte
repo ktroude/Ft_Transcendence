@@ -21,22 +21,22 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		<div class="game_navbar">
 
 			<div class="button_box">
-				<img class="button_picture" src="/img/home_icone.png">
+				<img class="button_picture" src="/img/home_icone.png" alt="">
 				<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
 			</div>
 
 			<div class="button_box">
-				<img class="button_picture" src="/img/profile_icone.png">
+				<img class="button_picture" src="/img/profile_icone.png" alt="">
 				<button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
 			</div>
 
 			<div class="button_box">
-				<img class="button_picture" src="/img/game_icone.png">
+				<img class="button_picture" src="/img/game_icone.png" alt="">
 				<button class="button_nav" on:click={() => fade('/game')}>Game</button>
 			</div>
 
 			<div class="button_box">
-				<img class="button_picture" src="/img/chat_icone.png">
+				<img class="button_picture" src="/img/chat_icone.png" alt="">
 				<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
 			</div>
 
@@ -131,11 +131,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	import { page } from '$app/stores';
 	import { navigate } from 'svelte-routing';
 	import { xlink_attr } from 'svelte/internal';
+	import { LOCALHOST } from "../../API/env";
 
 	let Colyseus;
-	let client;
-	let room;
-	let room_pong_id = null;
+	let client:any;
+	let room:any;
+	let room_pong_id:any = null;
 	let room_pong;
 	let first_connection = true;
 	let waiting = false;
@@ -153,9 +154,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     }
 
 	function redirectToGame() {
-  	return new Promise((resolve) => {
+  	return new Promise<void>((resolve) => {
     if (room_pong_id) {
-      const url = `http://localhost:5173/game/pong_game?room_id=${room_pong_id}`;
+      const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${room_pong_id}`;
       window.location.href = url;
       resolve();
     } else {
@@ -179,17 +180,17 @@ async function connect()
     waiting = true;
     Colyseus = await import("colyseus.js");
 	if(!client)
-		client = new Colyseus.Client('ws://localhost:3001');
+		client = new Colyseus.Client(`ws://${LOCALHOST}:3001`);
 
 	console.log("client colyseus created", client);
 	room = await client.joinOrCreate("ranked", user.id);
-	room.onMessage("connect", (message) => {
+	room.onMessage("connect", (message:any) => {
 		playerId = message.playerId;
 		console.log(`Connecté avec succès en tant que `);
 		// localStorage.setItem("playerId", playerId);
 	});
-    room.onMessage('waiting', (message) => { waiting = true; });
-    room.onMessage('seat', (message) => {
+    room.onMessage('waiting', (message:any) => { waiting = true; });
+    room.onMessage('seat', (message:any) => {
 		room_pong_id = message;
 		waiting = false;
       redirectToGame();
@@ -207,14 +208,14 @@ async function connect()
     let friends: any[] = [];
     let friendNameAdd: string = '';
     let searchProfile: string = '';
-    let connectedUsers = [];
-	let loading = false;
+    let connectedUsers:any = [];
+	let loading:boolean = false;
 	let friendUser: User;
 	
 	async function getConnectedUsers() {
 	const accessToken = await fetchAccessToken();
 	if (accessToken) {
-		const response = await fetch(`http://localhost:3000/websocket/getClient`, {
+		const response = await fetch(`http://${LOCALHOST}:3000/websocket/getClient`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -245,7 +246,7 @@ async function connect()
 		}
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-			const url = `http://localhost:3000/users/${searchProfile}/search`;
+			const url = `http://${LOCALHOST}:3000/users/${searchProfile}/search`;
 			const response = await fetch(url, {
 				method: 'GET',
 				headers: {
@@ -288,7 +289,7 @@ async function connect()
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
-			const url = `http://localhost:3000/users/${friendName}/search`;
+			const url = `http://${LOCALHOST}:3000/users/${friendName}/search`;
 				const response = await fetch(url, {
 					method: 'GET',
 					headers: {
@@ -316,7 +317,7 @@ async function connect()
     async function handleDeleteFriend(friendName: any) {
         const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const response = await fetch(`http://localhost:3000/users/${user.pseudo}/deletefriend`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/deletefriend`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -346,7 +347,7 @@ async function connect()
             return;
         const accessToken = await fetchAccessToken();
         if (accessToken) {
-            const response = await fetch(`http://localhost:3000/users/${user.pseudo}/friend`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/friend`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -372,7 +373,7 @@ async function connect()
         }
 		const accessToken = await fetchAccessToken();
             if (accessToken) {
-                const response = await fetch(`http://localhost:3000/users/${user.pseudo}`, {
+                const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -411,7 +412,7 @@ async function connect()
 		}
 		else
 		{
-			const socket = io('http://localhost:3000');
+			const socket = io(`http://${LOCALHOST}:3000`);
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo });
 			});
@@ -433,5 +434,6 @@ async function connect()
 		});
     });
 
-    export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, imageURL, user, newUsername, handleUpdateUsername };
+    export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, user, newUsername, handleUpdateUsername };
+	// imageURL removed from the above line
 </script>

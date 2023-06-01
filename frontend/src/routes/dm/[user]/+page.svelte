@@ -3,6 +3,7 @@
 	import { io, Socket } from 'socket.io-client';
 	import { page } from '$app/stores';
     import { onMount } from 'svelte';
+    import { LOCALHOST } from "../../../API/env";
 
 	let socket:Socket;
     let currentUser:any = null;
@@ -28,7 +29,7 @@
     async function getConnectedUsers() {
 	const accessToken = await fetchAccessToken();
 	if (accessToken) {
-		const response = await fetch(`http://localhost:3000/websocket/getClient`, {
+		const response = await fetch(`http://${LOCALHOST}:3000/websocket/getClient`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -41,7 +42,6 @@
 			console.log("FRONT NOT WORKIGN HOHO")
 	} else 
 		console.log('Error: Could not get users');
-        console.log("co users===", connectedUsers);
 }
 
 const fetchAccessToken = async () => {
@@ -62,7 +62,7 @@ const fetchAccessToken = async () => {
     if (accessToken) {
         const headers = new Headers();
         headers.append('Authorization', `Bearer ${accessToken}`);
-        const response = await fetch('http://localhost:3000/users/userInfo', { headers });
+        const response = await fetch(`http://${LOCALHOST}:3000/users/userInfo`, { headers });
         const data = await response.json();
         return data;
     } else {
@@ -81,7 +81,7 @@ const fetchAccessToken = async () => {
         socket.emit('getMessagesOfRoom', roomId);
     }
 
-    async function handleClickConnectedUserButton(userId:number) {
+    async function handleClickConnectedUserButton(userId:number):Promise<any> {
         socket.emit('getMessagesOfConnectedUser', userId);
     } 
 
@@ -145,9 +145,8 @@ const fetchAccessToken = async () => {
 		    if (accessToken) {
                 const headers = new Headers();
                 headers.append('Authorization', `Bearer ${accessToken}`);
-                const response = await fetch(`http://localhost:3000/dm/who?id=${$page.params.user}`, { headers });
+                const response = await fetch(`http://${LOCALHOST}:3000/dm/who?id=${$page.params.user}`, { headers });
                 const data =  await response.json();
-                console.log('data ====', data);
                 if (!data) {
                     goto('/dm');
                     return ;
@@ -172,7 +171,7 @@ const fetchAccessToken = async () => {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
                     // remplacer avec l'adresse celle pour fetch les contactes du mec
-			//const response = await fetch('http://localhost:3000/', { headers });
+			//const response = await fetch('http://${LOCALHOST}:3000/', { headers });
 			// const data =  await response.json();
             // contactList = data;
         }
@@ -188,13 +187,12 @@ const fetchAccessToken = async () => {
 		if (accessToken) {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
-			const response = await fetch('http://localhost:3000/dm/getRoomData', { headers });
+			const response = await fetch(`http://${LOCALHOST}:3000/dm/getRoomData`, { headers });
 			const data =  await response.json();
             currentUser = data.user;
             roomList = data.rooms;
     }}
     catch {
-        console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
     }
     }
 
@@ -213,21 +211,19 @@ let toast;
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			const response = await fetch(
-				`http://localhost:3000/users/getRoomId`,
+				`http://${LOCALHOST}:3000/users/getRoomId`,
 				{
 					headers
 				}
 			);
 			const data = await response.json();
-			// console.log('retour fetch ==', data);
 			return data;
 		}
 	}
 
     async function handleInviteGameButton() {
         const id = await fetchRoomGameId();
-        // console.log('ID ====', id);
-        const url = `http://localhost:5173/game/pong_game?room_id=${id.response}`;
+        const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${id.response}`;
 		const data = {
 			invited: selectedUser,
 			invitedBy: currentUser.username,
@@ -240,7 +236,7 @@ let toast;
 		pending_invitation = false;
 		console.log("Denied the invitation");
 		const boxito = document.querySelector(".popup");
-		boxito.remove();
+		boxito?.remove();
 	}
 
 	function acceptInvitation(notif:any) {
@@ -263,13 +259,13 @@ let toast;
 			<button class="popup_button" id="denyButton">Deny</button>
 			</div>
 		</div>`;
-		boxito.appendChild(toast);
+		boxito?.appendChild(toast);
 		
 		const acceptButton = document.getElementById("acceptButton");
 		const denyButton = document.getElementById("denyButton");
 
-		acceptButton.addEventListener("click", () => acceptInvitation(notif));
-		denyButton.addEventListener("click", removePopup);
+		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
+		denyButton?.addEventListener("click", removePopup);
 	}
 
 
@@ -286,7 +282,7 @@ let toast;
         if (!access_token) {
                 window.location.pathname = '/';
             }
-		socket = io('http://localhost:3000', {
+		socket = io(`http://${LOCALHOST}:3000`, {
 			extraHeaders: {
 				Authorization: 'Bearer ' + access_token
 			}
@@ -302,8 +298,6 @@ let toast;
             }
         });
         socket.on('newDirectMessage', async(data) => {
-            console.log('CU ==', currentRoom);
-            console.log('data ==', data)
             if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
                 	messages = [...messages, data.message];
             }
@@ -331,8 +325,6 @@ let toast;
                 notif.display = true;
                 notif.url = data.url;
                 notif.invitedBy = data.invitedBy;
-                console.log('je suis invité par ==', notif.invitedBy);
-                console.log('je suis invité à l\'url ==', notif.url);
 				if (pending_invitation == false)
 				{
                     pending_invitation = true;
@@ -340,7 +332,7 @@ let toast;
 				}
             }
 		});
-        // const socket = io('http://localhost:3000');
+        // const socket = io('http://${LOCALHOST}:3000');
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo });
 			});
@@ -387,23 +379,23 @@ let toast;
         {#if loading === true}
         <div class="game_navbar">
             <div class="button_box">
-                <img class="button_picture" src="/img/home_icone.png" />
+                <img class="button_picture" src="/img/home_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/profile_icone.png" />
+                <img class="button_picture" src="/img/profile_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade(`/profile/${currentUser.id}`)}>Profile</button
                 >
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/game_icone.png" />
+                <img class="button_picture" src="/img/game_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade('/game')}>Game</button>
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/chat_icone.png" />
+                <img class="button_picture" src="/img/chat_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
             </div>
         </div>
@@ -468,7 +460,7 @@ let toast;
                             id="sendMessageButton"
                             type="submit"
                             disabled>
-                            <img class="sent_icone" src="/img/edit_profile.png" /></button
+                            <img class="sent_icone" src="/img/edit_profile.png" alt="" /></button
                         >
                     </form>
                 </div>
@@ -488,7 +480,7 @@ let toast;
 										{:else}
 											<div class="green_dot"></div>
 										{/if}
-										<button on:click={handleClickConnectedUserButton(x.id)}>{x.username}</button>
+										<button on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
 									</div>
 								</li>
 							{/each}
@@ -496,7 +488,7 @@ let toast;
 						</div>
                 </div>
                 <div class="selctedUser_button_settings">
-                    <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
+                    <buton on:click={handleCheckProfileButton} on:keydown>Voir le profil</buton>
                     <button on:click={handleInviteGameButton}>Proposer une partie</button>
                 </div>
             </div>

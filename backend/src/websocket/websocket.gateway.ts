@@ -45,7 +45,6 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 			invitedBy: data.invitedBy,
 			url: data.url,
 		}
-    console.log('to send ==', toSend.invitedBy);
 		this.server.emit('InvitedNotif', toSend);
 	}
   // ---------------------- DEPRECATED ----------------------
@@ -73,7 +72,6 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
         connected: user.connected,
       });
     }
-    console.log('vec ==', vector);
     return vector;
   }
 }

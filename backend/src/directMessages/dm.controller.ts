@@ -48,7 +48,6 @@ async handleRoomData(@Headers('Authorization') cookie: String) {
 
 @Get('who')
 async handleWho(@Headers('Authorization') cookie: String, @Query('id') userId) {
-//   console.log("JE SUIS ICI")
   try {
 
     let existe = true;
@@ -58,7 +57,6 @@ async handleWho(@Headers('Authorization') cookie: String, @Query('id') userId) {
     where: {id: parseInt(userId, 10)},
   });
   if (!who) {
-    console.log('je retourn noule')
     return null;
   }
   let room = await this.dmService.findRoom(user, who);

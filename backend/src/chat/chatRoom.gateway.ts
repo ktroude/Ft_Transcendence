@@ -114,7 +114,6 @@ export class ChatRoomGateway
       for (let i=0; i < chatRoom.messages.length; i++) {
         for (let j=0; j < blocked.length; j++) {
           if (blocked[j] !== chatRoom.messages[i].senderId) {
-            console.log('chatRoom.messages ==', chatRoom.messages[0]);
             messages.push(chatRoom.messages[i]);
           }
         }
@@ -574,7 +573,6 @@ export class ChatRoomGateway
     });
     if (await this.chatRoomService.isOwner(user, room) === false)
       return ;
-    console.log('ancien mdp ==', room.password);
     await this.prismaService.chatRoom.update({
       where: {id: room.id},
       data: {
@@ -584,7 +582,6 @@ export class ChatRoomGateway
     const wroom = await this.prismaService.chatRoom.findUnique({
       where: {id: parseInt(data.room.id, 10)}
     });
-    console.log('new mdp ==', wroom.password);
     this.server.emit('passwordChanged');
   }
 

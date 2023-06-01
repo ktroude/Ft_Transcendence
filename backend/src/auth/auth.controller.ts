@@ -29,10 +29,10 @@ export class AuthController {
     const user = await this.userService.decodeToken(access_token);
     if (await this.userService.get2fastatus(user.id) == true) {
       await this.userService.update2fastatus(user.id, 'lock');
-      res.redirect('http://localhost:5173/auth/2fa');
+      res.redirect(`http://${process.env.LOCALHOST}:5173/auth/2fa`);
       return;
     }
-    res.redirect('http://localhost:5173/homepage');
+    res.redirect(`http://${process.env.LOCALHOST}:5173/homepage`);
     return;
   }
 

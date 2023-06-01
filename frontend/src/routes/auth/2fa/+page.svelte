@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { fetchData, fetchAccessToken, fetch2FA } from '../../../API/api';
   import { goto } from '$app/navigation';
+  import { LOCALHOST } from "../../../API/env";
 
   let qrImage = '';
   let code: string;
@@ -33,7 +34,7 @@
     const accessToken = await fetchAccessToken();
     const user = await fetchData();
     if (accessToken) {
-      const response = await fetch(`http://localhost:3000/${user.id}/auth/2fa/verify`, {
+      const response = await fetch(`http://${LOCALHOST}:3000/${user.id}/auth/2fa/verify`, {
         method: 'POST',
           headers: {
           'Content-Type': 'application/json',
@@ -44,7 +45,7 @@
       const data = await response.json();
       if (data.isVerified)
       {
-        const response = fetch(`http://localhost:3000/${user.id}/auth/2fa/lockstatus`, {
+        const response = fetch(`http://${LOCALHOST}:3000/${user.id}/auth/2fa/lockstatus`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

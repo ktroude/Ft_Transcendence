@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { io, Socket } from 'socket.io-client';
-
+    import { LOCALHOST } from "../../API/env";
 	import { onMount } from 'svelte';
 
 	let socket:Socket;
@@ -30,7 +30,6 @@
     }
 
     function handleCheckProfileButton() {
-		console.log('SU =======', selectedUser);
 		goto(`/profile/${selectedUser.id}`);
     }
 
@@ -91,7 +90,7 @@
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
                     // remplacer avec l'adresse celle pour fletch les contactes du mec
-			//const response = await fetch('http://localhost:3000/', { headers });
+			//const response = await fetch('http://${LOCALHOST}:3000/', { headers });
 			// const data =  await response.json();
             // contactList = data;
         }
@@ -107,14 +106,13 @@
 		    if (accessToken) {
 			    const headers = new Headers();
                 headers.append('Authorization', `Bearer ${accessToken}`);
-                const response = await fetch('http://localhost:3000/dm/getRoomData', { headers });
+                const response = await fetch(`http://${LOCALHOST}:3000/dm/getRoomData`, { headers });
                 const data =  await response.json();
                 currentUser = data.user;
                 roomList = data.rooms;
             }
     }
     catch {
-        console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
     }
     }
 
@@ -127,7 +125,7 @@
         if (!access_token) {
                 window.location.pathname = '/';
             }
-		socket = io('http://localhost:3000', {
+		socket = io(`http://${LOCALHOST}:3000`, {
 			extraHeaders: {
 				Authorization: 'Bearer ' + access_token
 			}
@@ -142,8 +140,6 @@
             }
         });
         socket.on('newDirectMessage', async(data) => {
-            console.log('CU ==', currentRoom);
-            console.log('data ==', data)
             if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
                 	messages = [...messages, data.message];
             }
@@ -161,7 +157,6 @@
 				notif = true;
 		});
         socket.on('returnDirectMessage', async(data) => {
-            console.log('data ================', data);
             if (currentUser.id === data.user.id) {
                 messages = data.messages;
                 currentRoom = data.room;
@@ -205,23 +200,23 @@
         {#if loading === true}
         <div class="game_navbar">
             <div class="button_box">
-                <img class="button_picture" src="/img/home_icone.png" />
+                <img class="button_picture" src="/img/home_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/profile_icone.png" />
+                <img class="button_picture" src="/img/profile_icone.png"  alt="" />
                 <button class="button_nav" on:click={() => fade(`/profile/${currentUser.id}`)}>Profile</button
                 >
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/game_icone.png" />
+                <img class="button_picture" src="/img/game_icone.png" alt=""  />
                 <button class="button_nav" on:click={() => fade('/game')}>Game</button>
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/chat_icone.png" />
+                <img class="button_picture" src="/img/chat_icone.png" alt=""  />
                 <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
             </div>
         </div>
@@ -287,7 +282,7 @@
                             id="sendMessageButton"
                             type="submit"
                             disabled>
-                            <img class="sent_icone" src="/img/edit_profile.png" /></button
+                            <img class="sent_icone" src="/img/edit_profile.png"  alt="" /></button
                         >
                     </form>
                 </div>
@@ -307,7 +302,7 @@
                     </div>
                 {#if selectedUser}
                 <div class="selctedUser_button_settings">
-                    <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
+                    <buton on:click={handleCheckProfileButton} on:keydown>Voir le profil</buton>
                     <button>Proposer une partie</button>
                 </div>
                 {/if}
