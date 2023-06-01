@@ -65,11 +65,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 										{/if}
 										<span class="friendname">{friendName}</span>
  									</div>
- 									{#if clickedFriend === friendName && showButtons && invited === 2}
- 										<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
- 										<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
- 										<button class="friend_button" on:click={() => {if (showButtons) handleSearchProfile(friendName)}}>See Profile</button>
- 										<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+ 									{#if clickedFriend === friendName && showButtons == true}
+ 										<button class="friend_button" on:click={() => {if (showButtons == true) handleMessageFriend(friendName)}}>💬</button>
+ 										<button class="friend_button" on:click={() => {if (showButtons == true) handleInviteFriend(friendName)}}>🎮</button>
+ 										<button class="friend_button" on:click={() => {if (showButtons == true) handleSearchProfile(friendName)}}>🔍</button>
+ 										<button class="friend_button" on:click={() => {if (showButtons == true) handleDeleteFriend(friendName)}}>❌</button>
  									{/if}
  								</li>
  								{/each}
@@ -102,11 +102,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 							{#each connectedUsers as x }
 								<li class="friends_list">
 									<div class="friend_line">
-										{#if x.connected == 1}
-											<div class="green_dot"></div>
-										{/if}
 										{#if x.connected == 2}
 											<div class="red_dot"></div>
+										{:else}
+											<div class="green_dot"></div>
 										{/if}
 										<div class="connectedUsersName">{x.username}</div>
 									</div>
@@ -211,14 +210,16 @@ async function connect()
     let connectedUsers = [];
 	let loading = false;
 	let friendUser: User;
-	/*	
-		-1 -> no invitation received
-		 0 -> invitation denied or accepted
-		 1 -> invitation received -> must be actualized when receiving an invitation
-		 2 -> prevents buttons from showing up when accepting/denying invitation
-	*/
-
-	let invited = 0;
+    let user: User;
+    interface User {
+        id: number;
+        pseudo: string;
+        firstName: string;
+        lastName: string;
+        picture: string;
+        username: string;
+        createdAt: Date;
+    }
 
 	async function getConnectedUsers() {
 	const accessToken = await fetchAccessToken();
@@ -276,29 +277,21 @@ async function connect()
 		console.log("Accepted the invitation");
 		goto(`/game/${'roomid'}`);
 		/*function that sends to the other user that the invitation has been accepted*/
-		invited = 0;
 	}
 
 	async function denyInvitation() {
 		console.log("Denied the invitation");
 		/*function that sends to the other user that the invitation has been denied*/
-		invited = 0;
 	}
 
     async function handleFriendClick(friendName: string) {
 		friends = await fetchFriend(user.pseudo);
 		clickedFriend = friendName;
-		setShowButtons(previousFriend !== clickedFriend ? true : !showButtons);
+		if (showButtons == false)
+			showButtons = true;
+		else
+			showButtons = false;
 		previousFriend = clickedFriend;
-	}
-
-	async function setShowButtons(value: boolean) {
-		if (invited == 0)
-			invited = 2;
-		else if (invited == 2 || invited == -1){
-			invited = 2;
-			showButtons = value;
-		}
 	}
 
     async function handleMessageFriend(friendName: any) {
@@ -382,7 +375,6 @@ async function connect()
     let imageURL: string = '';
     let newUsername: string = '';
 
-
     async function handleUpdateUsername() {
         if (!newUsername) {
             console.log('New username not set');
@@ -434,9 +426,9 @@ async function connect()
 				socket.emit('userConnected', { pseudo: user.pseudo });
 			});
 			await friendrequest();
-			setInterval(friendrequest, 10000);
+			setInterval(friendrequest, 5000);
 			await getConnectedUsers();
-			setInterval(getConnectedUsers, 10000);
+			setInterval(getConnectedUsers, 5000);
 		}
 		loading = true;
 		window.addEventListener('beforeunload', () => {

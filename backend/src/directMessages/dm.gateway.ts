@@ -155,10 +155,48 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
         });
     }
 
-
-
-
-
+    getMessagesOfConnectedUser
+    @SubscribeMessage('getMessagesOfConnectedUser')
+    async handleGetMessagesOfConnectedUser(@ConnectedSocket() client:Socket, @MessageBody() data:any) {
+        const user1 = this.clients.find(([, socket]) => socket === client)?.[0];
+        const user2 = await this.userService.findUserById(parseInt(data));
+        const rooms = await this.prisma.directMessageRoom.findMany({
+            where: {
+              OR: [
+                { ownerOne: user1, ownerTwo: user2 },
+                { ownerOne: user2, ownerTwo: user1 },
+              ],
+            },
+            select: {
+                messages:true,
+                ownerOne:true,
+                ownerTwo:true,
+                id:true,
+            }
+          });
+        if (rooms.length) {
+            this.server.emit('returnDirectMessage', {
+                user: user1,
+                room: rooms[0],
+                selectedUser: user2,
+                messages: rooms[0].messages,
+            });
+        }
+        else {
+            const room = this.prisma.directMessageRoom.create({
+                data: {
+                    ownerOneId: user1.id,
+                    ownerTwoId: user2.id,
+                }
+            })
+            this.server.emit('returnDirectMessage', {
+                user: user1,
+                room: room,
+                selectedUser: user2,
+                messages: [],
+            });
+        }
+    }
 
 
 

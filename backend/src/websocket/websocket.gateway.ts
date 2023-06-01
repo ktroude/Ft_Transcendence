@@ -42,9 +42,10 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 	handleInvitedInGame(@ConnectedSocket() client:any, @MessageBody() data) {
 		const toSend = {
 			invited: data.invited,
-			invitedBy: data.username,
+			invitedBy: data.invitedBy,
 			url: data.url,
 		}
+    console.log('to send ==', toSend.invitedBy);
 		this.server.emit('InvitedNotif', toSend);
 	}
   // ---------------------- DEPRECATED ----------------------
@@ -60,16 +61,19 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
           pseudo: key
         },
         select: {
+          id: true,
           username: true,
           connected: true,
         }
       });
       if (user)
       vector.push( {
+        id: user.id,
         username: user.username,
         connected: user.connected,
       });
     }
+    console.log('vec ==', vector);
     return vector;
   }
 }

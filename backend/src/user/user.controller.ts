@@ -71,4 +71,12 @@ export class UserController {
     async searchUser(@Param('user') searchProfile: string): Promise<User> {
         return await this.userService.findUserByUsername(searchProfile);
 	}
+
+    @UseGuards(JwtGuard)
+    @Get('history')
+    async getHistory(@Headers('Authorization') cookie: string,) {
+		const token = cookie.split(' ')[1];
+		const user = await this.userService.decodeToken(token);
+        return await this.userService.getHistory(user);
+	}
 }

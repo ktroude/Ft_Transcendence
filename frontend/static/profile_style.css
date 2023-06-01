@@ -143,7 +143,81 @@ img {
 	box-shadow: 10px 10px 50px black;
 	color: greenyellow;
 }
+
+.right_bloc{
+	overflow: hidden;
+	display: flex;
+	flex: row;
+	width: 300px;
+	will-change: transform;
+	height: 500px;
+}
 .achievements_bloc{
+	position: absolute;
+
+	margin:0;
+	padding: 20px;
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-radius: 3px;
+	width: 300px;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+	font-family: 'Bebas Neue', cursive;
+	box-shadow: 10px 10px 50px black;
+	color: greenyellow;
+	transform: translateX(0px);
+	animation: div_slide_right 0.2s ease-in-out;
+
+}
+.history_bloc{
+	position: absolute;
+
+	margin:0;
+	padding: 20px;
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-radius: 3px;
+	width: 300px;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+	font-family: 'Bebas Neue', cursive;
+	box-shadow: 10px 10px 50px black;
+	color: greenyellow;
+	transform: translateX(-500px);
+	animation: div_slide_left 0.2s ease-in-out;
+}
+
+.history_bloc_switched{
+	position: absolute;
+	padding: 20px;
+	background-color: rgba(0, 0, 0, 0.267);
+	backdrop-filter: blur(5px);
+	border-radius: 3px;
+	width: 300px;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+	font-family: 'Bebas Neue', cursive;
+	box-shadow: 10px 10px 50px black;
+	color: greenyellow;
+	transform: translateX(0px);
+	animation: div_slide_right 0.2s ease-in-out;
+}
+
+.achievements_bloc_switched{
+	position: absolute;
 	margin:auto;
 	padding: 20px;
 	background-color: rgba(0, 0, 0, 0.267);
@@ -155,10 +229,45 @@ img {
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
-	justify-content: top;
+	justify-content: center;
 	font-family: 'Bebas Neue', cursive;
 	box-shadow: 10px 10px 50px black;
 	color: greenyellow;
+	transform: translateX(-500px);
+	animation: div_slide_left 0.2s ease-in-out;
+}
+
+@keyframes div_slide_left {
+	0% {
+		transform: translateX(0px);
+	}
+	100% {
+		transform: translateX(-500px);
+	}
+}
+
+@keyframes div_slide_right {
+	0% {
+		transform: translateX(-500px);
+	}
+	100% {
+		transform: translateX(0px);
+	}
+}
+
+
+.history_button_div{
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+}
+.history_button{
+	color: white;
+	background-color: transparent;
+	border: none;
+}
+.history_button:hover{
+	cursor: pointer;
 }
 .friend_profile_icone{
 	width: 30px;
@@ -168,6 +277,7 @@ img {
 	width: 30px;
 }
 .profile_h1{
+	margin-top: 10px;
 	font-size: 30px;
 	display: flex;
 	flex-direction: row;
@@ -217,7 +327,16 @@ img {
 .input_friend{
 	outline: none;
 }
+.friend_button{
+	background: none;
+	border: none;
+	display: inline-block;
+	animation: text_slide 0.2s ease-in-out;
+}
 
+.friend_button:hover{
+	cursor: pointer;
+}
 .block_button:hover{
 	cursor: pointer;
 }
@@ -291,11 +410,11 @@ img {
 	border-radius: 6px;
 	position: absolute;
 	z-index: 1;
-  }
+}
 
   .remove_friend_button:hover .tooltiptext {
 	visibility: visible;
-  }
+}
 
 .block_user_button{
 	background: url("img/chafer_icone.png") no-repeat center;
@@ -358,7 +477,6 @@ img {
 	float:right
 }
 
-
 .achievement_div{
 	display: flex;
 	flex-direction: row;
@@ -380,7 +498,6 @@ img {
 	background-size: contain;
 	filter: grayscale(1);
 	align-items: flex-start;
-	
 }
 
 .achievement_true{
@@ -396,8 +513,8 @@ img {
 	filter: grayscale(0);
 	filter: drop-shadow(0px 0px 5px rgb(255, 230, 0));
 	animation: moving_shadow 4s infinite;
-	
 }
+
 @keyframes moving_shadow {
 	0% {
 		filter: drop-shadow(0px 0px 5px rgb(255, 230, 0));
@@ -412,14 +529,17 @@ img {
 		filter: drop-shadow(0px 0px 5px rgb(255, 230, 0));
 	}
 }
+
 .achievement_title_text_box{
 	display: flex;
 	flex-direction: column;
 }
+
 .achievement_title{
 	margin-top: 3px;
 	text-align: left;
 }
+
 .achievement_text{
 	width: 120px;
 	color: white;
@@ -457,4 +577,27 @@ img {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.history_title_bloc{
+	display: flex;
+	height: 50px;
+	position: absolute;
+	top: 40px;
+}
+
+.history_button{
+	margin-top: 40px;
+	font-size: 40px;
+	color:greenyellow;
+}
+
+.history_button:hover{
+	color:yellow;
+}
+
+.history_line{
+	font-size: 18px;
+	margin: 2px;
+	color: white;
 }

@@ -43,6 +43,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<img class="button_picture" src="/img/chat_icone.png">
 				<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
 			</div>
+			<div class="button_box">
+				<button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
+			</div>
 		</div>
 		<div class="main_profile">
 			{#if user?.username == currentUser}
@@ -66,10 +69,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 						  	<span class="friendname">{friendName}</span>
 						</div>
 						{#if clickedFriend === friendName && showButtons && invited === 2}
-							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>💬</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>🎮</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>🔍</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>❌</button>
 						{/if}
 					</li>
 					{/each}
@@ -121,68 +124,97 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			{/if}
 		</div>
 
-		<div class="achievements_bloc">
-			<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png"></span>Achievements</h1>
-			{#each Array.from(all_achievements) as [key, value]}
-				{#if value === false}
-						<div class="achievement_div">
-							<div class="achievement">
-							</div>
-							<div class="achievement_title_text_box">
-								{#if String(key) === 'FirstWin'}
-								<h4 class="achievement_title">First Win</h4>
-								<h5 class="achievement_text">Win a game.</h5>
-								{/if}
-								{#if String(key) === "WinStreak"}
-								<h4 class="achievement_title">Win Streak</h4>
-								<h5 class="achievement_text">Win three games in a row.</h5>
-								{/if}
-								{#if String(key) === "ImTheBoss"}
-								<h4 class="achievement_title">I'm The Boss</h4>
-								<h5 class="achievement_text">Win against a creator.</h5>
-								{/if}
-								{#if String(key) === "TheDarkSide"}
-								<h4 class="achievement_title">The Dark Side</h4>
-								<h5 class="achievement_text">Log in as a bocal member.</h5>
-								{/if}
-								{#if String(key) === "ImCurious"}
-								<h4 class="achievement_title">???</h4>
-								<h5 class="achievement_text">???</h5>
-								{/if}
-							</div>
-						</div>
-					{:else}
-						<div class="achievement_div">
-							<div class="achievement_true">
-							</div>
-							<div class="achievement_title_text_box">
-								{#if String(key) === 'FirstWin'}
-								<h4 class="achievement_title">First Win</h4>
-								<h5 class="achievement_text">Win a game.</h5>
-								{/if}
-								{#if String(key) === "WinStreak"}
-								<h4 class="achievement_title">Win Streak</h4>
-								<h5 class="achievement_text">Win three games in a row.</h5>
-								{/if}
-								{#if String(key) === "ImTheBoss"}
-								<h4 class="achievement_title">I'm The Boss</h4>
-								<h5 class="achievement_text">Win against a creator.</h5>
-								{/if}
-								{#if String(key) === "TheDarkSide"}
-								<h4 class="achievement_title">The Dark Side</h4>
-								<h5 class="achievement_text">Log in as a bocal member.</h5>
-								{/if}
-								{#if String(key) === "ImCurious"}
-								<h4 class="achievement_title">I'm Curious</h4>
-								<h5 class="achievement_text">Visit one of our GitHubs.</h5>
-								{/if}
-							</div>
-						</div>
 
-				{/if}
 
-			{/each}
+
+
+
+
+
+
+
+
+
+		<div class="right_bloc">
+			<div class="history_bloc" id="history_bloc_id">
+				<div class="history_title_bloc">
+					<h1 class="profile_h1"><span><img class="profile_icone" src="/img/time_icone.png"></span>History</h1>
+				</div>
+				{#if history.length == 0}
+					<h5 class="history_line">Feels empty...</h5>
+					{/if}
+				{#each Array.from(history) as hist}
+					<h5 class="history_line">{hist.winner} - {hist.loser} <span style="color:greenyellow">[{hist.scoreUser} - {hist.scoreOpponent}]</span></h5>
+				{/each}
+
+
+
+			</div>
+			<div class="achievements_bloc" id="achievements_bloc_id">
+				<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png"></span>Achievements</h1>
+				{#each Array.from(all_achievements) as [key, value]}
+					{#if value === false}
+							<div class="achievement_div">
+								<div class="achievement">
+								</div>
+								<div class="achievement_title_text_box">
+									{#if String(key) === 'FirstWin'}
+									<h4 class="achievement_title">First Win</h4>
+									<h5 class="achievement_text">Win a game.</h5>
+									{/if}
+									{#if String(key) === "WinStreak"}
+									<h4 class="achievement_title">Win Streak</h4>
+									<h5 class="achievement_text">Win three games in a row.</h5>
+									{/if}
+									{#if String(key) === "ImTheBoss"}
+									<h4 class="achievement_title">I'm The Boss</h4>
+									<h5 class="achievement_text">Win against a creator.</h5>
+									{/if}
+									{#if String(key) === "TheDarkSide"}
+									<h4 class="achievement_title">The Dark Side</h4>
+									<h5 class="achievement_text">Log in as a bocal member.</h5>
+									{/if}
+									{#if String(key) === "ImCurious"}
+									<h4 class="achievement_title">???</h4>
+									<h5 class="achievement_text">???</h5>
+									{/if}
+								</div>
+							</div>
+						{:else}
+							<div class="achievement_div">
+								<div class="achievement_true">
+								</div>
+								<div class="achievement_title_text_box">
+									{#if String(key) === 'FirstWin'}
+									<h4 class="achievement_title">First Win</h4>
+									<h5 class="achievement_text">Win a game.</h5>
+									{/if}
+									{#if String(key) === "WinStreak"}
+									<h4 class="achievement_title">Win Streak</h4>
+									<h5 class="achievement_text">Win three games in a row.</h5>
+									{/if}
+									{#if String(key) === "ImTheBoss"}
+									<h4 class="achievement_title">I'm The Boss</h4>
+									<h5 class="achievement_text">Win against a creator.</h5>
+									{/if}
+									{#if String(key) === "TheDarkSide"}
+									<h4 class="achievement_title">The Dark Side</h4>
+									<h5 class="achievement_text">Log in as a bocal member.</h5>
+									{/if}
+									{#if String(key) === "ImCurious"}
+									<h4 class="achievement_title">I'm Curious</h4>
+									<h5 class="achievement_text">Visit one of our GitHubs.</h5>
+									{/if}
+								</div>
+							</div>
+	
+					{/if}
+	
+				{/each}
+			</div>
+
 		</div>
+		<div class="button_switch_div"><button class="history_button" on:click={() => switchToHistory()}>➜</button></div>
 				</div> 
 	{/if}
 </body>
@@ -228,6 +260,26 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         username: string;
         createdAt: Date;
     }
+
+
+	function switchToHistory() {
+		const div1 = document.getElementById('achievements_bloc_id');
+		const div2 = document.getElementById('history_bloc_id');
+
+		div1.classList.toggle('achievements_bloc');
+		div1.classList.toggle('achievements_bloc_switched');
+
+		div2.classList.toggle('history_bloc');
+		div2.classList.toggle('history_bloc_switched');
+	}
+
+
+
+
+
+
+
+
 	/*	
 		-1 -> no invitation received
 		 0 -> invitation denied or accepted
@@ -483,7 +535,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			console.log('Error: Could not check if user is friend');
 	}
 
-
 	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
@@ -558,6 +609,55 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		friends = await fetchFriend(user.pseudo);
 	}
 
+
+
+
+
+
+
+	let history: any[];
+	history = [];
+
+	async function getHistory() {
+		const accessToken = await fetchAccessToken();
+		if (accessToken)
+		{
+			const url = `http://localhost:3000/users/history`;
+				const response = await fetch(url, {
+					method: 'GET',
+					headers: {
+					'Authorization': `Bearer ${accessToken}`,
+					},
+				});
+				return await response.json(); // Parse response body as JSON
+		}
+		else 
+			console.log('Error: Could not get history');
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	async function fade(thisplace:string) {
+		document.body.classList.add('fade-out');
+		console.log("switching page....");
+		setTimeout(() => {
+		// window.location.href = href;
+			goto(thisplace);
+			loadpage();
+			document.body.classList.remove('fade-out');
+		}, 400);
+	}
+
+
 	onMount(async function() {
 		user = await fetchData(); // Catch the user
 		if (!user)
@@ -574,17 +674,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			});
 		}
 		setInterval(friendRequest, 10000);
+		history = await getHistory();
+		console.log("HISTOTYYYY===", history);
 		loading = true;
 	});
 
-	async function fade(thisplace:string) {
-		document.body.classList.add('fade-out');
-		console.log("switching page....");
-		setTimeout(() => {
-		// window.location.href = href;
-			goto(thisplace);
-			loadpage();
-			document.body.classList.remove('fade-out');
-		}, 400);
-	}
+
 </script>

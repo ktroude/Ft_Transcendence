@@ -15,9 +15,75 @@
 	let notif:any = {url:'', display:false, invitedBy:''};
 	let anim = false;
 
+
+
+/****************************************************/
+/*****************LIST CONNECTED USERS***************/
+/****************************************************/
+
+
+    let connectedUsers:any[] = [];
+
+
+    async function getConnectedUsers() {
+	const accessToken = await fetchAccessToken();
+	if (accessToken) {
+		const response = await fetch(`http://localhost:3000/websocket/getClient`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`
+		},
+		});
+		if (response.ok)
+			connectedUsers = await response.json();
+		else
+			console.log("FRONT NOT WORKIGN HOHO")
+	} else 
+		console.log('Error: Could not get users');
+        console.log("co users===", connectedUsers);
+}
+
+const fetchAccessToken = async () => {
+    const cookies = document.cookie.split(';');
+    if (cookies.length === 0)
+        return null;
+    const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
+    if (!accessTokenCookie)
+        return null;
+    const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+    if (!accessToken)
+        return null;
+    return accessToken;
+ }
+
+ const fetchData = async () => {
+    const accessToken = await fetchAccessToken();
+    if (accessToken) {
+        const headers = new Headers();
+        headers.append('Authorization', `Bearer ${accessToken}`);
+        const response = await fetch('http://localhost:3000/users/userInfo', { headers });
+        const data = await response.json();
+        return data;
+    } else {
+        console.log('Access token not found');
+        goto('/');
+        return null;
+    }
+}
+/****************************************************/
+/****************************************************/
+/****************************************************/
+
+
+    
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
     }
+
+    async function handleClickConnectedUserButton(userId:number) {
+        socket.emit('getMessagesOfConnectedUser', userId);
+    } 
 
     function handleCheckProfileButton() {
         goto(`/profile/${selectedUser.id}`);
@@ -28,38 +94,7 @@
 
     }
 
-    async function fetchRoomGameId() {
 
-			const cookies = document.cookie.split(';');
-			const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
-			const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-			if (accessToken) {
-				const headers = new Headers();
-				headers.append('Authorization', `Bearer ${accessToken}`);
-				const response = await fetch(
-					`http://localhost:3000/users/getRoomId`,
-					{
-						headers
-					}
-				);
-				const data = await response.json();
-                console.log('retour fetch ==', data);
-                return data;
-			}
-
-	}
-
-    async function handleInviteGameButton() {
-        const id = await fetchRoomGameId();
-        console.log('ID ====', id);
-        const url = `http://localhost:5173/game/pong_game?room_id=${id.response}`;
-		const data = {
-			invited: selectedUser,
-			invitedBy: currentUser.username,
-			url: url,
-		}
-		socket.emit(`InvitedInGame`, data);
-    }
 
     function handleConnectedUserButton() {
 
@@ -157,42 +192,90 @@
 			const data =  await response.json();
             currentUser = data.user;
             roomList = data.rooms;
-            for (let i = 0; i < roomList.length; i++) {
-                if (currentUser.id === roomList[i].ownerOne.id) {
-                    roomList[i].name = roomList[i].ownerTwo.username;
-                }
-                else if (currentUser.id == roomList[i].ownerTwo) {
-                    roomList[i].name = roomList[i].ownerOne.username;
-                }            
-            }
-        }
-            console.log('RL ==', roomList);
-    }
+    }}
     catch {
         console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
     }
     }
 
-	function createPopup()
-	{
+/****************************************************/
+/*****************GAME INVITATION********************/
+/****************************************************/
+
+let toast;
+	let pending_invitation = false;
+
+    async function fetchRoomGameId() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(
+				`http://localhost:3000/users/getRoomId`,
+				{
+					headers
+				}
+			);
+			const data = await response.json();
+			// console.log('retour fetch ==', data);
+			return data;
+		}
+	}
+
+    async function handleInviteGameButton() {
+        const id = await fetchRoomGameId();
+        // console.log('ID ====', id);
+        const url = `http://localhost:5173/game/pong_game?room_id=${id.response}`;
+		const data = {
+			invited: selectedUser,
+			invitedBy: currentUser.username,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data);
+    }
+
+	function removePopup() {
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			goto(notif.url);
+		}
+	}
+
+	function createPopupDM(notif:any) {
 		const boxito = document.querySelector("body");
 		const toast = document.createElement("div");
 		toast.innerHTML = `<div class="popup">
-									<div class="popup_img">
-									</div>
-									<div class="popup_title_text_box">
-										<h4 class="popup_title">Invited by:</h4>
-										<button class="popup_button" on:click=>Accept</button>
-										<button class="popup_button" on:click=>Deny</button>
-									</div>
-							</div>`
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
 		boxito.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton.addEventListener("click", () => acceptInvitation(notif));
+		denyButton.addEventListener("click", removePopup);
 	}
 
-	function removePopup() {
-		const boxito = document.querySelector("popup");
-		toast.remove();
-	}
+
+/****************************************************/
+/****************************************************/
+/****************************************************/
 
 	onMount(async() => {
 		const cookies = document?.cookie?.split(';');
@@ -212,6 +295,7 @@
         if (!socket) {
             window.location.pathname = '/'; 
         }
+        let user = await fetchData();
         socket.on('DmRoomCreated', async(data) => {
             if (currentUser.id === data.user1.id || currentUser.id === data.user2.id) {
                 roomList = [...roomList, data.room]
@@ -239,20 +323,32 @@
                 selectedUser = data.selectedUser;
             }
         });
-		socket.on('InvitedNotif', async(data) => {
-            console.log("data ==", data);
-			if (data.invited.id === currentUser.id)
-				notif.display = true;
+        socket.on('InvitedNotif', async(data) => {
+            if (data.invitedBy === currentUser.username) {
+                goto(data.url);
+            }
+			if (data.invited.id === currentUser.id) {
+                notif.display = true;
                 notif.url = data.url;
                 notif.invitedBy = data.invitedBy;
-                console.log('je susi invite a url ==', notif.url);
-				createPopup(true);
+                console.log('je suis invité par ==', notif.invitedBy);
+                console.log('je suis invité à l\'url ==', notif.url);
+				if (pending_invitation == false)
+				{
+                    pending_invitation = true;
+					createPopupDM(notif);
+				}
+            }
 		});
-
+        // const socket = io('http://localhost:3000');
+			socket.on('connect', async function() {			
+				socket.emit('userConnected', { pseudo: user.pseudo });
+			});
         await isExist();
         await fetchContactList();
         await fletchDirectMessageRoomData();
-        
+        await getConnectedUsers();
+        setInterval(getConnectedUsers, 5000);
         loading = true;
     });
 
@@ -381,13 +477,23 @@
             <div class="right_bloc">
                 <div class="connected_users">
                     <h2 class="connected_users_title">Utilisateurs connectés:</h2>
-                    <!-- {#each contactList as contact}
-                        {#if contact?.connected == true}
-                            <button class="connected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
-                        {:else}
-                            <button class="disconnected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
-                        {/if}
-                    {/each} -->
+                    <div class="connected_users_bloc">
+						<div class="connected_title">Connected</div>
+						<ul class="ul_friends">
+							{#each connectedUsers as x }
+								<li class="friends_list">
+									<div class="friend_line">
+										{#if x.connected == 2}
+											<div class="red_dot"></div>
+										{:else}
+											<div class="green_dot"></div>
+										{/if}
+										<button on:click={handleClickConnectedUserButton(x.id)}>{x.username}</button>
+									</div>
+								</li>
+							{/each}
+						</ul>
+						</div>
                 </div>
                 <div class="selctedUser_button_settings">
                     <buton on:click={handleCheckProfileButton}>Voir le profil</buton>

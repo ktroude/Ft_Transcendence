@@ -64,6 +64,7 @@
 	outline: none;
 }
 
+
 .addfriend_button{
 	width: 30px;
 	border: none;
@@ -86,6 +87,17 @@
 .friend_name:hover{
 	cursor: pointer;
 	color: rgb(93, 215, 255);
+}
+
+.friend_button{
+	background: none;
+	border: none;
+	display: inline-block;
+	animation: text_slide 0.2s ease-in-out;
+}
+
+.friend_button:hover{
+	cursor: pointer;
 }
 
 .lobby_box{
