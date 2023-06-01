@@ -142,6 +142,16 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let waiting = false;
 	let playerId;
 	let mess = null;
+	let user: User;
+    interface User {
+        id: number;
+        pseudo: string;
+        firstName: string;
+        lastName: string;
+        picture: string;
+        username: string;
+        createdAt: Date;
+    }
 
 	function redirectToGame() {
   	return new Promise((resolve) => {
@@ -173,7 +183,7 @@ async function connect()
 		client = new Colyseus.Client('ws://localhost:3001');
 
 	console.log("client colyseus created", client);
-	room = await client.joinOrCreate("ranked");
+	room = await client.joinOrCreate("ranked", user.id);
 	room.onMessage("connect", (message) => {
 		playerId = message.playerId;
 		console.log(`Connecté avec succès en tant que `);
@@ -201,16 +211,6 @@ async function connect()
     let connectedUsers = [];
 	let loading = false;
 	let friendUser: User;
-    let user: User;
-    interface User {
-        id: number;
-        pseudo: string;
-        firstName: string;
-        lastName: string;
-        picture: string;
-        username: string;
-        createdAt: Date;
-    }
 	/*	
 		-1 -> no invitation received
 		 0 -> invitation denied or accepted
@@ -439,6 +439,16 @@ async function connect()
 			setInterval(getConnectedUsers, 10000);
 		}
 		loading = true;
+		window.addEventListener('beforeunload', () => {
+			console.log("leave la page");
+			room.leave(); // Appeler la fonction leave de votre room ici
+		});
+
+		// Ou vous pouvez également utiliser l'événement 'unload' pour détecter les changements de page
+		window.addEventListener('unload', () => {
+			console.log("leave la page");
+			room.leave(); // Appeler la fonction leave de votre room ici
+		});
     });
 
     export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, imageURL, user, newUsername, handleUpdateUsername };

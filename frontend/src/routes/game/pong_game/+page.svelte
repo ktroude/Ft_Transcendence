@@ -56,6 +56,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let mainclient = false;
 	let winner;
 	let gameFinished = false;
+	let break_r = false;
 	let connected = false;
 	let touched = 0;
 	let touched_player_1 = false;
@@ -172,6 +173,7 @@ async function connect(){
 	room.onMessage('role', (message) => {
 		clientId = message.client;
 	});
+	endGame();
 	// room.send('player_name', {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
 	console.log('Joined succefuly', room);
 }
@@ -332,6 +334,8 @@ function changeDirection(playerPosition){
 
 function endGame(){
   room.onMessage("gameFinished", (message) => {
+	connected = true;
+	console.log("gamefinishet ", gameFinished);
     winner = message.winner;
     gameFinished = true;
     if (winner == player.pseudo && mainclient == true)
@@ -355,21 +359,33 @@ function Updateball(){
   })
 }
 
-function ballMove(){
-  if (ball?.y > canvas.height || ball?.y < 0)
-      ball.velocity_y *= -1;
-  if (ball.x > canvas.width - setting_game.paddle_width) {
-	touched_player_2 = true;
-	touched_player_1 = false;
-    collide(player2);
-} else if (ball.x < setting_game.paddle_width) {
-	collide(player);
-	touched_player_2 = false;
-	touched_player_1 = true;
-  }
-  ball.x += ball.velocity_x;
-  ball.y += ball.velocity_y;
-  room.send("ballPos", {ball_x: ball.x, ball_y: ball.y});
+function ballMove()
+{
+	room.onMessage("break", (message) => {break_r = message});
+	if(break_r == true)
+	{
+		console.log("JEEUUUUUUU mis en pause");
+		ball.x = canvas.width / 2;
+		ball.y = canvas.height / 2;
+		ball.velocity_y = 2;
+		ball.velocity_x = 2;
+		room.send("ballPos", {ball_x: ball.x, ball_y: ball.y});
+		return;
+	}
+	if (ball?.y > canvas.height || ball?.y < 0)
+		ball.velocity_y *= -1;
+	if (ball.x > canvas.width - setting_game.paddle_width) {
+		touched_player_2 = true;
+		touched_player_1 = false;
+		collide(player2);
+	} else if (ball.x < setting_game.paddle_width) {
+		collide(player);
+		touched_player_2 = false;
+		touched_player_1 = true;
+	}
+	ball.x += ball.velocity_x;
+	ball.y += ball.velocity_y;
+	room.send("ballPos", {ball_x: ball.x, ball_y: ball.y});
 }
 
 function stop(){
@@ -383,10 +399,10 @@ function stop(){
   ball.velocity_y = 2;
   ball.velocity_x = 2;
   // Init score
-  player2.score = 0;
-  player.score = 0;
-  document.querySelector('#player2-score').textContent = player2.score;
-  document.querySelector('#player-score').textContent = player.score;
+//   player2.score = 0;
+//   player.score = 0;
+//   document.querySelector('#player2-score').textContent = player2.score;
+//   document.querySelector('#player-score').textContent = player.score;
   draw();
 }
 

@@ -2,6 +2,7 @@ import { Room, Client, Delayed, matchMaker } from "colyseus";
 
 interface ClientStat {
   client: Client;
+  userid: number;
 }
 
 export class RankedLobbyRoom extends Room {
@@ -20,10 +21,17 @@ export class RankedLobbyRoom extends Room {
   async onJoin(client: Client, options: any) {
     const playerId = client.sessionId;
     
-    console.log("une personne a rejoint", client.id);
+    console.log("une personne a rejoint", client.id, options);
 
+    const existingUser = this.stats.find(stat => stat.userid === options);
+    if (existingUser)
+    {
+      console.log("deja log", existingUser);
+      return;
+    }
     this.stats.push({
       client: client,
+      userid: options,
     });
     client.send("connect",{playerId: playerId});
     client.send("waiting", 1);

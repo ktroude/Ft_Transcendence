@@ -73,6 +73,7 @@ export class gameRoomService extends Room {
   p1_color: string = 'green';
   p2_color: string = 'green';
   winner: User;
+  break: boolean = false;
   // reconnectTimeout: NodeJS.Timeout;
 
   onCreate() {
@@ -147,11 +148,14 @@ export class gameRoomService extends Room {
     // }, 5000);
     
     if(client.sessionId == this.player1.id)
-    {
       leavePlayer(this.player1, this.prisma);
-    }
     else
       leavePlayer(this.player2, this.prisma);
+    if(this.player1.score < this.max_score || this.player2.score < this.max_score)
+    {
+      this.break = true;
+      this.broadcast('break',true);
+    }
     // updateConnected(this.player1, 1, this.prisma);
     // Le client a quitté la room involontairement (rafraîchissement de la page)
     console.log("Leave la salle pong rom_id = ", this.roomId,client.id);
@@ -186,8 +190,24 @@ export class gameRoomService extends Room {
     }
     
     client.send('role', { client: client.sessionId });
+    this.break = false;
   
     if (this.player1.pseudo !== 'null' && this.player2.pseudo !== 'null') {
+      if (this.player1.score >= this.max_score || this.player2.score >= this.max_score)
+      {
+        if(this.player1.score > this.player2.score)
+        {
+          handleVictoryPrisma(this.player1, this.player2, this.prisma);
+          this.broadcast('gameFinished', { winner: this.player1.pseudo });
+        }
+        else
+        {
+          handleVictoryPrisma(this.player2, this.player1, this.prisma);
+          this.broadcast('gameFinished', { winner: this.player2.pseudo });
+        }
+        console.log("reload but already finish");
+        return
+      }
       this.broadcast('Player_init', {
         player1_pseudo: this.player1.pseudo,
         player2_pseudo: this.player2.pseudo,
@@ -202,9 +222,9 @@ export class gameRoomService extends Room {
         player1_iD_user: this.player1.id_user,
         player2_iD_user: this.player2.id_user,
       });
-  
       updateConnected(this.player2, 2, this.prisma);
       updateConnected(this.player1, 2, this.prisma);
+      this.broadcast('break', false);
     }
   }
 }
