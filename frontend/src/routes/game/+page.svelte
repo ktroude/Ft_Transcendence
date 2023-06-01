@@ -210,17 +210,7 @@ async function connect()
     let connectedUsers = [];
 	let loading = false;
 	let friendUser: User;
-    let user: User;
-    interface User {
-        id: number;
-        pseudo: string;
-        firstName: string;
-        lastName: string;
-        picture: string;
-        username: string;
-        createdAt: Date;
-    }
-
+	
 	async function getConnectedUsers() {
 	const accessToken = await fetchAccessToken();
 	if (accessToken) {
