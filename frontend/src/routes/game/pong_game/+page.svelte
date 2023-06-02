@@ -76,6 +76,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 function ready_to_play()
 {
+	console.log(room);
 	room.send("rdtoplay", true);
 }
 
@@ -148,7 +149,7 @@ function print_win(gagnant){
 
 async function connect(){
     Colyseus = await import("colyseus.js");
-    client = new Colyseus.Client(`ws://${LOCALHOST}:3000`);
+    client = new Colyseus.Client(`ws://${LOCALHOST}:3001`);
     room = await client.joinById(room_id, {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
 	waiting_game = true;
     room.onMessage('Player_init', (message) =>

@@ -153,7 +153,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			</div>
 			<div class="achievements_bloc" id="achievements_bloc_id">
 				<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png" alt=""></span>Achievements</h1>
-				{#each Object.entries(all_achievements) as [key, value]}
+				{#each Array.from(all_achievements) as [key, value]}
 					{#if value === false}
 							<div class="achievement_div">
 								<div class="achievement">
@@ -498,7 +498,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     const accessToken = await fetchAccessToken();
 	if (accessToken)
 	{
-		const url = `http://localhost:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
+		const url = `http://${LOCALHOST}:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
 		const response = await fetch(url, {
 			method: 'GET',
 			headers: {
@@ -520,7 +520,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
-			const url = `http://localhost:3000/users/existingFriendship?id1=${id1}&id2=${id2}`;
+			const url = `http://${LOCALHOST}:3000/users/existingFriendship?id1=${id1}&id2=${id2}`;
 			const response = await fetch(url, {
 				method: 'GET',
 				headers: {
@@ -540,7 +540,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-			const url = `http://localhost:3000/users/achievements/${user.id}/getAchievements`;
+			const url = `http://${LOCALHOST}:3000/users/achievements/${user.id}/getAchievements`;
 			const response = await fetch(url, {
 			method: 'GET',
 			headers: {
@@ -558,7 +558,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	async function unblock(realUser:any, blockerUser:any) { // unblock user
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
-            const response = await fetch(`http://localhost:3000/users/${realUser}/deleteBlock`, {
+            const response = await fetch(`http://${LOCALHOST}:3000/users/${realUser}/deleteBlock`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -624,7 +624,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
-			const url = `http://localhost:3000/users/history`;
+			const url = `http://${LOCALHOST}:3000/users/history`;
 				const response = await fetch(url, {
 					method: 'GET',
 					headers: {

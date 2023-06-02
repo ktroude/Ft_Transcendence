@@ -89,17 +89,6 @@ const fetchAccessToken = async () => {
         goto(`/profile/${selectedUser.id}`);
     }
 
-
-    function handleBlockButton() {
-
-    }
-
-
-
-    function handleConnectedUserButton() {
-
-    }
-
     function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:any) {
 		event.preventDefault();
 		if (
