@@ -309,7 +309,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         } 
 		else
             console.log('Error: Could not delete friend');
-		isFriend = checkFrienship(user.id, realUserId)
+		isFriend = await checkFrienship(user.id, realUserId)
 	}
 
 	async function AddFriendButton(realUser:any, friendUser:any)
@@ -331,7 +331,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 console.log('Error: Could not add friend');
         
 		}
-		isFriend = checkFrienship(user.id, realUserId);
+		isFriend = await checkFrienship(user.id, realUserId);
     }
 
 	async function acceptInvitation() {

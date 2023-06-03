@@ -1,4 +1,4 @@
-<style>
+<!-- <style>
 	@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Signika+Negative:wght@500&display=swap');
 
 	*{
@@ -123,6 +123,5 @@
 	}
 
 	onMount(() => {
-		loadpage();
 	});
-</script>
+</script> -->

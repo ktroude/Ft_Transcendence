@@ -266,16 +266,16 @@ let toast;
 		const cookies = document?.cookie?.split(';');
 		const accessTokenCookie = cookies?.find((cookie) =>
 			cookie?.trim()?.startsWith('access_token=')
-		);
-		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
-        if (!access_token) {
+            );
+            const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
+            if (!access_token) {
                 window.location.pathname = '/';
             }
-		socket = io(`http://${LOCALHOST}:3000`, {
-			extraHeaders: {
-				Authorization: 'Bearer ' + access_token
-			}
-		});
+            const ForTheEmit = await fetchData();
+            const socket = io(`http://${LOCALHOST}:3000`);
+                socket.on('connect', async function() {			
+                    socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
+                });
 
         if (!socket) {
             window.location.pathname = '/'; 
@@ -321,10 +321,6 @@ let toast;
 				}
             }
 		});
-        // const socket = io('http://${LOCALHOST}:3000');
-			socket.on('connect', async function() {			
-				socket.emit('userConnected', { pseudo: user.pseudo });
-			});
         await isExist();
         await fetchContactList();
         await fletchDirectMessageRoomData();

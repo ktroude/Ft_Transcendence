@@ -103,9 +103,13 @@
 									<li class="friends_list">
 										<div class="friend_line">
 											{#if x.connected == 2}
-												<div class="red_dot"></div>
-											{:else}
+												<div class="blue_dot"></div>
+											{/if}
+											{#if x.connected == 1}
 												<div class="green_dot"></div>
+											{/if}
+											{#if x.connected == 0}
+											<div class="red_dot"></div>
 											{/if}
 											<div class="connectedUsersName">{x.username}</div>
 										</div>
@@ -364,7 +368,6 @@
 			}
 		}
 	
-		let imageURL: string = '';
 		let newUsername: string = '';
 	
 		async function handleUpdateUsername() {
@@ -425,5 +428,5 @@
 			loading = true;
 		});
 	
-		export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, imageURL, user, newUsername, handleUpdateUsername };
+		export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, user, newUsername, handleUpdateUsername };
 	</script>
