@@ -130,6 +130,7 @@
 		import {io, Socket} from 'socket.io-client';
 		import { goto } from "$app/navigation";
 		import { onMount } from 'svelte';
+		import { Room } from 'colyseus.js';
 		import { Buffer } from 'buffer';
 		import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../API/api';
 		import { page } from '$app/stores';
@@ -175,12 +176,12 @@
 		Colyseus = await import("colyseus.js");
 		if(!client)
 			client = new Colyseus.Client(`ws://${LOCALHOST}:3001`);
-				const room = await client.joinOrCreate("ranked");
-				console.log("joined successfully", room);
+		room = await client.joinOrCreate("ranked");
+		console.log("joined successfully", room);
 		console.log("after join or create");
 		room.onMessage("connect", (message) => {
 			playerId = message.playerId;
-			console.log(`Connecté avec succès en tant que `);
+			console.log(`Connecté avec succès`);
 			// localStorage.setItem("playerId", playerId);
 		});
 		room.onMessage('waiting', (message) => { waiting = true; });
@@ -192,6 +193,7 @@
 		});
 	  }
 	  else{
+		console.log("dans l'waiting fausse", room);
 		waiting = false;
 		room.send('waiting',  { waiting : false});
 	  }

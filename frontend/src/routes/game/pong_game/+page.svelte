@@ -77,7 +77,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 function ready_to_play()
 {
 	console.log(room);
-	room.send("rdtoplay", true);
+	// room.send("rdtoplay", true);
 }
 
 function countdown(counter)
@@ -273,6 +273,7 @@ function draw2(){
 }
 
 function play(){
+	room.onMessage("break", (message) => {break_r = message});
 	if (mainclient == true)
 		ballMove();
 	updatePos();
@@ -336,7 +337,6 @@ function changeDirection(playerPosition){
 function endGame(){
   room.onMessage("gameFinished", (message) => {
 	connected = true;
-	console.log("gamefinishet ", gameFinished);
     winner = message.winner;
     gameFinished = true;
     if (winner == player.pseudo && mainclient == true)
@@ -362,9 +362,10 @@ function Updateball(){
 
 function ballMove()
 {
-	room.onMessage("break", (message) => {break_r = message});
+	// room.onMessage("break", (message) => {break_r = message});
 	if(break_r == true)
 	{
+		console.log("break");
 		ball.x = canvas.width / 2;
 		ball.y = canvas.height / 2;
 		ball.velocity_y = 2;

@@ -24,8 +24,9 @@ async function creatmatchprsima(winner, looser, prisma)
 
 async function updateConnected(player, condition, prisma)
 {
+  console.log("pseudo check=",player.pseudo, "username=", player.username)
   await prisma.user.update({
-    where: {username : player.pseudo},
+    where: {pseudo : player.pseudo},
     data: { connected: condition}
   });
 }
@@ -35,7 +36,7 @@ async function handleVictoryPrisma(winner, looser, prisma) {
   const winner_match = await creatmatchprsima(winner, looser, prisma);
   const looser_match = await creatmatchprsima(looser, winner, prisma);
   await prisma.user.update({
-    where: {username : winner.pseudo},
+    where: {pseudo : winner.pseudo},
     data: {
       Match_historiques : {connect : {id: winner_match.id}},
       wins: { increment: 1 }, win_streak: { increment: 1 } }
@@ -43,7 +44,7 @@ async function handleVictoryPrisma(winner, looser, prisma) {
 
   // push looser
   await prisma.user.update({
-    where: {username : looser.pseudo},
+    where: {pseudo : looser.pseudo},
     data: {
       Match_historiques : {connect : {id: looser_match.id}},
       losses: { increment: 1 }, win_streak: 0 }
