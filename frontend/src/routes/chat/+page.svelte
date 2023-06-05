@@ -2,8 +2,9 @@
 	import { onMount } from 'svelte';
 	import { io, Socket } from 'socket.io-client';
 	import { goto } from '$app/navigation';
-	import { fetchData } from '../../API/api';
-	import { LOCALHOST } from '../../API/env';
+	import { fetchData, fetch2FA } from '../../API/api';
+	import { LOCALHOST } from "../../API/env";
+
 	// VARIABLES
 
 	let redirectUser: UserRedirect;
@@ -48,6 +49,8 @@
 		roomId: 0
 	};
 	let animation:any;
+	let pending_invitation = false;
+	let notif:any = {url:'', display:false, invitedBy:''};
 
 	// INTERFACES
 
@@ -76,7 +79,6 @@
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
 			goto(thisplace);
@@ -263,7 +265,6 @@
 	};
 
 	const fletchUserByRoom = async (pseudo: string) => {
-		console.log('pseudo == ', pseudo);
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -306,6 +307,75 @@
 		return user;
 	};
 
+	async function handleInviteGameButton() {
+        const id = await fetchRoomGameId();
+        const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${id.response}`;
+		const data = {
+			invited: selectedUser.pseudo ,
+			invitedBy: currentUser.pseudo,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data);
+    }
+	
+	function handleDM(){
+		goto("/dm/" + selectedUser.id);
+	}
+
+	async function fetchRoomGameId() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(
+				`http://${LOCALHOST}:3000/users/getRoomId`,
+				{
+					headers
+				}
+			);
+			const data = await response.json();
+			return data;
+		}
+	}
+
+	function createPopupDM(notif:any) {
+		const boxito = document.querySelector("body");
+		const toast = document.createElement("div");
+		toast.innerHTML = `<div class="popup">
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
+		boxito?.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
+		denyButton?.addEventListener("click", removePopup);
+	}
+
+	function removePopup() {
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito?.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			goto(notif.url);
+		}
+	}
+
 	async function fetchBlockedData() {
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
@@ -322,8 +392,9 @@
 
 	function check_array(num:any) {
 		for (let i=0; i<blocked.length; i++) {
-			if (blocked[i] === num)
+			if (blocked[i] === num) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -376,7 +447,6 @@
 	}
 
 	function findBlocked(array: any[], toFind:any) {
-		console.log('blocked ==',blocked)
 		for (let i = 0 ; i < array.length; i++) {
 			if (array[i] === toFind)
 				return true;
@@ -473,9 +543,10 @@
 	}
 
 	onMount(async () => {
+		
 		const cookies = document?.cookie?.split(';');
 		const accessTokenCookie = cookies?.find((cookie) =>
-			cookie?.trim()?.startsWith('access_token=')
+		cookie?.trim()?.startsWith('access_token=')
 		);
 		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
 		socket = io(`http://${LOCALHOST}:3000`, {
@@ -486,10 +557,19 @@
 		if (!access_token || !socket) {
 			window.location.pathname = '/';
 		}
+		currentUser = await fetchData();
+		if (!currentUser) {
+			goto('/')
+			return ;
+		}
+		const FA2 = await fetch2FA(currentUser.id)
+		if (FA2 === true) {
+			await goto('auth/2fa');
+			return ;
+		}
 		socket.on('connect', async function () {
 			console.log('Connected to server');
-			redirectUser = await fetchData();
-			socket.emit('userConnected', { pseudo: redirectUser.pseudo });
+			socket.emit('userConnected', { pseudo: currentUser.pseudo });
 		});
 		socket.on('roomCreated', async (newRoom: ChatRoom) => {
 			chatRooms = await fletchChatRoomsData();
@@ -505,11 +585,12 @@
 					];
 					return;
 				} else {
-					messages = data.msg;
+						messages = data.msg;
+					}
 					scrollToBottom();
 				}
 			}
-		});
+		);
 		socket.on('newMessage', (msg: any) => {
 			if (currentRoom && currentRoom?.id === msg?.chatRoomId) {
 				if (currentUser?.status != -2 && check_array(msg.senderId) === false) {
@@ -611,6 +692,7 @@
 			if (currentUser?.id == data?.user?.id) {
 				currentRoom = data.room;
 				animation = data.animation;
+    console.log("data.room 3 == ", data.room);
 				socket.emit('getMessage', data.room);
 				socket.emit('getUser', data.room);
 				await fletchMembres();
@@ -619,11 +701,8 @@
 			}
 		});
 		socket.on('failed', (data) => {
-			console.log('CU ID =', currentUser.id);
-			console.log('DATA MOERTO ==', data);
 			if (currentUser.id == data.user.id) {
 				animation = data.animation;
-				console.log("animation =", animation);
 				currentRoom = {
 					name: '',
 					id: -1
@@ -696,8 +775,6 @@
 		socket.on('UserAdded', async (data) => {
 			if (!data) {
 				animation = data.animation;
-					console.log("animation =", animation);
-
 					messages = [
 						...messages,
 						{ senderPseudo: 'server', content: "Cet utilisateur EST BAN, pas de ca chez moi" }
@@ -708,7 +785,6 @@
 			if (data.sucess === false && !data.userToAdd) {
 				if (currentUser.id === data.user.id) {
 					animation = data.animation;
-					console.log("animation =", animation);
 
 					messages = [
 						...messages,
@@ -724,8 +800,7 @@
 					];
 				}
 			} else if (data.sucess === true && data.userToAdd) {
-				membres = [];
-				await fletchMembres();
+				membres = [... membres, data.userToAdd];
 			}
 			chatRooms = await fletchChatRoomsData();
 		});
@@ -738,16 +813,35 @@
 			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('blocked', async (data) => {
-			if (currentUser.id === data.id) {
-				await fetchBlockedData();
-				// socket.emit('getMessage', data.room);
+			console.log("return .on'blocked' == ", data);
+			if (currentUser.id === data.user.id) {
+				blocked = data.block;
+			if (currentRoom?.id)
+				socket.emit('getMessage', currentRoom);
 			}
 		});
 		socket.on('unblocked', async (data)=> {
 			if (currentUser.id === data.id) {
+
 				await fetchBlockedData();
-				// socket.emit('getMessage', data.room);
+		if (currentRoom?.id)
+				socket.emit('getMessage', currentRoom);
 			}
+		});
+		socket.on('InvitedNotif', async(data) => {
+            if (data.invitedBy === currentUser.pseudo) {
+                goto(data.url);
+            }
+			if (data.invited.id === currentUser.id) {
+                notif.display = true;
+                notif.url = data.url;
+                notif.invitedBy = data.invitedBy;
+				if (pending_invitation == false)
+				{
+                    pending_invitation = true;
+					createPopupDM(notif);
+				}
+            }
 		});
 		chatRooms = await fletchChatRoomsData();
 		currentUser = await fletchCurrentUserData();
@@ -785,25 +879,26 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <!----------------------------------------------->
 	<div class="game_navbar">
 		<div class="button_box">
-			<img class="button_picture" src="/img/home_icone.png" />
+			<img class="button_picture" src="/img/home_icone.png" alt=""/>
 			<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
 		</div>
 
 		<div class="button_box">
-			<img class="button_picture" src="/img/profile_icone.png" />
+			<img class="button_picture" src="/img/profile_icone.png" alt="" />
 			<button class="button_nav" on:click={() => fade(`/profile/${currentUser.id}`)}>Profile</button
 			>
 		</div>
 
 		<div class="button_box">
-			<img class="button_picture" src="/img/game_icone.png" />
+			<img class="button_picture" src="/img/game_icone.png" alt="" />
 			<button class="button_nav" on:click={() => fade('/game')}>Game</button>
 		</div>
 
 		<div class="button_box">
-			<img class="button_picture" src="/img/chat_icone.png" />
-			<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+			<img class="button_picture" src="/img/chat_icone.png" alt="" />
+			<button class="button_nav" on:click={() => fade('/dm')}>DM</button>
 		</div>
+		
 	</div>
 	<div class="chat_body">
 		<!----------------------------------------------->
@@ -1054,7 +1149,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 											sendMessage(event, messageInput, currentRoom);
 											messageInput.value = '';
 										}
-									}}><img class="sent_icone" src="/img/edit_profile.png" /></button
+									}}><img class="sent_icone" src="/img/edit_profile.png" alt="" /></button
 								>
 							</form>
 						</div>
@@ -1151,6 +1246,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 								<h1>{selectedUser.pseudo}</h1>
 								{#if find(showOptionsPseudo, 'profile') === true}
 									<button class="button_show_profile" on:click={showProfile}>Voir le profil</button>
+									<button class="button_show_profile" on:click={handleDM}>DM</button>
+									<button class="button_show_profile" on:click={handleInviteGameButton}>Game</button>
 								{/if}
 								{#if find(showOptionsPseudo, 'ban') === true}
 									<button
@@ -1206,8 +1303,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 								on:click={() => unblock(selectedUser)}>unblock</button
 								>
 								{/if}
+								<button
+								class="button_show_profile"
 
-								<button on:click={delMenu}>X</button>
+								 on:click={delMenu}>X</button>
 							{/if}
 						{/if}
 					</div>

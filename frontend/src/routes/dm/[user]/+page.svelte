@@ -3,9 +3,9 @@
 	import { io, Socket } from 'socket.io-client';
 	import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import { LOCALHOST } from '../../../API/env';
-	
-    let socket:Socket;
+    import { LOCALHOST } from "../../../API/env";
+
+	let socket:Socket;
     let currentUser:any = null;
     let currentRoom:any = null;
     let selectedUser:any;
@@ -13,26 +13,80 @@
     let messages:any[] = [];
     let loading = false;
     let contactList = [];
+	let notif:any = {url:'', display:false, invitedBy:''};
+	let anim = false;
 
+
+
+/****************************************************/
+/*****************LIST CONNECTED USERS***************/
+/****************************************************/
+
+
+    let connectedUsers:any[] = [];
+
+
+    async function getConnectedUsers() {
+	const accessToken = await fetchAccessToken();
+	if (accessToken) {
+		const response = await fetch(`http://${LOCALHOST}:3000/websocket/getClient`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`
+		},
+		});
+		if (response.ok)
+			connectedUsers = await response.json();
+		else
+			console.log("FRONT NOT WORKIGN HOHO")
+	} else 
+		console.log('Error: Could not get users');
+}
+
+const fetchAccessToken = async () => {
+    const cookies = document.cookie.split(';');
+    if (cookies.length === 0)
+        return null;
+    const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
+    if (!accessTokenCookie)
+        return null;
+    const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+    if (!accessToken)
+        return null;
+    return accessToken;
+ }
+
+ const fetchData = async () => {
+    const accessToken = await fetchAccessToken();
+    if (accessToken) {
+        const headers = new Headers();
+        headers.append('Authorization', `Bearer ${accessToken}`);
+        const response = await fetch(`http://${LOCALHOST}:3000/users/userInfo`, { headers });
+        const data = await response.json();
+        return data;
+    } else {
+        console.log('Access token not found');
+        goto('/');
+        return null;
+    }
+}
+/****************************************************/
+/****************************************************/
+/****************************************************/
+
+
+    
     async function handleClickRoomButton(roomId: number) {
         socket.emit('getMessagesOfRoom', roomId);
     }
 
+    async function handleClickConnectedUserButton(userId:number):Promise<any> {
+        socket.emit('getMessagesOfConnectedUser', userId);
+    } 
+
     function handleCheckProfileButton() {
         goto(`/profile/${selectedUser.id}`);
-    }
-
-
-    function handleBlockButton() {
-
-    }
-
-    function handleInviteGameButton() {
-
-    }
-
-    function handleConnectedUserButton() {
-
     }
 
     function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:any) {
@@ -82,7 +136,6 @@
                 headers.append('Authorization', `Bearer ${accessToken}`);
                 const response = await fetch(`http://${LOCALHOST}:3000/dm/who?id=${$page.params.user}`, { headers });
                 const data =  await response.json();
-                console.log('data ====', data);
                 if (!data) {
                     goto('/dm');
                     return ;
@@ -107,7 +160,7 @@
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
                     // remplacer avec l'adresse celle pour fetch les contactes du mec
-			//const response = await fetch('http://localhost:3000/', { headers });
+			//const response = await fetch('http://${LOCALHOST}:3000/', { headers });
 			// const data =  await response.json();
             // contactList = data;
         }
@@ -127,51 +180,122 @@
 			const data =  await response.json();
             currentUser = data.user;
             roomList = data.rooms;
-            for (let i = 0; i < roomList.length; i++) {
-                if (currentUser.id === roomList[i].ownerOne.id) {
-                    roomList[i].name = roomList[i].ownerTwo.username;
-                }
-                else if (currentUser.id == roomList[i].ownerTwo) {
-                    roomList[i].name = roomList[i].ownerOne.username;
-                }            
-            }
-        }
-            console.log('RL ==', roomList);
-    }
+    }}
     catch {
-        console.log('Erreur de chargement si tu vois ce message redirige vers /index parce que le fletch de fletchDirectMessageRoomData a echoué');
     }
     }
+
+/****************************************************/
+/*****************GAME INVITATION********************/
+/****************************************************/
+
+let toast;
+	let pending_invitation = false;
+
+    async function fetchRoomGameId() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(
+				`http://${LOCALHOST}:3000/users/getRoomId`,
+				{
+					headers
+				}
+			);
+			const data = await response.json();
+			return data;
+		}
+	}
+
+    async function handleInviteGameButton() {
+        const id = await fetchRoomGameId();
+        const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${id.response}`;
+		const data = {
+			invited: selectedUser.username,
+			invitedBy: currentUser.username,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data);
+    }
+
+	function removePopup() {
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito?.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			goto(notif.url);
+		}
+	}
+
+	function createPopupDM(notif:any) {
+		const boxito = document.querySelector("body");
+		const toast = document.createElement("div");
+		toast.innerHTML = `<div class="popup">
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
+		boxito?.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
+		denyButton?.addEventListener("click", removePopup);
+	}
+
+
+/****************************************************/
+/****************************************************/
+/****************************************************/
 
 	onMount(async() => {
 		const cookies = document?.cookie?.split(';');
 		const accessTokenCookie = cookies?.find((cookie) =>
 			cookie?.trim()?.startsWith('access_token=')
-		);
-		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
-        if (!access_token) {
+            );
+            const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
+            if (!access_token) {
                 window.location.pathname = '/';
             }
-		socket = io(`http://${LOCALHOST}:3000`, {
-			extraHeaders: {
-				Authorization: 'Bearer ' + access_token
-			}
-		});
-
-        if (!socket) {
-            window.location.pathname = '/'; 
-        }
-        socket.on('DmRoomCreated', async(data) => {
+            socket = io(`http://${LOCALHOST}:3000`, {
+                extraHeaders: {
+                    Authorization: 'Bearer ' + access_token
+                }
+            });
+            const ForTheEmit = await fetchData();
+            if (!socket) {
+                window.location.pathname = '/'; 
+            }
+            let user = await fetchData();
+            socket.on('connect', async function() {
+                socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
+            });
+        socket.on('DmRoomCreated', async(data:any) => {
             if (currentUser.id === data.user1.id || currentUser.id === data.user2.id) {
                 roomList = [...roomList, data.room]
             }
         });
         socket.on('newDirectMessage', async(data) => {
-            console.log('CU ==', currentRoom);
-            console.log('data ==', data)
-            if (currentRoom.id === data.message.directMessageRoomId) {
-                messages = [...messages, data.message];
+            if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
+                	messages = [...messages, data.message];
             }
+            else if (data.blocked === true && data.user.id === currentUser.id) {
+				messages = [...messages, data.message];
+			}
         });
         socket.on('DirectMessageRoomData', async(data) => {
             if (data.user.id === currentUser.id) {
@@ -185,10 +309,26 @@
                 selectedUser = data.selectedUser;
             }
         });
+        socket.on('InvitedNotif', async(data) => {
+            if (data.invitedBy === currentUser.username) {
+                goto(data.url);
+            }
+			if (data.invited.id === currentUser.id) {
+                notif.display = true;
+                notif.url = data.url;
+                notif.invitedBy = data.invitedBy;
+				if (pending_invitation == false)
+				{
+                    pending_invitation = true;
+					createPopupDM(notif);
+				}
+            }
+		});
         await isExist();
         await fetchContactList();
         await fletchDirectMessageRoomData();
-        
+        await getConnectedUsers();
+        setInterval(getConnectedUsers, 5000);
         loading = true;
     });
 
@@ -201,6 +341,8 @@
 			document.body.classList.remove('fade-out');
 		}, 400);
 	}
+
+
 
 </script>
 
@@ -225,23 +367,23 @@
         {#if loading === true}
         <div class="game_navbar">
             <div class="button_box">
-                <img class="button_picture" src="/img/home_icone.png" />
+                <img class="button_picture" src="/img/home_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/profile_icone.png" />
+                <img class="button_picture" src="/img/profile_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade(`/profile/${currentUser.id}`)}>Profile</button
                 >
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/game_icone.png" />
+                <img class="button_picture" src="/img/game_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade('/game')}>Game</button>
             </div>
     
             <div class="button_box">
-                <img class="button_picture" src="/img/chat_icone.png" />
+                <img class="button_picture" src="/img/chat_icone.png" alt="" />
                 <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
             </div>
         </div>
@@ -306,7 +448,7 @@
                             id="sendMessageButton"
                             type="submit"
                             disabled>
-                            <img class="sent_icone" src="/img/edit_profile.png" /></button
+                            <img class="sent_icone" src="/img/edit_profile.png" alt="" /></button
                         >
                     </form>
                 </div>
@@ -315,17 +457,27 @@
             <div class="right_bloc">
                 <div class="connected_users">
                     <h2 class="connected_users_title">Utilisateurs connectés:</h2>
-                    <!-- {#each contactList as contact}
-                        {#if contact?.connected == true}
-                            <button class="connected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
-                        {:else}
-                            <button class="disconnected_contact_button" on:click={handleConnectedUserButton}>{contact.username}</button>
-                        {/if}
-                    {/each} -->
+                    <div class="connected_users_bloc">
+						<div class="connected_title">Connected</div>
+						<ul class="ul_friends">
+							{#each connectedUsers as x }
+								<li class="friends_list">
+									<div class="friend_line">
+										{#if x.connected == 2}
+											<div class="red_dot"></div>
+										{:else}
+											<div class="green_dot"></div>
+										{/if}
+										<button on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
+									</div>
+								</li>
+							{/each}
+						</ul>
+						</div>
                 </div>
                 <div class="selctedUser_button_settings">
-                    <buton on:click={handleCheckProfileButton}>Voir le profil</buton>
-                    <button>Proposer une partie</button>
+                    <buton on:click={handleCheckProfileButton} on:keydown>Voir le profil</buton>
+                    <button on:click={handleInviteGameButton}>Proposer une partie</button>
                 </div>
             </div>
         </div>

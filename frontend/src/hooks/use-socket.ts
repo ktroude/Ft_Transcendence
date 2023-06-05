@@ -1,6 +1,6 @@
 import { onMount, onDestroy } from 'svelte';
 import { io, Socket } from 'socket.io-client';
-import { LOCALHOST } from '../API/env';
+import { LOCALHOST } from "../API/env";
 
 const SOCKET_URL = `http://${LOCALHOST}:3000`;
 

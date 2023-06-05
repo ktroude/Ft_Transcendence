@@ -1,7 +1,7 @@
 import { goto } from "$app/navigation";
 import { LOCALHOST } from "./env";
 
-const fetchAccessToken = async () => {
+ const fetchAccessToken = async () => {
     const cookies = document.cookie.split(';');
     if (cookies.length === 0)
         return null;
@@ -77,7 +77,6 @@ const fetchAccessToken = async () => {
 
 const fetchDataOfUserPseudo = async (user) => {
     const accessToken = await fetchAccessToken();
-    console.log("hahahahahah", user);
     if (accessToken) {
         const headers = new Headers();
         headers.append('Authorization', `Bearer ${accessToken}`);

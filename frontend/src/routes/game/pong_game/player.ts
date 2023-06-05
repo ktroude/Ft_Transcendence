@@ -9,14 +9,18 @@ export class Player extends Schema {
 	score: number;
 	@type('number')
 	id: number;
+	@type('string')
+	id_user: string;
 	@type ('string')
 	pseudo : string;
 	@type ('string')
 	nickname : string;
 	@type ('string')
 	color : string;
+	@type ('boolean')
+	rdtoplay : boolean;
   
-	constructor(x = 0, y = 0, score = 0, id = 0, Pseudo = "", nickname = "", color = "red") {
+	constructor(x = 0, y = 0, score = 0, id = 0, id_user = '', Pseudo = "", nickname = "", color = "red") {
 	  super();
 	  this.x = x;
 	  this.y = y;
@@ -25,5 +29,7 @@ export class Player extends Schema {
 	  this.pseudo = Pseudo;
 	  this.nickname = nickname;
 	  this.color = color;
+	  this.id_user = id_user;
+	  this.rdtoplay = false;
 	}
   }

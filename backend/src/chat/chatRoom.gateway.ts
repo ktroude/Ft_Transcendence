@@ -94,7 +94,7 @@ export class ChatRoomGateway
   async handleGetMessage(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
     const chatRoom = await this.prismaService.chatRoom.findUnique({
-      where: { id: data.id },
+      where: { id: parseInt(data.id, 10) },
       select: { 
         messages: true,
         id:true,
@@ -108,17 +108,12 @@ export class ChatRoomGateway
     });
     let messages = [];
     const blocked = await this.blockService.getAllBlockReturnId(user.id);
-    if (!blocked.length)
-      messages = chatRoom.messages
-    else {
+
+
+
       for (let i=0; i < chatRoom.messages.length; i++) {
-        for (let j=0; j < blocked.length; j++) {
-          if (blocked[j] !== chatRoom.messages[i].senderId) {
-            console.log('chatRoom.messages ==', chatRoom.messages[0]);
-            messages.push(chatRoom.messages[i]);
-          }
-        }
-      }
+        if (this.chatRoomService.check_array(chatRoom.messages[i].senderId, blocked) === false)
+        messages.push(chatRoom.messages[i]);
     }
       if (await this.chatRoomService.isBanned(user, chatRoom) === true) {
         const toSend = {
@@ -574,7 +569,6 @@ export class ChatRoomGateway
     });
     if (await this.chatRoomService.isOwner(user, room) === false)
       return ;
-    console.log('ancien mdp ==', room.password);
     await this.prismaService.chatRoom.update({
       where: {id: room.id},
       data: {
@@ -584,7 +578,6 @@ export class ChatRoomGateway
     const wroom = await this.prismaService.chatRoom.findUnique({
       where: {id: parseInt(data.room.id, 10)}
     });
-    console.log('new mdp ==', wroom.password);
     this.server.emit('passwordChanged');
   }
 
@@ -612,10 +605,11 @@ export class ChatRoomGateway
   @SubscribeMessage('newBlock')
   async handleNewBlock(client:Socket, data:any) {
     const user = this.clients.find(([, socket]) => socket === client)?.[0];
-    const toBlock = await this.blockService.blockUserId(user.id, parseInt(data.userToBlock.id,10));
+    await this.blockService.blockUserId(user.id, parseInt(data.userToBlock.id,10));
+    const blocked = await this.blockService.getAllBlockReturnId(user.id);
     this.server.emit('blocked', {
       user : user,
-      block: toBlock,
+      block: blocked,
     });
     await this.handleGetMessage(client, data.room)
   }

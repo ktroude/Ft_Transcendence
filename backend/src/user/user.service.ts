@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { authenticator } from 'otplib';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrimaryColumnCannotBeNullableError } from 'typeorm';
+import { Room, Client, Delayed, matchMaker } from "colyseus";
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
@@ -39,6 +41,13 @@ export class UserService {
         }
     }
 
+    async handleGetRoomId()
+    {
+        const roomToCreate = "Private_Room"; //name of the room to create
+        const room = await matchMaker.createRoom(roomToCreate, {});
+        return (room.roomId);
+    }
+
     async getConnectedStatus(pseudo: string)
     {
         const user = await this.prisma.user.findUnique({
@@ -54,9 +63,20 @@ export class UserService {
         return user.connected;
     }
 
-    async enable2FA(user: number, status: string): Promise<User> {
+    async enable2FA(user: number, status: string, code: string): Promise<User> {
         if (status == 'enable') 
         {
+            const findUser = await this.prisma.user.findUnique({
+                where: {
+                    id: user,
+                },
+            });
+            const isVerified = authenticator.check(code, findUser.FA2secret)
+            if (!isVerified)
+            {
+                console.log('Invalid code');
+                return null;
+            }
             const updatedUser = await this.prisma.user.update({ // update user
             where: { id: user }, // where id = user
             data: { FA2: true } // set FA2 to true
@@ -216,4 +236,14 @@ export class UserService {
         else
           return undefined;
     }
+	
+    async getHistory(id : number) {
+		const history = await this.prisma.user.findUnique({
+			where: {id: id},
+			select: {
+				Match_historiques:true
+			}
+		})
+		return history.Match_historiques;
+	}
 }

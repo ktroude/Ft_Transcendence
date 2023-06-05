@@ -1,1 +1,1 @@
-export const LOCALHOST='10.11.3.5'
+export const LOCALHOST='localhost'

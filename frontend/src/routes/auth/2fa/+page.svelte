@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { fetchData, fetchAccessToken, fetch2FA } from '../../../API/api';
   import { goto } from '$app/navigation';
-  import { LOCALHOST } from '../../../API/env';
+  import { LOCALHOST } from "../../../API/env";
 
   let qrImage = '';
   let code: string;
@@ -17,10 +17,16 @@
   onMount(async () => {
     user = await fetchData();
     if (!user)
+    {
       goto('/');
+      return ;
+    }
     const FA2 = await fetch2FA(user.id);
     if (FA2 == false)
+    {
       goto('/homepage');
+      return ;
+    }
   });
   
   async function handleSubmit(event) {

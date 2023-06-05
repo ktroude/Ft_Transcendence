@@ -11,7 +11,7 @@ export class FriendService{
     constructor(private prisma: PrismaService) {}
 
     // Finding user
-    async getAllFriend(pseudo: string): Promise<string[]> {
+    async getAllFriend(pseudo: string): Promise<[string, number][]> {
         const user = await this.prisma.user.findUnique({
           where: {
             pseudo: pseudo,
@@ -28,13 +28,20 @@ export class FriendService{
           select: {
             friend: {
               select: {
-                username: true
+                username: true, connected: true,
               }
             }
           }
         });
-      
-        return friends.map(friend => friend.friend.username);
+        
+        const friendlists = [];
+
+        friends.forEach(friend => {
+            friendlists.push([friend.friend.username, friend.friend.connected]);
+        });
+
+        return friendlists;
+        
       }      
       
     // Looking if user exist

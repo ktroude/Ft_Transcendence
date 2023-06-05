@@ -1,4 +1,4 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { OnGatewayDisconnect, OnGatewayConnection } from '@nestjs/websockets';
 import { User } from '@prisma/client';
@@ -6,10 +6,11 @@ import { io } from 'socket.io-client';
 import { map } from 'rxjs';
 import { Socket } from 'dgram';
 import { UserService } from '../user/user.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway()
 export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private prisma: PrismaService) {}
   @WebSocketServer()
   server: Server;
   clients: Map<string, string> = new Map();
@@ -37,14 +38,43 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 		});
 	}
   
-  // ---------------------- DEPRECATED ----------------------
-  async getClient() { 
-	const newmap = this.clients;
-	const vector = [];
-	for (const [key, value] of newmap.entries()) {
-	  vector.push(key);
+	@SubscribeMessage('InvitedInGame')
+	async handleInvitedInGame(@ConnectedSocket() client:any, @MessageBody() data) {
+    const invited = await this.prisma.user.findUnique({
+      where: {username:data.invited},
+    });
+		const toSend = {
+			invited: invited,
+			invitedBy: data.invitedBy,
+			url: data.url,
+		}
+		this.server.emit('InvitedNotif', toSend);
 	}
-	return vector;
+  // ---------------------- DEPRECATED ----------------------
+  
+  async getClient() 
+  { 
+    const newmap = this.clients;
+    const vector = [];
+  
+    for (const [key, value] of newmap.entries()) {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          pseudo: key
+        },
+        select: {
+          id: true,
+          username: true,
+          connected: true,
+        }
+      });
+      if (user)
+      vector.push( {
+        id: user.id,
+        username: user.username,
+        connected: user.connected,
+      });
+    }
+    return vector;
   }
-
 }

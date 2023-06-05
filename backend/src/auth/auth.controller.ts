@@ -1,12 +1,17 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Controller, Get, Param, Post, Query, Res, Body, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { sign } from 'cookie-signature';
+import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 import { UserService } from 'src/user/user.service';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { User } from '@prisma/client';
 import { authenticator } from 'otplib';
+import { JwtGuard } from '../auth/guard';
+import { UseGuards } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-
 dotenv.config();
 
 @Controller({})
@@ -72,4 +77,5 @@ export class AuthController {
     const isVerified = authenticator.check(code, user.FA2secret);
     return res.json({ isVerified });
   }
+
 }

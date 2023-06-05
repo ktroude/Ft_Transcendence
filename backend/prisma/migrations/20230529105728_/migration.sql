@@ -21,6 +21,7 @@ CREATE TABLE "user" (
     "TheDarkSide" BOOLEAN NOT NULL DEFAULT false,
     "ImCurious" BOOLEAN NOT NULL DEFAULT false,
     "connected" INTEGER NOT NULL DEFAULT 0,
+    "win_streak" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
@@ -102,6 +103,21 @@ CREATE TABLE "DirectMessage" (
     "directMessageRoomId" INTEGER NOT NULL,
 
     CONSTRAINT "DirectMessage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "match" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "opponentId" INTEGER NOT NULL,
+    "scoreUser" INTEGER NOT NULL,
+    "scoreOpponent" INTEGER NOT NULL,
+    "winner" TEXT NOT NULL,
+    "loser" TEXT NOT NULL,
+
+    CONSTRAINT "match_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -190,6 +206,9 @@ ALTER TABLE "message" ADD CONSTRAINT "message_chatRoomId_fkey" FOREIGN KEY ("cha
 
 -- AddForeignKey
 ALTER TABLE "DirectMessage" ADD CONSTRAINT "DirectMessage_directMessageRoomId_fkey" FOREIGN KEY ("directMessageRoomId") REFERENCES "direct_message"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "match" ADD CONSTRAINT "match_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ChatRoomMembers" ADD CONSTRAINT "_ChatRoomMembers_A_fkey" FOREIGN KEY ("A") REFERENCES "chat_room"("id") ON DELETE CASCADE ON UPDATE CASCADE;

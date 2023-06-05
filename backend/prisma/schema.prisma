@@ -17,8 +17,8 @@ model User {
 
   firstname String
   lastname  String
-  pseudo    String @unique
-  username  String @unique
+  pseudo    String @unique //login
+  username  String @unique 
   picture   String
 
   wins      Int @default(0)
@@ -38,8 +38,6 @@ model User {
   TheDarkSide Boolean @default(false) // Se log en tant que membre du bocal
   ImCurious Boolean @default(false) // Aller voir le github d'un des createurs
 
-
-
   Match_historiques Match[] @relation("Match_User")
 
   // pitié monsieur donne un autre nom a cette variable, je m'en sers deja dans le front du chat et je fais des gros user =  donc ca va ecraser mon status du front
@@ -47,7 +45,6 @@ model User {
   // pitié j'ai 1200 lignes de code a checker sinon
   connected    Int @default(0) // 0 = offline, 1 = online, 2 = in game
   win_streak   Int @default(0)
-
 
   userBlocks        Block[] @relation("user")
   blockedUserBlocks Block[] @relation("blocked_users")

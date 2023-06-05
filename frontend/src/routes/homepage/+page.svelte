@@ -21,23 +21,26 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     <div class="game_navbar">
 
         <div class="button_box">
-            <img class="button_picture" src="/img/home_icone.png">
+            <img class="button_picture" src="/img/home_icone.png" alt=''>
             <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
         </div>
 
         <div class="button_box">
-            <img class="button_picture" src="/img/profile_icone.png">
+            <img class="button_picture" src="/img/profile_icone.png" alt=''>
             <button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
         </div>
 
         <div class="button_box">
-            <img class="button_picture" src="/img/game_icone.png">
+            <img class="button_picture" src="/img/game_icone.png" alt=''>
             <button class="button_nav" on:click={() => fade('/game')}>Game</button>
         </div>
 
         <div class="button_box">
-            <img class="button_picture" src="/img/chat_icone.png">
+            <img class="button_picture" src="/img/chat_icone.png" alt=''>
             <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+        </div>
+        <div class="button_box">
+            <button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
         </div>
 
     </div>
@@ -53,12 +56,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	</div>
 
     <footer class="footer">
-        <p>Un projet de 
-          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('ktroude')}>Ktroude</span>,
-          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Krokmouuu')}>Bleroy</span>,
-          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Lmaujean')}>Lmaujean</span>,
-          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('PKLB')}>Ple-berr</span> et
-          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('venum78160')}>vl-hotel</span>
+        <p>Un projet de
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('ktroude')} on:keydown>Ktroude</span>,
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Krokmouuu')} on:keydown>Bleroy</span>,
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Lmaujean')} on:keydown>Lmaujean</span>,
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('PKLB')} on:keydown>Ple-berr</span> et
+          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('venum78160')} on:keydown>vl-hotel</span>
         </p>
       </footer>
 	  {/if}
@@ -74,15 +77,15 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../API/api';
 	import { redirect } from '@sveltejs/kit';
 	import {io, Socket} from 'socket.io-client';
-	import { LOCALHOST } from '../../API/env';
-	
+	import { LOCALHOST } from "../../API/env";
+
 	let socket: Socket;
-	let anim = false;
+	let anim:any = false;
 
-	let all_achievements = {};
+	let all_achievements:any = {};
 
 
-	let loading = false;
+	let loading:boolean = false;
 	let user: User;
     interface User {
         id: number;
@@ -92,7 +95,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         username: string;
     }
 
-    async function redirectToGithub(username) {
+    async function redirectToGithub(username:any) {
       	const accessToken = await fetchAccessToken();
       	const response = await fetch(`http://${LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
 			method: 'PUT',
@@ -105,7 +108,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		if (!response.ok)
             console.log("Error update achievements <ImCurious>")
 		else if (anim == false){
-			for (const [key, value] of Array.from(all_achievements)) {
+			for (const [key, value] of Array.from(all_achievements) as Iterable<any>) {
 				if (key == "ImCurious" && value == false)
 				{
 					anim = true;
@@ -119,7 +122,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 													<h5 class="popup_text">Check one of our Githubs.</h5>
 												</div>
 										</div>`;
-					boxito.appendChild(toast);
+					boxito?.appendChild(toast);
 					setTimeout(() => removePopup(toast), 3000);
 				}
 			}
@@ -127,8 +130,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		window.open(`https://github.com/${username}`, '_blank');
 }
 
-
-	const removePopup = (toast) => {
+	const removePopup = (toast:any) => {
     if(toast.timeoutId) clearTimeout(toast.timeoutId); 
     setTimeout(() => toast.remove(), 3000);
 	getAllAchievements();
@@ -136,12 +138,18 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
 
     onMount(async function() {
-		user = await fetchData();
-		const FA2 = await fetch2FA(user.id)
+	user = await fetchData();
     if (!user)
-      await goto('/');
+	{
+		await goto('/');
+		return;
+	}
+	const FA2 = await fetch2FA(user.id)
 	if (FA2 == true)
+	{
 		await goto('/auth/2fa');
+		return;
+	}
     else
     {
       const socket = io(`http://${LOCALHOST}:3000`);
@@ -177,7 +185,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 													<h5 class="popup_text">Log in as a bocal member</h5>
 												</div>
 										</div>`;
-					boxito.appendChild(toast);
+					boxito?.appendChild(toast);
 					setTimeout(() => removePopup(toast), 3000);
 		  }
         }
@@ -215,9 +223,4 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		else 
 			console.log('Error: Could not get achievements');
 	}
-
-
-
-
-
 </script>

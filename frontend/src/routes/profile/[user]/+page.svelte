@@ -20,51 +20,59 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	{#if loading === true}
     	<div class="game_navbar">
 			<div class="button_box">
-				<img class="button_picture" src="/img/home_icone.png">
+				<img class="button_picture" src="/img/home_icone.png" alt="">
 				<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
 			</div>
 			{#if user?.username === currentUser}
 				<div class="button_box">
-					<img class="button_picture" src="/img/profile_icone.png">
+					<img class="button_picture" src="/img/profile_icone.png" alt="">
 					<button class="button_nav">Profile</button>
 				</div>
 				{:else}
 				<div class="button_box">
-					<img class="button_picture" src="/img/profile_icone.png">
+					<img class="button_picture" src="/img/profile_icone.png" alt="">
 					<button class="button_nav" on:click={() => fade(`/profile/${realUserId}`)}>Profile</button>
 				</div>
 			{/if}
 			<div class="button_box">
-				<img class="button_picture" src="/img/game_icone.png">
+				<img class="button_picture" src="/img/game_icone.png" alt="">
 				<button class="button_nav" on:click={() => fade('/game')}>Game</button>
 			</div>
 
 			<div class="button_box">
-				<img class="button_picture" src="/img/chat_icone.png">
+				<img class="button_picture" src="/img/chat_icone.png" alt="">
 				<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+			</div>
+			<div class="button_box">
+				<button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
 			</div>
 		</div>
 		<div class="main_profile">
 			{#if user?.username == currentUser}
 			<div class="friends_bloc">
-				<h1 class="profile_h1"><span><img class="friend_profile_icone" src="/img/friend_icone.png"></span>Friends</h1>
+				<h1 class="profile_h1"><span><img class="friend_profile_icone" src="/img/friend_icone.png" alt=""></span>Friends</h1>
 				<ul class="ul_friends">
 					{#if friends}
-					{#each friends as friendName}
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<li class="friends_list" on:click={() => handleFriendClick(friendName)}>
+					{#each friends as [friendName, connected]}
+					  <!-- svelte-ignore a11y-click-events-have-key-events -->
+					  <li class="friends_list" on:click={() => handleFriendClick(friendName)}>
 						<div class="friendBloc">
-							<span class="friendname">{friendName}</span>
-							{#if invited === 1 }
-							<button class="accept_invite" on:click={() => acceptInvitation()}>V</button>
-							<button class="deny_invite" on:click={() => denyInvitation()}>X</button>
+							{#if connected == 0}
+								<div class="red_dot"></div>
 							{/if}
+							{#if connected == 1}
+								<div class="green_dot"></div>
+							{/if}
+							{#if connected == 2}
+								<div class="blue_dot"></div>
+							{/if}
+						  	<span class="friendname">{friendName}</span>
 						</div>
 						{#if clickedFriend === friendName && showButtons && invited === 2}
-						<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>Send Message</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>Invite to Play</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>See Profile</button>
-						<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>Delete Friend</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>💬</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleInviteGameButton(friendName)}}>🎮</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>🔍</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>❌</button>
 						{/if}
 					</li>
 					{/each}
@@ -108,76 +116,106 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<!-- svelte-ignore a11y-img-redundant-alt -->
 				<img class=".profile_img" src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
 				{#if user?.username === currentUser} 
-					<button class="edit_button" on:click={() => fade('/profile/edit')}>Edit profile<span><img class="edit_icone" src="/img/edit_profile.png"></span></button>
+					<button class="edit_button" on:click={() => fade('/profile/edit')}>Edit profile<span><img class="edit_icone" src="/img/edit_profile.png" alt=""></span></button>
 				{:else}
 				<button class="send_message" on:click={() => sendMessage()}>
+				<!-- svelte-ignore a11y-img-redundant-alt -->
 				<img class="button_picture" src="/img/chat_icone.png" alt="Image button"/>
 				</button>
 			{/if}
 		</div>
 
-		<div class="achievements_bloc">
-			<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png"></span>Achievements</h1>
-			{#each Array.from(all_achievements) as [key, value]}
-				{#if value === false}
-						<div class="achievement_div">
-							<div class="achievement">
-							</div>
-							<div class="achievement_title_text_box">
-								{#if String(key) === 'FirstWin'}
-								<h4 class="achievement_title">First Win</h4>
-								<h5 class="achievement_text">Win a game.</h5>
-								{/if}
-								{#if String(key) === "WinStreak"}
-								<h4 class="achievement_title">Win Streak</h4>
-								<h5 class="achievement_text">Win three games in a row.</h5>
-								{/if}
-								{#if String(key) === "ImTheBoss"}
-								<h4 class="achievement_title">I'm The Boss</h4>
-								<h5 class="achievement_text">Win against a creator.</h5>
-								{/if}
-								{#if String(key) === "TheDarkSide"}
-								<h4 class="achievement_title">The Dark Side</h4>
-								<h5 class="achievement_text">Log in as a bocal member.</h5>
-								{/if}
-								{#if String(key) === "ImCurious"}
-								<h4 class="achievement_title">???</h4>
-								<h5 class="achievement_text">???</h5>
-								{/if}
-							</div>
-						</div>
-					{:else}
-						<div class="achievement_div">
-							<div class="achievement_true">
-							</div>
-							<div class="achievement_title_text_box">
-								{#if String(key) === 'FirstWin'}
-								<h4 class="achievement_title">First Win</h4>
-								<h5 class="achievement_text">Win a game.</h5>
-								{/if}
-								{#if String(key) === "WinStreak"}
-								<h4 class="achievement_title">Win Streak</h4>
-								<h5 class="achievement_text">Win three games in a row.</h5>
-								{/if}
-								{#if String(key) === "ImTheBoss"}
-								<h4 class="achievement_title">I'm The Boss</h4>
-								<h5 class="achievement_text">Win against a creator.</h5>
-								{/if}
-								{#if String(key) === "TheDarkSide"}
-								<h4 class="achievement_title">The Dark Side</h4>
-								<h5 class="achievement_text">Log in as a bocal member.</h5>
-								{/if}
-								{#if String(key) === "ImCurious"}
-								<h4 class="achievement_title">I'm Curious</h4>
-								<h5 class="achievement_text">Visit one of our GitHubs.</h5>
-								{/if}
-							</div>
-						</div>
 
-				{/if}
 
-			{/each}
+
+
+
+
+
+
+
+
+
+		<div class="right_bloc">
+			<div class="history_bloc" id="history_bloc_id">
+				<div class="history_title_bloc">
+					<h1 class="profile_h1"><span><img class="profile_icone" src="/img/time_icone.png" alt=""></span>History</h1>
+				</div>
+				{#if history.length == 0}
+					<h5 class="history_line">Feels empty...</h5>
+					{/if}
+				{#each Array.from(history) as hist}
+					<h5 class="history_line">{hist.winner} - {hist.loser} <span style="color:greenyellow">[{hist.scoreUser} - {hist.scoreOpponent}]</span></h5>
+				{/each}
+
+
+
+			</div>
+			<div class="achievements_bloc" id="achievements_bloc_id">
+				<h1 class="profile_h1"><span><img class="profile_icone" src="/img/level_icone.png" alt=""></span>Achievements</h1>
+				{#each Array.from(all_achievements) as [key, value]}
+					{#if value === false}
+							<div class="achievement_div">
+								<div class="achievement">
+								</div>
+								<div class="achievement_title_text_box">
+									{#if String(key) === 'FirstWin'}
+									<h4 class="achievement_title">First Win</h4>
+									<h5 class="achievement_text">Win a game.</h5>
+									{/if}
+									{#if String(key) === "WinStreak"}
+									<h4 class="achievement_title">Win Streak</h4>
+									<h5 class="achievement_text">Win three games in a row.</h5>
+									{/if}
+									{#if String(key) === "ImTheBoss"}
+									<h4 class="achievement_title">I'm The Boss</h4>
+									<h5 class="achievement_text">Win against a creator.</h5>
+									{/if}
+									{#if String(key) === "TheDarkSide"}
+									<h4 class="achievement_title">The Dark Side</h4>
+									<h5 class="achievement_text">Log in as a bocal member.</h5>
+									{/if}
+									{#if String(key) === "ImCurious"}
+									<h4 class="achievement_title">???</h4>
+									<h5 class="achievement_text">???</h5>
+									{/if}
+								</div>
+							</div>
+						{:else}
+							<div class="achievement_div">
+								<div class="achievement_true">
+								</div>
+								<div class="achievement_title_text_box">
+									{#if String(key) === 'FirstWin'}
+									<h4 class="achievement_title">First Win</h4>
+									<h5 class="achievement_text">Win a game.</h5>
+									{/if}
+									{#if String(key) === "WinStreak"}
+									<h4 class="achievement_title">Win Streak</h4>
+									<h5 class="achievement_text">Win three games in a row.</h5>
+									{/if}
+									{#if String(key) === "ImTheBoss"}
+									<h4 class="achievement_title">I'm The Boss</h4>
+									<h5 class="achievement_text">Win against a creator.</h5>
+									{/if}
+									{#if String(key) === "TheDarkSide"}
+									<h4 class="achievement_title">The Dark Side</h4>
+									<h5 class="achievement_text">Log in as a bocal member.</h5>
+									{/if}
+									{#if String(key) === "ImCurious"}
+									<h4 class="achievement_title">I'm Curious</h4>
+									<h5 class="achievement_text">Visit one of our GitHubs.</h5>
+									{/if}
+								</div>
+							</div>
+	
+					{/if}
+	
+				{/each}
+			</div>
+
 		</div>
+		<div class="button_switch_div"><button class="history_button" on:click={() => switchToHistory()}>➜</button></div>
 				</div> 
 	{/if}
 </body>
@@ -187,32 +225,33 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <!-- ****************************** -->
 
 <script lang="ts">
-  	
+
 	import {io, Socket} from 'socket.io-client';
 	import { page } from '$app/stores';
 	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../../API/api';
-	import { LOCALHOST } from '../../../API/env';
+	import { LOCALHOST } from "../../../API/env";
+
 /********************** FRIENDS ***********************************************/
 	
-	let socket: Socket;
 
+	let socket: Socket;
     let previousFriend: string;
     let showButtons = false;
     let clickedFriend: string;
-    let friends = [];
+    let friends:any = {};
     let friendNameAdd: string = '';
     let searchProfile: string = '';
     let connectedUsers = [];
 	let loading = false;
-	let isFriend = undefined;
+	let isFriend:any = undefined;
 
-	let all_achievements = {};
-
+	let all_achievements:any = {};
 
 	let friendUser: User;
+	let pending_invitation = false;
     let user: User;
     interface User {
         id: number;
@@ -223,6 +262,26 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         username: string;
         createdAt: Date;
     }
+	let notif:any = {url:'', display:false, invitedBy:''};
+
+
+	function switchToHistory() {
+		const div1 = document.getElementById('achievements_bloc_id');
+		const div2 = document.getElementById('history_bloc_id');
+
+		div1?.classList.toggle('achievements_bloc');
+		div1?.classList.toggle('achievements_bloc_switched');
+
+		div2?.classList.toggle('history_bloc');
+		div2?.classList.toggle('history_bloc_switched');
+	}
+
+
+
+
+
+
+
 	/*	
 		-1 -> no invitation received
 		 0 -> invitation denied or accepted
@@ -232,7 +291,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	let invited = -1;
 
-	async function DeleteFriendButton(realUser, friendName) {
+	async function DeleteFriendButton(realUser:any, friendName:any) {
         const accessToken = await fetchAccessToken();
         if (accessToken) {
             const response = await fetch(`http://${LOCALHOST}:3000/users/${realUser}/deletefriend`, {
@@ -244,16 +303,16 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 body: JSON.stringify({ friend: friendName })
             });
             if (response.ok)
-                friends = friends.filter(friend => friend !== friendName);
+                friends = friends?.filter((friend: any) => friend !== friendName);
             else
                 console.log('Error: Could not delete friend');
         } 
 		else
             console.log('Error: Could not delete friend');
-		isFriend = checkFrienship(user.id, realUserId)
+		isFriend = await checkFrienship(user.id, realUserId)
 	}
 
-	async function AddFriendButton(realUser, friendUser)
+	async function AddFriendButton(realUser:any, friendUser:any)
 	{
 		const accessToken = await fetchAccessToken();
         if (accessToken) {
@@ -272,59 +331,22 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 console.log('Error: Could not add friend');
         
 		}
-		isFriend = checkFrienship(user.id, realUserId);
+		isFriend = await checkFrienship(user.id, realUserId);
     }
 
-	async function getConnectedUsers() {
-	const accessToken = await fetchAccessToken();
-	if (accessToken) {
-		const response = await fetch(`http://${LOCALHOST}:3000/websocket/getClient`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${accessToken}`
-		},
-		});
-		if (response.ok) {
-			connectedUsers =  await response.json();
-		}
-		else{
-			console.log("Error: Could not get users")
-		}
-	} else {
-		console.log('Error: Could not get users');
-	}
+	function removePopup() {
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito?.remove();
 	}
 
-	async function handleSearchProfile(searchProfile: string) {
-		if (!searchProfile) {
-			return;
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			goto(notif.url);
 		}
-		const accessToken = await fetchAccessToken();
-		if (accessToken) {
-			const url = `http://${LOCALHOST}:3000/users/${searchProfile}/search`;
-			const response = await fetch(url, {
-				method: 'GET',
-				headers: {
-				'Authorization': `Bearer ${accessToken}`,
-				},
-			});
-			const userExists = await response.json(); // Parse response body as JSON
-			if (userExists) { // Check if user exists
-				goto(`/profile/${userExists.id}`);
-			} else {
-				return;
-			}
-		}
-		else 
-			console.log('Error: Could not get users');
-	}
-
-	async function acceptInvitation() {
-		console.log("Accepted the invitation");
-		goto(`/game/${'roomid'}`);
-		/*function that sends to the other user that the invitation has been accepted*/
-		invited = 0;
 	}
 
 	async function denyInvitation() {
@@ -349,7 +371,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 	}
 
-    async function handleMessageFriend(friendName) {
+    async function handleMessageFriend(friendName:any) {
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
@@ -362,14 +384,14 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				});
 				const userExists = await response.json(); // Parse response body as JSON
 				if (userExists) { // Check if user exists
-					await goto(`/chat/dm/${userExists.id}`);
+					await goto(`/dm/${userExists.id}`);
 				}
 		}
 		else 
 			console.log('Error: Could not get users');
 	}
 
-    async function handleProfileFriend(friendName) {
+    async function handleProfileFriend(friendName:any) {
         const accessToken = await fetchAccessToken();
         if (accessToken)
 		{
@@ -386,7 +408,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             console.log('Error: Could not get profile');
     }
 
-    async function handleDeleteFriend(friendName) {
+    async function handleDeleteFriend(friendName:any) {
         const accessToken = await fetchAccessToken();
         if (accessToken) {
             const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}/deletefriend`, {
@@ -398,7 +420,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 body: JSON.stringify({ friend: friendName })
             });
             if (response.ok)
-                friends = friends.filter(friend => friend !== friendName);
+				friends = friends.filter((friend: any[]) => friend[0] !== friendName);
             else
                 console.log('Error: Could not delete friend');
         } 
@@ -406,7 +428,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             console.log('Error: Could not delete friend');
     }
 
-    function handleInviteFriend(friendName) {
+    function handleInviteFriend(friendName:any) {
         console.log(`Inviting ${friendName} to play`);
 		/*If accepted -> goto(`/game/${roomid}`); */
     }
@@ -440,39 +462,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     }
 
     let imageURL: string = '';
-    let newUsername: string = '';
-
-
-    async function handleUpdateUsername() {
-        if (!newUsername) {
-            console.log('New username not set');
-            return;
-        }
-		const accessToken = await fetchAccessToken();
-            if (accessToken) {
-                const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({ username: newUsername })
-                });
-                if (response.ok) {
-                    user.username = newUsername;
-                    newUsername = '';
-                } else {
-                    console.log('Error: Could not update username');
-                }
-            } else {
-                console.log('Error: Could not update username');
-            }
-	}
 
 /***********************************************************************************/
-
-
-	let blockedusers: any[] = [];
 
 	async function getImageURL() {
 		const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
@@ -492,7 +483,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       console.log('Error: Could not send message');
   }
 
-	async function block(realUser, blockerUser) { // block user
+	async function block(realUser:any, blockerUser:any) { // block user
 		const accessToken = await fetchAccessToken();
 		if (accessToken) 
 		{
@@ -511,7 +502,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			console.log('Error: Could not block user');
     }
 	
-	async function checkBlocked(realUser, blockerUser) { // check if user is blocked
+	async function checkBlocked(realUser:any, blockerUser:any) { // check if user is blocked
     const accessToken = await fetchAccessToken();
 	if (accessToken)
 	{
@@ -533,7 +524,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		console.log('Error: Could not check if user is blocked');
 }
 
-	async function checkFrienship(id1, id2) { // check if the two users are friends
+	async function checkFrienship(id1:any, id2:any) { // check if the two users are friends
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
@@ -554,6 +545,55 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			console.log('Error: Could not check if user is friend');
 	}
 
+	async function fetchRoomGameId() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(
+				`http://${LOCALHOST}:3000/users/getRoomId`,
+				{
+					headers
+				}
+			);
+			const data = await response.json();
+			return data;
+		}
+	}
+
+	async function handleInviteGameButton(friendname:any) {
+        const id = await fetchRoomGameId();
+        const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${id.response}`;
+		const data = {
+			invited: friendname,
+			invitedBy: user.username,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data);
+    }
+
+	function createPopupDM(notif:any) {
+		const boxito = document.querySelector("body");
+		const toast = document.createElement("div");
+		toast.innerHTML = `<div class="popup">
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
+		boxito?.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
+		denyButton?.addEventListener("click", removePopup);
+	}
 
 	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
@@ -573,7 +613,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			console.log('Error: Could not get achievements');
 	}
 
-	async function unblock(realUser, blockerUser) { // unblock user
+	async function unblock(realUser:any, blockerUser:any) { // unblock user
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
             const response = await fetch(`http://${LOCALHOST}:3000/users/${realUser}/deleteBlock`, {
@@ -594,7 +634,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let is_blocked: any;
 	let realUserId: any;
 	let realUserPseudo: any;
-	
+
 	async function loadpage() {
 		if (!user)
 			goto('/');
@@ -605,6 +645,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			currentUser = user.username;
 			friends = await fetchFriend(user.pseudo);
 			await getAllAchievements();
+			history = await getHistory(user.id);
 		}
 		else // If the user is on another profile
 		{
@@ -621,27 +662,51 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			isFriend = await checkFrienship(user.id, realUserId);
 			await getImageURL();
 			await getAllAchievements();
+			history = await getHistory(realUserId);
 		}
 	}
-	onMount(async function() {
-		user = await fetchData(); // Catch the user
-		if (!user)
-			await goto('/'); // If no user redirect
-		const FA2 = await fetch2FA(user.id);
-		if (FA2 == true)
-			await goto('auth/2fa');
-		else
-		{
-			await loadpage();
-			const socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
-			socket.on('connect', async function() {			
-				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
-			});
-		}
+
+	async function friendRequest()
+	{
 		friends = await fetchFriend(user.pseudo);
-		await getConnectedUsers();
-		loading = true;
-	});
+	}
+
+
+
+
+
+
+
+	let history: any[];
+	history = [];
+
+	async function getHistory(id: number) {
+		const accessToken = await fetchAccessToken();
+		if (accessToken)
+		{
+			const url = `http://${LOCALHOST}:3000/users/${id}/history`;
+				const response = await fetch(url, {
+					method: 'GET',
+					headers: {
+					'Authorization': `Bearer ${accessToken}`,
+					},
+				});
+				return await response.json(); // Parse response body as JSON
+		}
+		else 
+			console.log('Error: Could not get history');
+	}
+
+
+
+
+
+
+
+
+
+
+
 
 	async function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
@@ -653,4 +718,44 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			document.body.classList.remove('fade-out');
 		}, 400);
 	}
+
+
+	onMount(async function() {
+		user = await fetchData(); // Catch the user
+		if (!user)
+			await goto('/'); // If no user redirect
+		const FA2 = await fetch2FA(user.id);
+		if (FA2 == true)
+			await goto('auth/2fa');
+		else
+		{
+			await loadpage();
+			socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
+			socket.on('connect', async function() {			
+				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
+			});
+		}
+		setInterval(friendRequest, 10000);
+		socket.on('InvitedNotif', async(data:any) => {
+			console.log("data notif === ", data);
+            console.log("username == ", user.username);
+            if (data.invitedBy === user.username) {
+                goto(data.url);
+            }
+			if (data.invited.id === user.id) {
+                notif.display = true;
+                notif.url = data.url;
+                notif.invitedBy = data.invitedBy;
+				if (pending_invitation == false)
+				{
+                    pending_invitation = true;
+					createPopupDM(notif);
+				}
+            }
+		});
+		loading = true;
+
+	});
+
+
 </script>

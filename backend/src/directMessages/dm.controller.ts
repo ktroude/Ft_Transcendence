@@ -30,15 +30,24 @@ async handleRoomData(@Headers('Authorization') cookie: String) {
           id: true,
         }
       });
+      let customRoom = [];
+      for (let i = 0; i < rooms.length; i++) {
+        customRoom[i] = rooms[i];
+        if (user.id === customRoom[i].ownerOne.id) {
+          customRoom[i].name = customRoom[i].ownerTwo.username;
+        }
+        else {
+          customRoom[i].name = customRoom[i].ownerOne.username;
+      }
+    }
     return {
-            rooms: rooms,
+            rooms: customRoom,
             user: user,
         };
 }
 
 @Get('who')
 async handleWho(@Headers('Authorization') cookie: String, @Query('id') userId) {
-  console.log("JE SUIS ICI")
   try {
 
     let existe = true;
@@ -48,7 +57,6 @@ async handleWho(@Headers('Authorization') cookie: String, @Query('id') userId) {
     where: {id: parseInt(userId, 10)},
   });
   if (!who) {
-    console.log('je retourn noule')
     return null;
   }
   let room = await this.dmService.findRoom(user, who);

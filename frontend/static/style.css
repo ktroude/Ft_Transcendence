@@ -155,17 +155,6 @@
   flex-direction: row;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 .room-bandeau {
   overflow: hidden;
   margin-top: 20px;
@@ -220,12 +209,6 @@
   cursor: pointer;
   max-width: 300px;
 }
-
-
-
-
-
-
 
 .message-container {
   display: flex;
@@ -315,16 +298,6 @@
   font-family: 'roboto';
 }
 
-
-
-
-
-
-
-
-
-
-
 body {
   background-color: #6e6b6b9a;
 }
@@ -378,8 +351,6 @@ button:hover {
   padding: 16px;
   width: 210px;
 }
-
-
 
 .admin-panel {
   display: flex;

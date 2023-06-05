@@ -22,52 +22,61 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	{#if loading === true}
     <div class="game_navbar">
         <div class="button_box">
-            <img class="button_picture" src="/img/home_icone.png">
+            <img class="button_picture" src="/img/home_icone.png" alt="">
             <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
         </div>
 
 		<div class="button_box">
-			<img class="button_picture" src="/img/profile_icone.png">
+			<img class="button_picture" src="/img/profile_icone.png" alt="">
 			<button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
 		</div>
 
         <div class="button_box">
-            <img class="button_picture" src="/img/game_icone.png">
+            <img class="button_picture" src="/img/game_icone.png" alt="">
             <button class="button_nav" on:click={() => fade('/game')}>Game</button>
         </div>
 
         <div class="button_box">
-            <img class="button_picture" src="/img/chat_icone.png">
+            <img class="button_picture" src="/img/chat_icone.png" alt="">
             <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
         </div>
-
+		<div class="button_box">
+			<button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
+		</div>
     </div>
 	<div class="main_profile">
+		<div class="left_bloc"></div>
 		<div class="edit_box">
-			<h1>{displayUsername}</h1>
+			<div class="username_bloc_edit">
+				<h1 class="username_bloc_username">{user.username}</h1>
+				{#if FAstatus === false}
+					<span><button  class="twofa_button" on:click={enable2fa}>🔒</button></span>
+				{:else if FAstatus === true}
+					<span><button  class="twofa_button" on:click={disable2fa}>🔓</button></span>
+				{/if}
+			</div>
 			<label for="username-input">New Username:</label>
 			<input type="text" id="username-input" bind:value={newUsername} />
-      {#if FAstatus === false}
-        <button  class="edit_button" on:click={enable2fa}>ACTIVATE</button>
-      {:else if FAstatus === true}
-        <button  class="edit_button" on:click={disable2fa}>DESACTIVATE</button>
-      {/if}
 			<button  class="edit_button" on:click={handleUpdateUsername}>Update</button>
 			<!-- svelte-ignore a11y-img-redundant-alt -->
 			<img src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" style={`width: ${300}px; height: ${200}px;`} />
 			<input type="file" on:change={handleFileUpload} />
 		</div>
+		<div class="right_bloc_twofa">
+			<div class="twofa_bloc" id="twofa_bloc_id">
+				{#if qrImage}
+				<img src="{qrImage}" alt="QR Code" />
+				<p>Please scan this QR code with Google Authenticator and enter the code to activate.</p>
+				<form on:submit="{handleSubmit2fa}">
+					<label>
+					  Verification Code:
+					  <input type="text" bind:value="{code}" />
+					</form>
+			  {/if}
+			</div>
+		</div>
 	</div>
 	{/if}
-  {#if qrImage}
-  <img src="{qrImage}" alt="QR Code" />
-  <p>Please scan this QR code with Google Authenticator and enter the code to activate.</p>
-  <form on:submit="{handleSubmit2fa}">
-      <label>
-        Verification Code:
-        <input type="text" bind:value="{code}" />
-      </form>
-{/if}
 </body>
 
 <!-- ****************************** -->
@@ -77,11 +86,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 <script lang="ts">
 	let loading = false;
   	
-	import { goto } from "$app/navigation";
+	  import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchFriend, fetch2FA, fetch2FAstatus} from '../../../API/api';
-    import { LOCALHOST } from '../../../API/env';
+    import { LOCALHOST } from "../../../API/env";
 
     interface User {
         id: number;
@@ -104,6 +113,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     async function disable2fa()
     {
+
+	const div1 = document.getElementById('twofa_bloc_id');
+
+	div1?.classList.toggle('twofa_bloc');
+	div1?.classList.toggle('twofa_bloc_switched');
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
@@ -126,7 +140,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       else {
         console.log('Error: Could not update the 2fa');
       }
-    }
+  }
+
 
     async function handleSubmit2fa()
     {
@@ -139,33 +154,49 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
               },
-            body: JSON.stringify({status : 'enable'})
+            body: JSON.stringify({status : 'enable', codestring: code})
           });
-          if (response.ok)
-          {
-            ;
-          }
-          else
-            console.log('Error: Could not update the 2fa');
-      }
+          if (!response.ok) {
+      console.log('Error:', response.status);
+      return null;
     }
+
+        const responseData = await response.text();
+
+        let data;
+        if (responseData) {
+          try 
+          {
+            data = JSON.parse(responseData);
+          }
+          catch (error) {
+            console.log('Error parsing JSON:', error);
+            return null;
+          }
+        } else {
+          console.log('Empty response');
+          return null;
+        }
+        if (data === null)
+          return null;
+        else
+          qrImage = '';
+      }
+      else
+        console.log('Error: Could not update the 2fa');
+  }
 
 
     async function enable2fa() // Update the 2fa
     {
+
+	const div1 = document.getElementById('twofa_bloc_id');
+
+	div1?.classList.toggle('twofa_bloc');
+	div1?.classList.toggle('twofa_bloc_switched');
       const accessToken = await fetchAccessToken();
       if (accessToken)
       {
-        // const response = await fetch(`http://localhost:3000/users/${user.id}/enable2fa`, {
-        // method: 'PUT',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //       'Authorization': `Bearer ${accessToken}`
-        //     },
-        //   body: JSON.stringify({status : 'enable'})
-        // });
-        // if (response.ok)
-        // {
           const response = await fetch(`http://${LOCALHOST}:3000/${user.id}/auth/2fa/setup`, {
           method: 'GET',
           headers: {
@@ -175,16 +206,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           const data = await response.json();
           qrImage = data.image;
           FAstatus = true;
-        // }
-        // else
-        //   console.log('Error: Could not update the 2fa');
+        }
+        else
+          console.log('Error: Could not update the 2fa');
       }
-      else {
-        console.log('Error: Could not update the 2fa');
-      }
-    }
 
         async function getImageURL() {
+        user = await fetchData();
         const buffer = Buffer.from(user.picture, 'base64'); // Convert the base64-encoded string to a buffer
         const blob = new Blob([buffer], { type: 'image/png' }); // Convert the buffer to a blob
         imageURL = URL.createObjectURL(blob); // Create a URL for the blob
@@ -218,6 +246,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           console.log('Username updated');
           displayUsername = newUsername;
           newUsername = '';
+          user = await fetchData();
         }
         else
           console.log('Error: Could not update the username');
@@ -225,7 +254,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         newUsername = '';
       }
 
-      async function handleFileUpload(event) { // Upload a new profile picture
+      async function handleFileUpload(event:any) { // Upload a new profile picture
       // Get the file from the input
       const file = event.target.files[0];
 
@@ -245,7 +274,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = async () => {
-        const base64 = reader.result.replace(/^data:image\/[a-z]+;base64,/, "");
+        const base64 = (reader.result as string).replace(/^data:image\/[a-z]+;base64,/, "");
         const accessToken = await fetchAccessToken();
         if (accessToken)
         {
@@ -270,14 +299,20 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     onMount(async function() {
         user = await fetchData();
         if (!user)
+        {
           await goto('/');
+          return ;
+        }
         const FA2 = await fetch2FA(user.id);
         if (FA2 == true)
+        {
           await goto('auth/2fa');
+          return ;
+        }
         else
         {
           FAstatus = await fetch2FAstatus(user.id);
-          getImageURL()
+          await getImageURL()
           displayUsername = user.username;
         }
 		loading = true;

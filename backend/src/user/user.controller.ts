@@ -53,15 +53,27 @@ export class UserController {
     }
 
     @UseGuards(JwtGuard)
-    @Put(':id/enable2fa')
-    async enable2fa(@Param('id') id: string, @Body() body: {status : string}): Promise<User> {
-        return await this.userService.enable2FA(parseInt(id,10), body.status);
+    @Get('getRoomId')
+    async handleGetRoomId() {
+        const resp = await this.userService.handleGetRoomId();
+        return {response:resp};
     }
 
+    @UseGuards(JwtGuard)
+    @Put(':id/enable2fa')
+    async enable2fa(@Param('id') id: string, @Body() body: {status : string, codestring: string}): Promise<User> {
+        return await this.userService.enable2FA(parseInt(id,10), body.status, body.codestring);
+    }
 
     @UseGuards(JwtGuard)
     @Get(':user/search')
     async searchUser(@Param('user') searchProfile: string): Promise<User> {
         return await this.userService.findUserByUsername(searchProfile);
+	}
+
+    @UseGuards(JwtGuard)
+    @Get(':id/history')
+    async getHistory(@Param('id') id: string, @Headers('Authorization') cookie: string,) {
+        return await this.userService.getHistory(parseInt(id,10));
 	}
 }
