@@ -587,6 +587,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			currentUser = user.username;
 			friends = await fetchFriend(user.pseudo);
 			await getAllAchievements();
+			history = await getHistory(user.id);
 		}
 		else // If the user is on another profile
 		{
@@ -603,6 +604,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			isFriend = await checkFrienship(user.id, realUserId);
 			await getImageURL();
 			await getAllAchievements();
+			history = await getHistory(realUserId);
 		}
 	}
 
@@ -620,11 +622,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let history: any[];
 	history = [];
 
-	async function getHistory() {
+	async function getHistory(id: number) {
 		const accessToken = await fetchAccessToken();
 		if (accessToken)
 		{
-			const url = `http://${LOCALHOST}:3000/users/history`;
+			const url = `http://${LOCALHOST}:3000/users/${id}/history`;
 				const response = await fetch(url, {
 					method: 'GET',
 					headers: {
@@ -676,7 +678,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			});
 		}
 		setInterval(friendRequest, 10000);
-		history = await getHistory();
 		loading = true;
 	});
 

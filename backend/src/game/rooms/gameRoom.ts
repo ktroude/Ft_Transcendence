@@ -35,6 +35,22 @@ async function handleVictoryPrisma(winner, looser, prisma) {
   // push winner
   const winner_match = await creatmatchprsima(winner, looser, prisma);
   const looser_match = await creatmatchprsima(looser, winner, prisma);
+  const tmp = await prisma.user.findUnique({
+    where: {id : winner.id_user},
+    select : {wins : true}
+  });
+  // if (tmp.wins == 0)
+  // {
+  //   achievements
+  // }
+  // if (looser.pseudo == 'bleroy' || looser.pseudo == 'vl-hotel'|| looser.pseudo == 'ple-berr'|| looser.pseudo == 'ktroude')
+  // {
+  //   achievements
+  // }
+  // if (function return true)
+  // {
+  //   achievements
+  // }
   await prisma.user.update({
     where: {pseudo : winner.pseudo},
     data: {
@@ -51,10 +67,10 @@ async function handleVictoryPrisma(winner, looser, prisma) {
   });
 }
 
-function leavePlayer(player, prisma)
+async function leavePlayer(player, prisma)
 {
-  updateConnected(player, 1, prisma);
-  player.pseudo = 'null';
+  await updateConnected(player, 1, prisma);
+  player.pseudo = '';
   player.username = '';
   player.id = '';
 }
@@ -146,8 +162,7 @@ export class gameRoomService extends Room {
     //   // Supprimer le joueur de la salle après le délai d'attente
       
     //   console.log("je retire les player de la room");
-    // }, 5000);
-    
+    // }, 5000);    
     if(client.sessionId == this.player1.id)
       leavePlayer(this.player1, this.prisma);
     else

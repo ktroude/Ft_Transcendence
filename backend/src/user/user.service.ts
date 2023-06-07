@@ -237,9 +237,9 @@ export class UserService {
           return undefined;
     }
 	
-    async getHistory(user:User) {
+    async getHistory(id : number) {
 		const history = await this.prisma.user.findUnique({
-			where: {id: user.id},
+			where: {id: id},
 			select: {
 				Match_historiques:true
 			}

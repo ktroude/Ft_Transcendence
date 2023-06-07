@@ -72,10 +72,8 @@ export class UserController {
 	}
 
     @UseGuards(JwtGuard)
-    @Get('history')
-    async getHistory(@Headers('Authorization') cookie: string,) {
-		const token = cookie.split(' ')[1];
-		const user = await this.userService.decodeToken(token);
-        return await this.userService.getHistory(user);
+    @Get(':id/history')
+    async getHistory(@Param('id') id: string, @Headers('Authorization') cookie: string,) {
+        return await this.userService.getHistory(parseInt(id,10));
 	}
 }
