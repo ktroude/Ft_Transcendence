@@ -389,24 +389,6 @@ function ballMove()
 	room.send("ballPos", {ball_x: ball.x, ball_y: ball.y});
 }
 
-function stop(){
-  cancelAnimationFrame(anim);
-  // Placez la balle et les joueurs au centre
-  ball.x = canvas.width / 2;
-  ball.y = canvas.height / 2;
-  player.y = canvas.height / 2 - setting_game.paddle_height / 2;
-  player2.y = canvas.height / 2 - setting_game.paddle_height / 2;
-  // Reset speed
-  ball.velocity_y = 2;
-  ball.velocity_x = 2;
-  // Init score
-//   player2.score = 0;
-//   player.score = 0;
-//   document.querySelector('#player2-score').textContent = player2.score;
-//   document.querySelector('#player-score').textContent = player.score;
-  draw();
-}
-
 function playerMove(event){
   if ((clientId === player?.id))
   {
@@ -507,8 +489,13 @@ onMount(async() => {
 		const socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
-			});		
-		await connect();
+			});
+		try {
+			await connect();
+		}
+		catch{
+			fade("/game");
+		}
 	}
 	else
 	{	
