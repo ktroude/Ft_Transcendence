@@ -70,7 +70,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 						</div>
 						{#if clickedFriend === friendName && showButtons && invited === 2}
 							<button class="friend_button" on:click={() => {if (showButtons) handleMessageFriend(friendName)}}>💬</button>
-							<button class="friend_button" on:click={() => {if (showButtons) handleInviteFriend(friendName)}}>🎮</button>
+							<button class="friend_button" on:click={() => {if (showButtons) handleInviteGameButton(friendName)}}>🎮</button>
 							<button class="friend_button" on:click={() => {if (showButtons) handleProfileFriend(friendName)}}>🔍</button>
 							<button class="friend_button" on:click={() => {if (showButtons) handleDeleteFriend(friendName)}}>❌</button>
 						{/if}
@@ -236,8 +236,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 /********************** FRIENDS ***********************************************/
 	
-	let socket: Socket;
 
+	let socket: Socket;
     let previousFriend: string;
     let showButtons = false;
     let clickedFriend: string;
@@ -250,8 +250,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	let all_achievements:any = {};
 
-
 	let friendUser: User;
+	let pending_invitation = false;
     let user: User;
     interface User {
         id: number;
@@ -262,6 +262,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         username: string;
         createdAt: Date;
     }
+	let notif:any = {url:'', display:false, invitedBy:''};
 
 
 	function switchToHistory() {
@@ -274,7 +275,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		div2?.classList.toggle('history_bloc');
 		div2?.classList.toggle('history_bloc_switched');
 	}
-
 
 
 
@@ -334,11 +334,19 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		isFriend = await checkFrienship(user.id, realUserId);
     }
 
-	async function acceptInvitation() {
-		console.log("Accepted the invitation");
-		goto(`/game/${'roomid'}`);
-		/*function that sends to the other user that the invitation has been accepted*/
-		invited = 0;
+	function removePopup() {
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito?.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			goto(notif.url);
+		}
 	}
 
 	async function denyInvitation() {
@@ -537,6 +545,56 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			console.log('Error: Could not check if user is friend');
 	}
 
+	async function fetchRoomGameId() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(
+				`http://${LOCALHOST}:3000/users/getRoomId`,
+				{
+					headers
+				}
+			);
+			const data = await response.json();
+			return data;
+		}
+	}
+
+	async function handleInviteGameButton(friendname:any) {
+        const id = await fetchRoomGameId();
+        const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${id.response}`;
+		const data = {
+			invited: friendname,
+			invitedBy: user.username,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data);
+    }
+
+	function createPopupDM(notif:any) {
+		const boxito = document.querySelector("body");
+		const toast = document.createElement("div");
+		toast.innerHTML = `<div class="popup">
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
+		boxito?.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
+		denyButton?.addEventListener("click", removePopup);
+	}
+
 	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
@@ -672,13 +730,31 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		else
 		{
 			await loadpage();
-			const socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
+			socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
 			});
 		}
 		setInterval(friendRequest, 10000);
+		socket.on('InvitedNotif', async(data:any) => {
+			console.log("data notif === ", data);
+            console.log("username == ", user.username);
+            if (data.invitedBy === user.username) {
+                goto(data.url);
+            }
+			if (data.invited.id === user.id) {
+                notif.display = true;
+                notif.url = data.url;
+                notif.invitedBy = data.invitedBy;
+				if (pending_invitation == false)
+				{
+                    pending_invitation = true;
+					createPopupDM(notif);
+				}
+            }
+		});
 		loading = true;
+
 	});
 
 
