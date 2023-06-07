@@ -480,6 +480,9 @@ function fade(thisplace) {
 		}, 400);
 	}
 
+	import {io, Socket} from 'socket.io-client';
+
+
 onMount(async() => {
 	const access = await fetchAccessToken();
 	const user = await fetchData();
@@ -501,6 +504,10 @@ onMount(async() => {
 		canvas.addEventListener('mousemove', playerMove);
 		canvas.addEventListener('mousemove', player2Move);
 		room_id = await getRoomIdFromUrl();
+		const socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
+			socket.on('connect', async function() {			
+				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
+			});		
 		await connect();
 	}
 	else

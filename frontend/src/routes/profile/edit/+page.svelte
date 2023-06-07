@@ -48,7 +48,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		<div class="left_bloc"></div>
 		<div class="edit_box">
 			<div class="username_bloc_edit">
-				<h1 class="username_bloc_username">{displayUsername}</h1>
+				<h1 class="username_bloc_username">{user.username}</h1>
 				{#if FAstatus === false}
 					<span><button  class="twofa_button" on:click={enable2fa}>🔒</button></span>
 				{:else if FAstatus === true}
@@ -246,6 +246,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           console.log('Username updated');
           displayUsername = newUsername;
           newUsername = '';
+          user = await fetchData();
         }
         else
           console.log('Error: Could not update the username');

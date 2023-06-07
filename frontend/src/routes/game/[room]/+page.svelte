@@ -1,4 +1,4 @@
-<!-- <style>
+<style>
 	@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Signika+Negative:wght@500&display=swap');
 
 	*{
@@ -101,27 +101,28 @@
 
 	let realUser = ''; 
 	let currentUser = ''; 
-	
+	import {io, Socket} from 'socket.io-client';
+
 	async function loadpage() {
 		user = await fetchData();
 		if (!user)
+		{
 			goto('/');
+			return;
+		}
 		const FA2 = await fetch2FA(user.id);
 		if (FA2 == true)
+		{
 			goto('auth/2fa');
-		if ($page.params.user == user.pseudo)
-		{
-			getImageURL();
-			currentUser = user.username;
+			return ;
 		}
-		else
-		{
-			realUser = user.pseudo;
-			user = await fetchDataOfUser($page.params.user);
-			getImageURL();
-		}
+		const socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
+			socket.on('connect', async function() {			
+				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
+			});
 	}
 
 	onMount(() => {
+		loadpage();
 	});
-</script> -->
+</script>
