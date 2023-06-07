@@ -38,8 +38,10 @@
 				<div class="button_box">
 					<img class="button_picture" src="/img/chat_icone.png" alt="">
 					<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
-				</div>
-	
+			</div>
+			<div class="button_box">
+				<button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
+			</div>
 			</div>
 	
 				<div class="full_page">
