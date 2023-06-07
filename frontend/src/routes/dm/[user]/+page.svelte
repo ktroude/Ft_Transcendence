@@ -214,7 +214,7 @@ let toast;
         const id = await fetchRoomGameId();
         const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${id.response}`;
 		const data = {
-			invited: selectedUser,
+			invited: selectedUser.username,
 			invitedBy: currentUser.username,
 			url: url,
 		}
@@ -271,17 +271,20 @@ let toast;
             if (!access_token) {
                 window.location.pathname = '/';
             }
+            socket = io(`http://${LOCALHOST}:3000`, {
+                extraHeaders: {
+                    Authorization: 'Bearer ' + access_token
+                }
+            });
             const ForTheEmit = await fetchData();
-            const socket = io(`http://${LOCALHOST}:3000`);
-                socket.on('connect', async function() {			
-                    socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
-                });
-
-        if (!socket) {
-            window.location.pathname = '/'; 
-        }
-        let user = await fetchData();
-        socket.on('DmRoomCreated', async(data) => {
+            if (!socket) {
+                window.location.pathname = '/'; 
+            }
+            let user = await fetchData();
+            socket.on('connect', async function() {
+                socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
+            });
+        socket.on('DmRoomCreated', async(data:any) => {
             if (currentUser.id === data.user1.id || currentUser.id === data.user2.id) {
                 roomList = [...roomList, data.room]
             }

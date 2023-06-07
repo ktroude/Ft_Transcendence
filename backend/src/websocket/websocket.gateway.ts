@@ -39,9 +39,12 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 	}
   
 	@SubscribeMessage('InvitedInGame')
-	handleInvitedInGame(@ConnectedSocket() client:any, @MessageBody() data) {
+	async handleInvitedInGame(@ConnectedSocket() client:any, @MessageBody() data) {
+    const invited = await this.prisma.user.findUnique({
+      where: {username:data.invited},
+    });
 		const toSend = {
-			invited: data.invited,
+			invited: invited,
 			invitedBy: data.invitedBy,
 			url: data.url,
 		}

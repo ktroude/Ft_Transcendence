@@ -49,6 +49,8 @@
 		roomId: 0
 	};
 	let animation:any;
+	let pending_invitation = false;
+	let notif:any = {url:'', display:false, invitedBy:''};
 
 	// INTERFACES
 
@@ -305,6 +307,75 @@
 		return user;
 	};
 
+	async function handleInviteGameButton() {
+        const id = await fetchRoomGameId();
+        const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${id.response}`;
+		const data = {
+			invited: selectedUser.pseudo ,
+			invitedBy: currentUser.pseudo,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data);
+    }
+	
+	function handleDM(){
+		goto("/dm/" + selectedUser.id);
+	}
+
+	async function fetchRoomGameId() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(
+				`http://${LOCALHOST}:3000/users/getRoomId`,
+				{
+					headers
+				}
+			);
+			const data = await response.json();
+			return data;
+		}
+	}
+
+	function createPopupDM(notif:any) {
+		const boxito = document.querySelector("body");
+		const toast = document.createElement("div");
+		toast.innerHTML = `<div class="popup">
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
+		boxito?.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
+		denyButton?.addEventListener("click", removePopup);
+	}
+
+	function removePopup() {
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito?.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			goto(notif.url);
+		}
+	}
+
 	async function fetchBlockedData() {
 		const cookies = document.cookie.split(';');
 		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
@@ -315,15 +386,19 @@
 			const response = await fetch(`http://${LOCALHOST}:3000/users/getAllBlockReturnId?id=${currentUser.id}`, { headers });
 			const data = await response.json();
 			blocked = data;
+			console.log("blocked == ", blocked)
 		}	
 	}
 
 
 	function check_array(num:any) {
 		for (let i=0; i<blocked.length; i++) {
-			if (blocked[i] === num)
+			if (blocked[i] === num) {
+				console.log("check array ft return true")
 				return true;
+			}
 		}
+				console.log("check array ft return false")
 		return false;
 	}
 
@@ -741,7 +816,8 @@
 		});
 		socket.on('blocked', async (data) => {
 			if (currentUser.id === data.id) {
-				await fetchBlockedData();
+				blocked = [...blocked, data.block.id];
+				// await fetchBlockedData();
 				// socket.emit('getMessage', data.room);
 			}
 		});
@@ -750,6 +826,23 @@
 				await fetchBlockedData();
 				// socket.emit('getMessage', data.room);
 			}
+		});
+		socket.on('InvitedNotif', async(data) => {
+			console.log("data notif === ", data);
+            console.log("username == ", currentUser.pseudo);	
+            if (data.invitedBy === currentUser.pseudo) {
+                goto(data.url);
+            }
+			if (data.invited.id === currentUser.id) {
+                notif.display = true;
+                notif.url = data.url;
+                notif.invitedBy = data.invitedBy;
+				if (pending_invitation == false)
+				{
+                    pending_invitation = true;
+					createPopupDM(notif);
+				}
+            }
 		});
 		chatRooms = await fletchChatRoomsData();
 		currentUser = await fletchCurrentUserData();
@@ -1153,6 +1246,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 								<h1>{selectedUser.pseudo}</h1>
 								{#if find(showOptionsPseudo, 'profile') === true}
 									<button class="button_show_profile" on:click={showProfile}>Voir le profil</button>
+									<button class="button_show_profile" on:click={handleDM}>DM</button>
+									<button class="button_show_profile" on:click={handleInviteGameButton}>Game</button>
 								{/if}
 								{#if find(showOptionsPseudo, 'ban') === true}
 									<button
