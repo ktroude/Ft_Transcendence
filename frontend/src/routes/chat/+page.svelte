@@ -897,8 +897,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 		<div class="button_box">
 			<img class="button_picture" src="/img/chat_icone.png" alt="" />
-			<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+			<button class="button_nav" on:click={() => fade('/dm')}>DM</button>
 		</div>
+		
 	</div>
 	<div class="chat_body">
 		<!----------------------------------------------->
