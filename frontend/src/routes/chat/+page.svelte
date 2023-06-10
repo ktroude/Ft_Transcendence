@@ -386,7 +386,6 @@
 			const response = await fetch(`http://${LOCALHOST}:3000/users/getAllBlockReturnId?id=${currentUser.id}`, { headers });
 			const data = await response.json();
 			blocked = data;
-			console.log("blocked == ", blocked)
 		}	
 	}
 
@@ -394,11 +393,9 @@
 	function check_array(num:any) {
 		for (let i=0; i<blocked.length; i++) {
 			if (blocked[i] === num) {
-				console.log("check array ft return true")
 				return true;
 			}
 		}
-				console.log("check array ft return false")
 		return false;
 	}
 
@@ -588,11 +585,12 @@
 					];
 					return;
 				} else {
-					messages = data.msg;
+						messages = data.msg;
+					}
 					scrollToBottom();
 				}
 			}
-		});
+		);
 		socket.on('newMessage', (msg: any) => {
 			if (currentRoom && currentRoom?.id === msg?.chatRoomId) {
 				if (currentUser?.status != -2 && check_array(msg.senderId) === false) {
@@ -694,6 +692,7 @@
 			if (currentUser?.id == data?.user?.id) {
 				currentRoom = data.room;
 				animation = data.animation;
+    console.log("data.room 3 == ", data.room);
 				socket.emit('getMessage', data.room);
 				socket.emit('getUser', data.room);
 				await fletchMembres();
@@ -801,8 +800,7 @@
 					];
 				}
 			} else if (data.sucess === true && data.userToAdd) {
-				membres = [];
-				await fletchMembres();
+				membres = [... membres, data.userToAdd];
 			}
 			chatRooms = await fletchChatRoomsData();
 		});
@@ -815,21 +813,22 @@
 			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('blocked', async (data) => {
-			if (currentUser.id === data.id) {
-				blocked = [...blocked, data.block.id];
-				// await fetchBlockedData();
-				// socket.emit('getMessage', data.room);
+			console.log("return .on'blocked' == ", data);
+			if (currentUser.id === data.user.id) {
+				blocked = data.block;
+			if (currentRoom?.id)
+				socket.emit('getMessage', currentRoom);
 			}
 		});
 		socket.on('unblocked', async (data)=> {
 			if (currentUser.id === data.id) {
+
 				await fetchBlockedData();
-				// socket.emit('getMessage', data.room);
+		if (currentRoom?.id)
+				socket.emit('getMessage', currentRoom);
 			}
 		});
 		socket.on('InvitedNotif', async(data) => {
-			console.log("data notif === ", data);
-            console.log("username == ", currentUser.pseudo);	
             if (data.invitedBy === currentUser.pseudo) {
                 goto(data.url);
             }
