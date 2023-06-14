@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { fetchData, fetch2FA } from '../../API/api';
 	import { LOCALHOST } from "../../API/env";
+	import "../../../node_modules/normalize.css"
 
 	// VARIABLES
 
@@ -80,9 +81,8 @@
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
 		setTimeout(() => {
-		// window.location.href = href;
-			goto(thisplace);
-			document.body.classList.remove('fade-out');
+		document.body.classList.remove('fade-out');
+		location.href = thisplace;
 		}, 400);
 	}
 
@@ -319,7 +319,7 @@
     }
 	
 	function handleDM(){
-		goto("/dm/" + selectedUser.id);
+		location.href = "/dm/" + selectedUser.id;
 	}
 
 	async function fetchRoomGameId() {
@@ -372,7 +372,7 @@
 		if (pending_invitation == true) {
 			pending_invitation = false;
 			console.log("Accepted the invitation");
-			goto(notif.url);
+			location.href = notif.url;
 		}
 	}
 
@@ -481,7 +481,7 @@
 	}
 
 	async function showProfile() {
-		goto(`/profile/${selectedUser.id}`);
+		location.href = `/profile/${selectedUser.id}`;
 	}
 
 	function ban(userToBan: any, room: any) {
@@ -559,12 +559,12 @@
 		}
 		currentUser = await fetchData();
 		if (!currentUser) {
-			goto('/')
+			location.href = '/';
 			return ;
 		}
 		const FA2 = await fetch2FA(currentUser.id)
 		if (FA2 === true) {
-			await goto('auth/2fa');
+			location.href = 'auth/2fa';
 			return ;
 		}
 		socket.on('connect', async function () {
@@ -830,7 +830,7 @@
 		});
 		socket.on('InvitedNotif', async(data) => {
             if (data.invitedBy === currentUser.pseudo) {
-                goto(data.url);
+                location.href = data.url;
             }
 			if (data.invited.id === currentUser.id) {
                 notif.display = true;
@@ -1086,9 +1086,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 										>+
 									</button>
 								</div> -->
-								{#if currentUser.status === 2}
+								{#if currentUser.status === 2 && currentRoom?.id > 0}
 								<button class="leave_chat" on:click={leaveRoom}>Supprimer la room ❌</button>
-								{:else}
+								{:else if  currentRoom?.id > 0}
 								<button class="leave_chat" on:click={leaveRoom}>Quitter la room ❌</button>
 								{/if}
 								{/if}

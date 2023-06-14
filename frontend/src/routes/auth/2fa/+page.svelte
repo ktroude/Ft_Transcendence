@@ -18,13 +18,13 @@
     user = await fetchData();
     if (!user)
     {
-      goto('/');
+      location.href = '/';
       return ;
     }
     const FA2 = await fetch2FA(user.id);
     if (FA2 == false)
     {
-      goto('/homepage');
+      location.href = '/homepage';
       return ;
     }
   });
@@ -54,7 +54,7 @@
           body: JSON.stringify({lockstatus: 'unlock'})
         });
           await alert('2FA verification successful!');
-          goto('/homepage');
+          location.href = '/homepage';
       }
       }
       else

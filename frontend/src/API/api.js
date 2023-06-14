@@ -111,7 +111,7 @@ const fetchDataOfUsername = async (user) => {
         return data;
     } else {
         console.log('Access token not found');
-        goto('/');
+        location.href = '/';
         return null;
     }
 }

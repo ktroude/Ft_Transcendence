@@ -21,7 +21,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     	<div class="game_navbar">
 			<div class="button_box">
 				<img class="button_picture" src="/img/home_icone.png" alt="">
-				<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
+				<button class="button_nav" on:click={() => location.href = '/homepage'}>Home</button>
 			</div>
 			{#if user?.username === currentUser}
 				<div class="button_box">
@@ -31,20 +31,19 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				{:else}
 				<div class="button_box">
 					<img class="button_picture" src="/img/profile_icone.png" alt="">
-					<button class="button_nav" on:click={() => fade(`/profile/${realUserId}`)}>Profile</button>
+					<button class="button_nav" on:click={ () => dlProfile()}>Profile</button>
 				</div>
 			{/if}
 			<div class="button_box">
 				<img class="button_picture" src="/img/game_icone.png" alt="">
-				<button class="button_nav" on:click={() => fade('/game')}>Game</button>
+				<button class="button_nav" on:click={() =>location.href = '/game'}>Game</button>
 			</div>
-
 			<div class="button_box">
 				<img class="button_picture" src="/img/chat_icone.png" alt="">
-				<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+				<button class="button_nav" on:click={() => location.href = '/chat'}>Chat</button>
 			</div>
 			<div class="button_box">
-				<button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
+				<button class="button_nav" on:click={() =>location.href = '/dm'}>✉️ DM</button>
 			</div>
 		</div>
 		<div class="main_profile">
@@ -116,7 +115,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<!-- svelte-ignore a11y-img-redundant-alt -->
 				<img class=".profile_img" src={imageURL} alt="OH Y'A PAS D'IMAGE MON GADJO" />
 				{#if user?.username === currentUser} 
-					<button class="edit_button" on:click={() => fade('/profile/edit')}>Edit profile<span><img class="edit_icone" src="/img/edit_profile.png" alt=""></span></button>
+					<button class="edit_button" on:click={() => location.href = '/profile/edit'}>Edit profile<span><img class="edit_icone" src="/img/edit_profile.png" alt=""></span></button>
 				{:else}
 				<button class="send_message" on:click={() => sendMessage()}>
 				<!-- svelte-ignore a11y-img-redundant-alt -->
@@ -228,7 +227,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	import {io, Socket} from 'socket.io-client';
 	import { page } from '$app/stores';
-	import { goto } from "$app/navigation";
     import { onMount } from 'svelte';
     import { Buffer } from 'buffer';
     import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../../API/api';
@@ -264,7 +262,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     }
 	let notif:any = {url:'', display:false, invitedBy:''};
 
-
 	function switchToHistory() {
 		const div1 = document.getElementById('achievements_bloc_id');
 		const div2 = document.getElementById('history_bloc_id');
@@ -277,6 +274,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
 
 
+	function dlProfile(){
+		location.href = `/profile/${realUserId}`;
+		}
 
 
 
@@ -345,7 +345,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		if (pending_invitation == true) {
 			pending_invitation = false;
 			console.log("Accepted the invitation");
-			goto(notif.url);
+			location.href = notif.url;
 		}
 	}
 
@@ -384,7 +384,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				});
 				const userExists = await response.json(); // Parse response body as JSON
 				if (userExists) { // Check if user exists
-					await goto(`/dm/${userExists.id}`);
+					location.href = `/dm/${userExists.id}`;
 				}
 		}
 		else 
@@ -400,7 +400,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				console.log('Error: Could not get profile');
 			else
 			{
-				await goto(`/profile/${friendUser.id}`);
+				location.href = `/profile/${friendUser.id}`;
 				await loadpage();
 			}
 		}
@@ -430,7 +430,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
     function handleInviteFriend(friendName:any) {
         console.log(`Inviting ${friendName} to play`);
-		/*If accepted -> goto(`/game/${roomid}`); */
+		/*If accepted -> location.href = (`/game/${roomid}`); */
     }
 
 	async function handleEnter(event:any)
@@ -478,7 +478,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   {
     const accessToken = await fetchAccessToken();
     if (accessToken)
-      goto(`/dm/${user.id}`);
+      location.href = `/dm/${user.id}`;
     else
       console.log('Error: Could not send message');
   }
@@ -637,10 +637,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	async function loadpage() {
 		if (!user)
-			goto('/');
+			location.href = '/';
 		if ($page.params.user == user.id.toString()) // If the user is on his own profile
 		{
-			user = await fetchData();
 			await getImageURL();
 			currentUser = user.username;
 			friends = await fetchFriend(user.pseudo);
@@ -653,11 +652,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			realUser = user.username;
 			realUserPseudo = user.pseudo;
 			user = await fetchDataOfUser($page.params.user);
-			if (!user)
-			{
-				user = await fetchData();
-				return await goto(`/homepage`);
-			}
+			// if (!user)
+			// {
+			// 	user = await fetchData();
+			// 	return location.href = (`/homepage`);
+			// }
 			is_blocked = await checkBlocked(realUser, user.username);
 			isFriend = await checkFrienship(user.id, realUserId);
 			await getImageURL();
@@ -699,62 +698,51 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 
 
-
-
-
-
-
-
-
-
-
 	async function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
 		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
-			goto(thisplace);
-			loadpage();
-			document.body.classList.remove('fade-out');
+		document.body.classList.remove('fade-out');
+		location.href = (thisplace);
+		//loadpage();
 		}, 400);
 	}
 
-
 	onMount(async function() {
+		
 		user = await fetchData(); // Catch the user
+		console.log("BONJOUR, JE SUSI ", user);
 		if (!user)
-			await goto('/'); // If no user redirect
+			location.href = '/'; // If no user redirect
 		const FA2 = await fetch2FA(user.id);
 		if (FA2 == true)
-			await goto('auth/2fa');
+			location.href = 'auth/2fa';
 		else
 		{
-			await loadpage();
 			socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
 			socket.on('connect', async function() {			
 				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
 			});
+			await loadpage();
 		}
 		setInterval(friendRequest, 10000);
 		socket.on('InvitedNotif', async(data:any) => {
-			console.log("data notif === ", data);
-            console.log("username == ", user.username);
-            if (data.invitedBy === user.username) {
-                goto(data.url);
-            }
+			if (data.invitedBy === user.username) {
+				location.href = data.url;
+			}
 			if (data.invited.id === user.id) {
-                notif.display = true;
-                notif.url = data.url;
-                notif.invitedBy = data.invitedBy;
+				notif.display = true;
+				notif.url = data.url;
+				notif.invitedBy = data.invitedBy;
 				if (pending_invitation == false)
 				{
-                    pending_invitation = true;
+					pending_invitation = true;
 					createPopupDM(notif);
 				}
-            }
+			}
 		});
 		loading = true;
-
 	});
 
 

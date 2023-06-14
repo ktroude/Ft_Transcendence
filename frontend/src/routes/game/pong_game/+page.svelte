@@ -31,7 +31,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			{/if}
 		{/if}
 		{#if gameFinished == true}
-			<button class="lobby_button" on:click={() => fade("/game")}>LOBBY</button>
+			<button class="lobby_button" on:click={() => location.href = "/game"}>LOBBY</button>
 		{/if}
 	</div>
 </body>
@@ -44,7 +44,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   import { Player } from './player';
   import { onMount } from 'svelte';
   import * as setting_game from "./GameConfig" 
-  import { goto } from "$app/navigation";
   import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../../API/api';
   import { LOCALHOST } from "../../../API/env";
 
@@ -457,8 +456,8 @@ function fade(thisplace) {
 		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
-			goto(thisplace);
-			document.body.classList.remove('fade-out');
+		document.body.classList.remove('fade-out');
+		location.href = thisplace;
 		}, 400);
 	}
 
@@ -470,13 +469,13 @@ onMount(async() => {
 	const user = await fetchData();
 	if (!user)
 	{
-		goto('/')
+		location.href = '/';
 		return ;
 	}
 	const FA2 = await fetch2FA(user.id);
 	if (FA2 === true)
 	{
-		goto('auth/2fa');
+		location.href = 'auth/2fa';
 		return ;
 	}
 	if (access)
@@ -494,12 +493,12 @@ onMount(async() => {
 			await connect();
 		}
 		catch{
-			fade("/game");
+			location.href = "/game";
 		}
 	}
 	else
 	{	
-		goto('/')
+		location.href = '/';
 		return ;
 	}
 });

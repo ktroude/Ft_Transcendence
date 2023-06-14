@@ -22,25 +22,25 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
         <div class="button_box">
             <img class="button_picture" src="/img/home_icone.png" alt=''>
-            <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
+            <button class="button_nav" on:click={() => location.href = '/homepage'}>Home</button>
         </div>
 
         <div class="button_box">
             <img class="button_picture" src="/img/profile_icone.png" alt=''>
-            <button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
+            <button class="button_nav" on:click={() => location.href = `/profile/${user.id}`}>Profile</button>
         </div>
 
         <div class="button_box">
             <img class="button_picture" src="/img/game_icone.png" alt=''>
-            <button class="button_nav" on:click={() => fade('/game')}>Game</button>
+            <button class="button_nav" on:click={() => location.href = '/game'}>Game</button>
         </div>
 
         <div class="button_box">
             <img class="button_picture" src="/img/chat_icone.png" alt=''>
-            <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+            <button class="button_nav" on:click={() => location.href = '/chat'}>Chat</button>
         </div>
         <div class="button_box">
-            <button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
+            <button class="button_nav" on:click={() => location.href = '/dm'}>✉️ DM</button>
         </div>
 
     </div>
@@ -73,7 +73,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { goto } from "$app/navigation";
     import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../API/api';
 	import { redirect } from '@sveltejs/kit';
 	import {io, Socket} from 'socket.io-client';
@@ -141,13 +140,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	user = await fetchData();
     if (!user)
 	{
-		await goto('/');
+		location.href = '/';
 		return;
 	}
 	const FA2 = await fetch2FA(user.id)
 	if (FA2 == true)
 	{
-		await goto('/auth/2fa');
+		location.href = '/auth/2fa';
 		return;
 	}
     else
@@ -200,8 +199,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
-			goto(thisplace);
-			document.body.classList.remove('fade-out');
+		document.body.classList.remove('fade-out');
+			location.href = thisplace;
 		}, 400);
 	}
 

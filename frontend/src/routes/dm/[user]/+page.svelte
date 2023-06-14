@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { io, Socket } from 'socket.io-client';
 	import { page } from '$app/stores';
     import { onMount } from 'svelte';
@@ -67,7 +66,7 @@ const fetchAccessToken = async () => {
         return data;
     } else {
         console.log('Access token not found');
-        goto('/');
+        location.href = ('/');
         return null;
     }
 }
@@ -78,6 +77,7 @@ const fetchAccessToken = async () => {
 
     
     async function handleClickRoomButton(roomId: number) {
+        console.log("roomId == ", roomId);
         socket.emit('getMessagesOfRoom', roomId);
     }
 
@@ -86,7 +86,7 @@ const fetchAccessToken = async () => {
     } 
 
     function handleCheckProfileButton() {
-        goto(`/profile/${selectedUser.id}`);
+        location.href = (`/profile/${selectedUser.id}`);
     }
 
     function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:any) {
@@ -137,7 +137,7 @@ const fetchAccessToken = async () => {
                 const response = await fetch(`http://${LOCALHOST}:3000/dm/who?id=${$page.params.user}`, { headers });
                 const data =  await response.json();
                 if (!data) {
-                    goto('/dm');
+                    location.href = '/dm';
                     return ;
                 }
                 selectedUser = data.who;
@@ -146,7 +146,7 @@ const fetchAccessToken = async () => {
             }
         }
         catch {
-            goto('/dm');
+            location.href = '/dm';
         }
     }
 
@@ -232,7 +232,7 @@ let toast;
 		if (pending_invitation == true) {
 			pending_invitation = false;
 			console.log("Accepted the invitation");
-			goto(notif.url);
+			location.href = notif.url;
 		}
 	}
 
@@ -280,7 +280,6 @@ let toast;
             if (!socket) {
                 window.location.pathname = '/'; 
             }
-            let user = await fetchData();
             socket.on('connect', async function() {
                 socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
             });
@@ -311,7 +310,7 @@ let toast;
         });
         socket.on('InvitedNotif', async(data) => {
             if (data.invitedBy === currentUser.username) {
-                goto(data.url);
+                location.href = data.url;
             }
 			if (data.invited.id === currentUser.id) {
                 notif.display = true;
@@ -337,8 +336,8 @@ let toast;
 		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
-			goto(thisplace);
-			document.body.classList.remove('fade-out');
+        document.body.classList.remove('fade-out');
+        location.href = thisplace;
 		}, 400);
 	}
 
@@ -368,23 +367,23 @@ let toast;
         <div class="game_navbar">
             <div class="button_box">
                 <img class="button_picture" src="/img/home_icone.png" alt="" />
-                <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
+                <button class="button_nav" on:click={() => location.href = '/homepage'}>Home</button>
             </div>
     
             <div class="button_box">
                 <img class="button_picture" src="/img/profile_icone.png" alt="" />
-                <button class="button_nav" on:click={() => fade(`/profile/${currentUser.id}`)}>Profile</button
+                <button class="button_nav" on:click={() => location.href = `/profile/${currentUser.id}`}>Profile</button
                 >
             </div>
     
             <div class="button_box">
                 <img class="button_picture" src="/img/game_icone.png" alt="" />
-                <button class="button_nav" on:click={() => fade('/game')}>Game</button>
+                <button class="button_nav" on:click={() => location.href = '/game'}>Game</button>
             </div>
     
             <div class="button_box">
                 <img class="button_picture" src="/img/chat_icone.png" alt="" />
-                <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+                <button class="button_nav" on:click={() => location.href = '/chat'}>Chat</button>
             </div>
         </div>
     
@@ -468,7 +467,7 @@ let toast;
 										{:else}
 											<div class="green_dot"></div>
 										{/if}
-										<button on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
+										<button on:click={() => handleClickRoomButton(x.id)}>{x.username}</button>
 									</div>
 								</li>
 							{/each}

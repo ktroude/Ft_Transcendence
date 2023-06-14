@@ -22,25 +22,25 @@
 	
 				<div class="button_box">
 					<img class="button_picture" src="/img/home_icone.png" alt="">
-					<button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
+					<button class="button_nav" on:click={() => location.href = '/homepage'}>Home</button>
 				</div>
 	
 				<div class="button_box">
 					<img class="button_picture" src="/img/profile_icone.png" alt="">
-					<button class="button_nav" on:click={() => fade(`/profile/${user.id}`)}>Profile</button>
+					<button class="button_nav" on:click={() => location.href = `/profile/${user.id}`}>Profile</button>
 				</div>
 	
 				<div class="button_box">
 					<img class="button_picture" src="/img/game_icone.png" alt="">
-					<button class="button_nav" on:click={() => fade('/game')}>Game</button>
+					<button class="button_nav" on:click={() => location.href = '/game'}>Game</button>
 				</div>
 	
 				<div class="button_box">
 					<img class="button_picture" src="/img/chat_icone.png" alt="">
-					<button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+					<button class="button_nav" on:click={() => location.href = '/chat'}>Chat</button>
 			</div>
 			<div class="button_box">
-				<button class="button_nav" on:click={() => fade('/dm')}>✉️ DM</button>
+				<button class="button_nav" on:click={() => location.href = '/dm'}>✉️ DM</button>
 			</div>
 			</div>
 	
@@ -130,7 +130,6 @@
 	
 	<script lang="ts">
 		import {io, Socket} from 'socket.io-client';
-		import { goto } from "$app/navigation";
 		import { onMount } from 'svelte';
 		import { Room } from 'colyseus.js';
 		import { Buffer } from 'buffer';
@@ -150,7 +149,7 @@
 		let playerId;
 		let mess = null;
 	
-		function redirectToGame() {
+		async function redirectToGame() {
 		  return new Promise((resolve) => {
 		if (room_pong_id) {
 		  const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${room_pong_id}`;
@@ -158,7 +157,7 @@
 		  resolve();
 		} else {
 		  // Si room_pong_id n'est pas encore rempli, attendez 1 seconde et réessayez
-		  setTimeout(() => redirectToGame().then(resolve), 1000);
+		  setTimeout(async () => await redirectToGame().then(resolve), 1000);
 		}
 	  });
 	}
@@ -207,7 +206,7 @@
 		let friends: any[] = [];
 		let friendNameAdd: string = '';
 		let searchProfile: string = '';
-		let connectedUsers = [];
+		let connectedUsers:any[] = [];
 		let loading = false;
 		let friendUser: User;
 		let user: User;
@@ -244,7 +243,7 @@
 			console.log("switching page....");
 			setTimeout(() => {
 			// window.location.href = href;
-				goto(thisplace);
+				location.href = thisplace;
 				document.body.classList.remove('fade-out');
 			}, 400);
 		}
@@ -264,7 +263,7 @@
 				});
 				const userExists = await response.json(); // Parse response body as JSON
 				if (userExists) { // Check if user exists
-					goto(`/profile/${userExists.id}`);
+					location.href = `/profile/${userExists.id}`;
 				} else {
 					return;
 				}
@@ -275,7 +274,7 @@
 	
 		async function acceptInvitation() {
 			console.log("Accepted the invitation");
-			goto(`/game/${'roomid'}`);
+			location.href = `/game/${'roomid'}`;
 			/*function that sends to the other user that the invitation has been accepted*/
 		}
 	
@@ -307,7 +306,7 @@
 					});
 					const userExists = await response.json(); // Parse response body as JSON
 					if (userExists) { // Check if user exists
-						await goto(`/dm/${userExists.id}`);
+						location.href = `/dm/${userExists.id}`;
 					}
 			}
 			else 
@@ -318,7 +317,7 @@
 			const accessToken = await fetchAccessToken();
 			friendUser = await fetchDataOfUser(friendName);
 			if (accessToken)
-				goto(`/profile/${friendUser.id}`)
+				location.href = `/profile/${friendUser.id}`;
 			else
 				console.log('Error: Could not get profile');
 		}
@@ -342,13 +341,13 @@
 			else
 			{
 				console.log('Error: Could not delete friend');
-				goto('/');
+				location.href = '/';
 			}
 		}
 	
 		function handleInviteFriend(friendName: any) {
 			console.log(`Inviting ${friendName} to play`);
-			/*If accepted -> goto(`/game/${roomid}`); */
+			/*If accepted -> location.href = (`/game/${roomid}`); */
 		}
 	
 		const handleAddFriend = async () => {
@@ -409,25 +408,29 @@
 			user = await fetchData();
 			if (!user)
 			{
-				await goto('/'); 
+				location.href = '/'; 
 				return ;
 			}
 			const FA2 = await fetch2FA(user.id);
 			if (FA2 == true)
 			{
-				await goto('auth/2fa');
+				location.href = 'auth/2fa';
 				return ;
 			}
 			else
 			{
 				const socket = io(`http://${LOCALHOST}:3000`);
-				socket.on('connect', async function() {			
+				socket.on('connect', function() {			
 					socket.emit('userConnected', { pseudo: user.pseudo });
 				});
 				await friendrequest();
-				setInterval(friendrequest, 5000);
 				await getConnectedUsers();
-				setInterval(getConnectedUsers, 5000);
+				setInterval(async () => {
+  					await friendrequest();
+					}, 5000);
+				setInterval(async () => {
+  					await getConnectedUsers();
+					}, 5000);
 			}
 			loading = true;
 		});

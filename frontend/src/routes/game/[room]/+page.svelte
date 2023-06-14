@@ -63,13 +63,12 @@
 
 <body>
 	<div class="game_navbar">
-		<button class="button_nav" on:click={() => goto('/homepage')}>Home</button>
+		<button class="button_nav" on:click={() => location.href = '/homepage'}>Home</button>
 	</div>
 </body>
 
 
 <script lang="ts">
-	import { goto } from "$app/navigation";
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
     import { fetchAccessToken, fetchData, fetchDataOfUser, fetch2FA } from '../../../API/api';
@@ -107,13 +106,13 @@
 		user = await fetchData();
 		if (!user)
 		{
-			goto('/');
+			location.href = '/';
 			return;
 		}
 		const FA2 = await fetch2FA(user.id);
 		if (FA2 == true)
 		{
-			goto('auth/2fa');
+			location.href = 'auth/2fa';
 			return ;
 		}
 		const socket = io(`http://${LOCALHOST}:3000`); // Connect to the server

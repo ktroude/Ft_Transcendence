@@ -13,7 +13,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { ChatRoomService } from './chatRoom.service';
 import * as bcrypt from 'bcryptjs'
-import { RouterModule } from '@nestjs/core';
 import { BlockService } from 'src/block/block.service';
 
 

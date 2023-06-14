@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { io, Socket } from 'socket.io-client';
     import { LOCALHOST } from "../../API/env";
 	import { onMount } from 'svelte';
@@ -22,8 +21,8 @@
 		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
-			goto(thisplace);
-			document.body.classList.remove('fade-out');
+        document.body.classList.remove('fade-out');
+        location.href = thisplace;
 		}, 400);
 	}
 
@@ -43,6 +42,7 @@
 			console.log("FRONT NOT WORKIGN HOHO")
 	} else 
 		console.log('Error: Could not get users');
+        console.log("co user == ", connectedUsers)
 }
 
 const fetchAccessToken = async () => {
@@ -68,7 +68,7 @@ const fetchAccessToken = async () => {
         return data;
     } else {
         console.log('Access token not found');
-        goto('/');
+        location.href = '/';
         return null;
     }
 }
@@ -79,11 +79,12 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
     } 
 
     async function handleClickRoomButton(roomId: number) {
+        console.log("roomId == ", roomId);
         socket.emit('getMessagesOfRoom', roomId);
     }
 
     function handleCheckProfileButton() {
-		goto(`/profile/${selectedUser.id}`);
+		location.href = `/profile/${selectedUser.id}`;
     }
 
     function handleBlockButton() {
@@ -134,7 +135,7 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 		if (pending_invitation == true) {
 			pending_invitation = false;
 			console.log("Accepted the invitation");
-			goto(notif.url);
+			location.href = notif.url;
 		}
 	}
 
@@ -230,13 +231,12 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
     }
     }
 
-        async function init(){
-
-            const cookies = document?.cookie?.split(';');
-            const accessTokenCookie = cookies?.find((cookie) =>
-			cookie?.trim()?.startsWith('access_token=')
-            );
-            const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
+    onMount(async() => {    
+    const cookies = document?.cookie?.split(';');
+    const accessTokenCookie = cookies?.find((cookie) =>
+    cookie?.trim()?.startsWith('access_token=')
+    );
+    const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
             if (!access_token) {
                 window.location.pathname = '/';
             }
@@ -250,14 +250,14 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
                 window.location.pathname = '/'; 
             }
             const ForTheEmit = await fetchData();
-                socket.on('connect', async function() {
-                    console.log("JE SUIS ICI");		
-                    socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
-                });
-                socket.on('DmRoomCreated', async(data) => {
-                    if (currentUser.id === data.user1.id || currentUser.id === data.user2.id) {
-                        roomList = [...roomList, data.room]
-                    }
+            socket.on('connect', async function() {
+                console.log("JE SUIS ICI");		
+                socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
+            });
+            socket.on('DmRoomCreated', async(data) => {
+                if (currentUser.id === data.user1.id || currentUser.id === data.user2.id) {
+                    roomList = [...roomList, data.room]
+                }
                 });
                 socket.on('newDirectMessage', async(data) => {
                     if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
@@ -280,21 +280,21 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
                     if (currentUser.id === data.user.id) {
                         messages = data.messages;
                         currentRoom = data.room;
-                selectedUser = data.selectedUser;
-            }
-        });
-        socket.on('InvitedNotif', async(data) => {
-            console.log("data notif === ", data);
-            console.log("username == ", currentUser.username);
-            if (data.invitedBy === currentUser.username) {
-                goto(data.url);
-            }
-			if (data.invited.id === currentUser.id) {
-                notif.display = true;
-                notif.url = data.url;
-                notif.invitedBy = data.invitedBy;
-				if (pending_invitation == false)
-				{
+                        selectedUser = data.selectedUser;
+                    }
+                });
+                socket.on('InvitedNotif', async(data) => {
+                    console.log("data notif === ", data);
+                    console.log("username == ", currentUser.username);
+                    if (data.invitedBy === currentUser.username) {
+                        location.href = data.url;
+                    }
+                    if (data.invited.id === currentUser.id) {
+                        notif.display = true;
+                        notif.url = data.url;
+                        notif.invitedBy = data.invitedBy;
+                        if (pending_invitation == false)
+                        {
                     pending_invitation = true;
 					createPopupDM(notif);
 				}
@@ -303,21 +303,14 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
         await fletchContactList();
         await fletchDirectMessageRoomData();
         await getConnectedUsers();
-        setInterval(getConnectedUsers, 5000);
+        setInterval( async () => await getConnectedUsers, 5000);
         loading = true;
-    }
+});
+
 	
-    onMount(async() => {await init()});
-    if (typeof window !== 'undefined') {
-    window.addEventListener('popstate', () => {
-      init();
-    });
-  }
-
-
-
-
-
+    
+    
+    
 
 
 
@@ -345,23 +338,23 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
         <div class="game_navbar">
             <div class="button_box">
                 <img class="button_picture" src="/img/home_icone.png" alt="" />
-                <button class="button_nav" on:click={() => fade('/homepage')}>Home</button>
+                <button class="button_nav" on:click={() => location.href = '/homepage'}>Home</button>
             </div>
     
             <div class="button_box">
                 <img class="button_picture" src="/img/profile_icone.png"  alt="" />
-                <button class="button_nav" on:click={() => fade(`/profile/${currentUser.id}`)}>Profile</button
+                <button class="button_nav" on:click={() => location.href = `/profile/${currentUser.id}`}>Profile</button
                 >
             </div>
     
             <div class="button_box">
                 <img class="button_picture" src="/img/game_icone.png" alt=""  />
-                <button class="button_nav" on:click={() => fade('/game')}>Game</button>
+                <button class="button_nav" on:click={() => location.href = '/game'}>Game</button>
             </div>
     
             <div class="button_box">
                 <img class="button_picture" src="/img/chat_icone.png" alt=""  />
-                <button class="button_nav" on:click={() => fade('/chat')}>Chat</button>
+                <button class="button_nav" on:click={() => location.href = '/chat'}>Chat</button>
             </div>
         </div>
     
@@ -447,7 +440,7 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 										{:else}
 											<div class="green_dot"></div>
 										{/if}
-										<button on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
+										<button on:click={() => handleClickRoomButton(x.id)}>{x.username}</button>
 									</div>
 								</li>
 							{/each}
