@@ -812,8 +812,6 @@
 			if (data.sucess === true) {
 				membres = [... membres, data.userToAdd];
 			}
-			// console.log()
-
 			await fletchMembres();
 			chatRooms = await fletchChatRoomsData();
 		}

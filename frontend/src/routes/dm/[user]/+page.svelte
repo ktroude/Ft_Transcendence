@@ -302,6 +302,7 @@ let toast;
             }
         });
         socket.on('returnDirectMessage', async(data) => {
+            console.log("data de returnDirectMessage == ", data);
             if (currentUser.id === data.user.id) {
                 messages = data.messages;
                 currentRoom = data.room;
@@ -467,7 +468,7 @@ let toast;
 										{:else}
 											<div class="green_dot"></div>
 										{/if}
-										<button on:click={() => handleClickRoomButton(x.id)}>{x.username}</button>
+										<button on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
 									</div>
 								</li>
 							{/each}

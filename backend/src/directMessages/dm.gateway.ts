@@ -163,8 +163,8 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
         const rooms = await this.prisma.directMessageRoom.findMany({
             where: {
               OR: [
-                { ownerOne: user1, ownerTwo: user2 },
-                { ownerOne: user2, ownerTwo: user1 },
+                { ownerOneId: user1.id, ownerTwoId: user2.id },
+                { ownerOneId: user2.id, ownerTwoId: user1.id },
               ],
             },
             select: {
@@ -174,6 +174,7 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
                 id:true,
             }
           });
+        console.log("ROOZ === ", rooms)
         if (rooms.length) {
             this.server.emit('returnDirectMessage', {
                 user: user1,

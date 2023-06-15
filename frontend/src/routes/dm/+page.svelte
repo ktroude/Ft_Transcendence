@@ -36,13 +36,13 @@
 			'Authorization': `Bearer ${accessToken}`
 		},
 		});
-		if (response.ok)
-			connectedUsers = await response.json();
+		if (response.ok) {
+            connectedUsers = await response.json();
+        }
 		else
 			console.log("FRONT NOT WORKIGN HOHO")
 	} else 
 		console.log('Error: Could not get users');
-        console.log("co user == ", connectedUsers)
 }
 
 const fetchAccessToken = async () => {
@@ -245,13 +245,11 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
                     Authorization: 'Bearer ' + access_token
                 }
             });
-            
+            const ForTheEmit = await fetchData();
             if (!socket) {
                 window.location.pathname = '/'; 
             }
-            const ForTheEmit = await fetchData();
             socket.on('connect', async function() {
-                console.log("JE SUIS ICI");		
                 socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
             });
             socket.on('DmRoomCreated', async(data) => {
@@ -303,7 +301,7 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
         await fletchContactList();
         await fletchDirectMessageRoomData();
         await getConnectedUsers();
-        setInterval( async () => await getConnectedUsers, 5000);
+        setInterval( getConnectedUsers, 5000);
         loading = true;
 });
 
