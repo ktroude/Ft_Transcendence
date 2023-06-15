@@ -438,7 +438,7 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 										{:else}
 											<div class="green_dot"></div>
 										{/if}
-										<button on:click={() => handleClickRoomButton(x.id)}>{x.username}</button>
+										<button on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
 									</div>
 								</li>
 							{/each}
