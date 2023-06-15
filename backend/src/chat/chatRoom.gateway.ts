@@ -534,16 +534,16 @@ export class ChatRoomGateway
       where: { pseudo: data.pseudo },
     });
     if (!userToAdd) {
-      this.server.emit('UserAdded', { sucess: false, userToAdd: null, user: user })
+      this.server.emit('UserAdded', { sucess: false, userToAdd: null, room: chatRoom, user:user })
       return;
     }
     else {
 	  if (await this.chatRoomService.isBanned(userToAdd, chatRoom) === true) {
-		this.server.emit('UserAdded', null)
+		this.server.emit('UserAdded', {room:chatRoom, ban:true, user:user})
 		return ;
 	  }
       if (await this.chatRoomService.isMember(userToAdd, chatRoom) === true) {
-        this.server.emit('UserAdded', { sucess: false, userToAdd: userToAdd, user: user });
+        this.server.emit('UserAdded', { sucess: false, userToAdd: userToAdd, user: user, room:chatRoom });
         return;
       }
       await this.prismaService.chatRoom.update({
@@ -554,7 +554,7 @@ export class ChatRoomGateway
       });
         const toSend = await this.chatRoomService.createMessage(`${userToAdd.pseudo} a rejoind la room`,
           { id: 0, pseudo: 'server' }, chatRoom);
-          this.server.emit('UserAdded', { sucess: true, user: userToAdd });
+          this.server.emit('UserAdded', { sucess: true, user: userToAdd, room:chatRoom });
           this.server.emit('sucess');
           this.server.emit('newMessage', toSend);
     }

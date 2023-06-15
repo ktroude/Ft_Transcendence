@@ -772,38 +772,56 @@
 				scrollToBottom();
 			}
 		});
+
+
+
 		socket.on('UserAdded', async (data) => {
-			if (!data) {
-				animation = data.animation;
+
+
+			if (data.room.id === currentRoom?.id) {
+
+				if (data?.ban === true && data?.user.id === currentUser.id) {
+					animation = data.animation;
 					messages = [
 						...messages,
 						{ senderPseudo: 'server', content: "Cet utilisateur EST BAN, pas de ca chez moi" }
 					];
 					scrollToBottom();
 					return
-			}
-			if (data.sucess === false && !data.userToAdd) {
+				}
+
+			if (data?.userToAdd === null && data?.user.id === currentUser.id) {
 				if (currentUser.id === data.user.id) {
 					animation = data.animation;
-
 					messages = [
 						...messages,
 						{ senderPseudo: 'server', content: "Cet utilisateur n'existe pas" }
 					];
 					scrollToBottom();
 				}
-			} else if (data.sucess === false && data.userToAdd) {
-				if (currentUser.id === data.user.id) {
+				return ;
+			} 
+			
+			if (data.sucess === false && data?.user.id === currentUser.id) {
 					messages = [
 						...messages,
 						{ senderPseudo: 'server', content: 'Cet utilisateur est deja membre' }
 					];
-				}
-			} else if (data.sucess === true && data.userToAdd) {
+			}
+			
+			if (data.sucess === true) {
 				membres = [... membres, data.userToAdd];
 			}
+			// console.log()
+
+			await fletchMembres();
 			chatRooms = await fletchChatRoomsData();
+		}
 		});
+
+
+
+
 		socket.on('wrongPW', async (data) => {
 			if (currentUser.id == data.user.id) {
 				currentRoom.id = -1;
