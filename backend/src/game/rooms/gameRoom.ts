@@ -37,25 +37,36 @@ async function handleVictoryPrisma(winner, looser, prisma) {
   const looser_match = await creatmatchprsima(looser, winner, prisma);
   const tmp = await prisma.user.findUnique({
     where: {id : winner.id_user},
-    select : {wins : true}
+    select : {wins : true, FirstWin: true, ImTheBoss: true, win_streak: true, WinStreak: true}
   });
-  // if (tmp.wins == 0)
-  // {
-  //   achievements
-  // }
-  // if (looser.pseudo == 'bleroy' || looser.pseudo == 'vl-hotel'|| looser.pseudo == 'ple-berr'|| looser.pseudo == 'ktroude')
-  // {
-  //   achievements
-  // }
-  // if (function return true)
-  // {
-  //   achievements
-  // }
+  console.log("firstwin", tmp.FirstWin)
+  console.log("nnrdebwin", tmp.wins)
+  if (tmp.FirstWin == false)
+  {
+    await prisma.user.update({
+      where: {id : winner.id_user},
+      data: {FirstWin: true}
+    });
+  }
+  if (looser.pseudo == 'bleroy' || looser.pseudo == 'vl-hotel'|| looser.pseudo == 'ple-berr'|| looser.pseudo == 'ktroude')
+  {
+    await prisma.user.update({
+      where: {id : winner.id_user},
+      data: {ImTheBoss: true}
+    });
+  }
+  if (tmp.win_streak == 2)
+  {
+    await prisma.user.update({
+      where: {id : winner.id_user},
+      data: {WinStreak: true}
+    });
+  }
   await prisma.user.update({
     where: {pseudo : winner.pseudo},
     data: {
       Match_historiques : {connect : {id: winner_match.id}},
-      wins: { increment: 1 }, win_streak: { increment: 1 } }
+      wins: { increment: 1 }, win_streak: { increment: 1 }, level: { increment: 1 }}
   });
 
   // push looser
@@ -139,12 +150,12 @@ export class gameRoomService extends Room {
         if(this.player1.score > this.player2.score)
         {
           handleVictoryPrisma(this.player1, this.player2, this.prisma);
-          this.broadcast('gameFinished', { winner: this.player1.pseudo });
+          this.broadcast('gameFinished', { winner: this.player1.username });
         }
         else
         {
           handleVictoryPrisma(this.player2, this.player1, this.prisma);
-          this.broadcast('gameFinished', { winner: this.player2.pseudo });
+          this.broadcast('gameFinished', { winner: this.player2.username });
         }
         console.log("envoie winner", this.player1.pseudo, this.player2.pseudo);
       }
@@ -214,12 +225,12 @@ export class gameRoomService extends Room {
         if(this.player1.score > this.player2.score)
         {
           handleVictoryPrisma(this.player1, this.player2, this.prisma);
-          this.broadcast('gameFinished', { winner: this.player1.pseudo });
+          this.broadcast('gameFinished', { winner: this.player1.username });
         }
         else
         {
           handleVictoryPrisma(this.player2, this.player1, this.prisma);
-          this.broadcast('gameFinished', { winner: this.player2.pseudo });
+          this.broadcast('gameFinished', { winner: this.player2.username });
         }
         console.log("reload but already finish");
         return

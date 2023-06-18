@@ -85,27 +85,27 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<div class="username_bloc">
 					<h1 class="username">{user?.username}
 					</h1>
-					{#if user?.username != currentUser && is_blocked === false}
-					<span class="buttons_other_user">
-						<button class="block_user_button" on:click={() => block(realUserPseudo, user.pseudo)}>
-							<span class="tooltiptext">Block</span>
-						</button>
-						{#if isFriend == false}
-							<button class="add_friend_button" on:click={() => AddFriendButton(realUserPseudo, user.username)}>
-								<span class="tooltiptext">Add to friends</span>
-							</button>
-						{:else}
-							<button class="remove_friend_button" on:click={() => DeleteFriendButton(realUserPseudo, user.username)}>
-								<span class="tooltiptext">Remove from friends</span>
-							</button>
-						{/if}
-					</span>
-					{/if}
 					{#if user?.username != currentUser && is_blocked === true}
 					<span>
 						<button class="unblock_button" on:click={() => unblock(realUserPseudo, user.pseudo)}>
 							<span class="tooltiptext">Unblock</span>
 						</button>
+					</span>
+					{/if}
+					{#if user?.username != currentUser && is_blocked === false}
+					<span class="buttons_other_user">
+						<button class="block_user_button" on:click={() => block(realUserPseudo, user.pseudo)}>
+							<span class="tooltiptext">Block</span>
+						</button>
+						{#if isFriend === false}
+						<button class="add_friend_button" on:click={() => AddFriendButton(realUserPseudo, user.username)}>
+							<span class="tooltiptext">Add to friends</span>
+						</button>
+						{:else}
+						<button class="remove_friend_button" on:click={() => DeleteFriendButton(realUserPseudo, user.username)}>
+							<span class="tooltiptext">Remove from friends</span>
+						</button>
+						{/if}
 					</span>
 					{/if}
 				</div>
@@ -124,17 +124,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			{/if}
 		</div>
 
-
-
-
-
-
-
-
-
-
-
-
 		<div class="right_bloc">
 			<div class="history_bloc" id="history_bloc_id">
 				<div class="history_title_bloc">
@@ -144,10 +133,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					<h5 class="history_line">Feels empty...</h5>
 					{/if}
 				{#each Array.from(history) as hist}
-					<h5 class="history_line">{hist.winner} - {hist.loser} <span style="color:greenyellow">[{hist.scoreUser} - {hist.scoreOpponent}]</span></h5>
+					{#if hist.winner == user?.pseudo || hist.loser == user?.pseudo }
+						<h5 class="history_line">{hist.winner} - {hist.loser} <span style="color:greenyellow">[{hist.scoreUser} - {hist.scoreOpponent}]</span></h5>
+					{/if}
 				{/each}
-
-
 
 			</div>
 			<div class="achievements_bloc" id="achievements_bloc_id">
@@ -303,8 +292,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 body: JSON.stringify({ friend: friendName })
             });
             if (response.ok)
-                friends = friends?.filter((friend: any) => friend !== friendName);
-            else
+			{
+				;
+			}
+			else
                 console.log('Error: Could not delete friend');
         } 
 		else
@@ -497,32 +488,34 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             });
 			if (response.ok)
 				is_blocked = true;
-
+			else
+				console.log('Error: Could not block user');
         } else
 			console.log('Error: Could not block user');
+		is_blocked = await checkBlocked(realUser, blockerUser);
     }
 	
 	async function checkBlocked(realUser:any, blockerUser:any) { // check if user is blocked
-    const accessToken = await fetchAccessToken();
-	if (accessToken)
-	{
-		const url = `http://${LOCALHOST}:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				'Authorization': `Bearer ${accessToken}`,
-			},
-		});
-		const data = await response.json();
-		if (data === true)
-			is_blocked = true;
+		const accessToken = await fetchAccessToken();
+		if (accessToken)
+		{
+			const url = `http://${LOCALHOST}:3000/users/${realUser}/checkBlock?block=${blockerUser}`;
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${accessToken}`,
+				},
+			});
+			const data = await response.json();
+			if (data === true)
+				return true;
+			else
+				return false;
+			}
 		else
-			is_blocked = false;
-		return is_blocked;
+			console.log('Error: Could not check if user is blocked');
 	}
-	else
-		console.log('Error: Could not check if user is blocked');
-}
+
 
 	async function checkFrienship(id1:any, id2:any) { // check if the two users are friends
 		const accessToken = await fetchAccessToken();
@@ -537,9 +530,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			});
 			const data = await response.json();
 			if (data === true)
-				isFriend =  true;
+				return true;
 			else
-				isFriend =  false;
+				return false
 		}
 		else
 			console.log('Error: Could not check if user is friend');
@@ -652,16 +645,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			realUser = user.username;
 			realUserPseudo = user.pseudo;
 			user = await fetchDataOfUser($page.params.user);
-			// if (!user)
-			// {
-			// 	user = await fetchData();
-			// 	return location.href = (`/homepage`);
-			// }
-			is_blocked = await checkBlocked(realUser, user.username);
+			if (!user)
+				return location.href = (`/homepage`);
+			is_blocked = await checkBlocked(realUserPseudo, user.username);
 			isFriend = await checkFrienship(user.id, realUserId);
 			await getImageURL();
 			await getAllAchievements();
-			history = await getHistory(realUserId);
+			history = await getHistory(user.id);
 		}
 	}
 

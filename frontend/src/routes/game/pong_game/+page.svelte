@@ -16,7 +16,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	<div class="score_bloc">
 		{#if connected == true}
 			<div class="scores">
-				<span style="color:rgb(93, 215, 255);">{player.pseudo}</span>: <span id="player1_score">{player.score}</span> <span style="color:rgb(93, 215, 255);">|</span> <span style="color:rgb(93, 215, 255);">{player2.pseudo}</span>: <span id="player2_score">{player2.score}</span>
+				<span style="color:rgb(93, 215, 255);">{player.username}</span>: <span id="player1_score">{player.score}</span> <span style="color:rgb(93, 215, 255);">|</span> <span style="color:rgb(93, 215, 255);">{player2.username}</span>: <span id="player2_score">{player2.score}</span>
 			</div>
 		{/if} 
 	</div>

@@ -27,9 +27,9 @@ export class FriendController {
 
     @UseGuards(JwtGuard)
     @Get('existingFriendship') // Check if two users are friends or not
-    async existingFriendship(@Query('id1') id1: number, @Query('id2') id2: number): Promise<Boolean>
+    async existingFriendship(@Query('id1') id1: string, @Query('id2') id2: string): Promise<Boolean>
     {
-		return this.friendService.existingFriendship(Number(id1), Number(id2));
+		return this.friendService.existingFriendship(parseInt(id1, 10), parseInt(id2, 10));
     }
 
     @UseGuards(JwtGuard)
