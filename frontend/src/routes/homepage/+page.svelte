@@ -156,7 +156,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         socket.emit('userConnected', { pseudo: user.pseudo });
       });
     
-      if (user.pseudo === 'yoshi' || user.pseudo === 'tac' || user.pseudo === 'mboy' || user.pseudo === 'palmi')
+      if (user.pseudo === 'yoshi' || user.pseudo === 'tac' || user.pseudo === 'mboy' || user.pseudo === 'palmi' || user.pseudo === "anissa")
       {
         const accessToken = await fetchAccessToken();
         if (accessToken)

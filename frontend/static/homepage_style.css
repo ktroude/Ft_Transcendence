@@ -59,6 +59,31 @@
 	  text-shadow: 6px 6px 0px rgba(0,0,0,0.2);
   }
   
+  .verify_button{
+	color: white;
+	padding: auto;
+	width:90px;
+	font-size: 30px;
+	/* height:40px; */
+	background-color: transparent;
+	cursor: pointer;
+	line-height: 22px;
+	border: none;
+	display:flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	text-align: center;
+}
+
+.verify_button:hover{
+	color: rgb(255, 175, 47);
+	animation: squeeze_text_edit 0.4s ease-in-out;
+	text-shadow: 3px 3px 20px rgb(255, 175, 47),
+	-2px 1px 30px rgb(255, 175, 47);
+}
+
   .homepage_redirect_pointer:hover {
 	cursor: pointer;
 	color: greenyellow;
