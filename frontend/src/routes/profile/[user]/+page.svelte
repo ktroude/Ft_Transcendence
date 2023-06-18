@@ -702,7 +702,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	onMount(async function() {
 		
 		user = await fetchData(); // Catch the user
-		console.log("BONJOUR, JE SUSI ", user);
 		if (!user)
 			location.href = '/'; // If no user redirect
 		const FA2 = await fetch2FA(user.id);
