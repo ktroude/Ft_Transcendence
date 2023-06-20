@@ -120,25 +120,6 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 		socket.emit(`InvitedInGame`, data);
     }
 
-    function handleConnectedUserButton() {
-
-    }
-
-    function removePopup() {
-		pending_invitation = false;
-		console.log("Denied the invitation");
-		const boxito = document.querySelector(".popup");
-		boxito?.remove();
-	}
-
-	function acceptInvitation(notif:any) {
-		if (pending_invitation == true) {
-			pending_invitation = false;
-			console.log("Accepted the invitation");
-			location.href = notif.url;
-		}
-	}
-
 	function createPopupDM(notif:any) {
 		const boxito = document.querySelector("body");
 		const toast = document.createElement("div");
@@ -158,6 +139,33 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 
 		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
 		denyButton?.addEventListener("click", removePopup);
+	}
+
+	function removePopup(notif:any) {
+		const data = {
+				accepted: false,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+		socket.emit('AnswerGame', data);
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito?.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			const data = {
+				accepted: true,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+			socket.emit('AnswerGame', data);
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			location.href = notif.url;
+		}
 	}
 
     function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:any) {
@@ -249,9 +257,10 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
             if (!socket) {
                 window.location.pathname = '/'; 
             }
-            socket.on('connect', async function() {
-                socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
-            });
+            socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
+            // socket.on('connect', async function() {
+                // socket.emit('userConnected', { pseudo: ForTheEmit.pseudo });
+            // });
             socket.on('DmRoomCreated', async(data) => {
                 if (currentUser.id === data.user1.id || currentUser.id === data.user2.id) {
                     roomList = [...roomList, data.room]
@@ -270,10 +279,10 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
                         roomList = data.rooms;
                     }
                 });
-                socket.on('InvitedNotif', async(data) => {
-                    if (data.invited.id === currentUser.id)
-                    notif = true;
-                });
+                // socket.on('InvitedNotif', async(data) => {
+                //     if (data.invited.id === currentUser.id)
+                //     notif = true;
+                // });
                 socket.on('returnDirectMessage', async(data) => {
                     if (currentUser.id === data.user.id) {
                         messages = data.messages;
@@ -282,11 +291,11 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
                     }
                 });
                 socket.on('InvitedNotif', async(data) => {
-                    console.log("data notif === ", data);
-                    console.log("username == ", currentUser.username);
-                    if (data.invitedBy === currentUser.username) {
-                        location.href = data.url;
-                    }
+                    // console.log("data notif === ", data);
+                    // console.log("username == ", currentUser.username);
+                    // if (data.invitedBy === currentUser.username) {
+                    //     location.href = data.url;
+                    // }
                     if (data.invited.id === currentUser.id) {
                         notif.display = true;
                         notif.url = data.url;
@@ -298,6 +307,17 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 				}
             }
 		});
+        socket.on('GameAnswer', async (data) => {
+            console.log('game answer data == ', data);
+		if (data.target.id == currentUser.id) {
+			if (data.accepted = false) {
+				console.log("invitation refusee");
+			}
+			else {
+				location.href = data.url;
+			}
+		}
+	  });
         await fletchContactList();
         await fletchDirectMessageRoomData();
         await getConnectedUsers();

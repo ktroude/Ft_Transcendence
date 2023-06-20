@@ -325,21 +325,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		isFriend = await checkFrienship(user.id, realUserId);
     }
 
-	function removePopup() {
-		pending_invitation = false;
-		console.log("Denied the invitation");
-		const boxito = document.querySelector(".popup");
-		boxito?.remove();
-	}
-
-	function acceptInvitation(notif:any) {
-		if (pending_invitation == true) {
-			pending_invitation = false;
-			console.log("Accepted the invitation");
-			location.href = notif.url;
-		}
-	}
-
 	async function denyInvitation() {
 		console.log("Denied the invitation");
 		/*function that sends to the other user that the invitation has been denied*/
@@ -588,6 +573,33 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		denyButton?.addEventListener("click", removePopup);
 	}
 
+	function removePopup(notif:any) {
+		const data = {
+				accepted: false,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+		socket.emit('AnswerGame', data);
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito?.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			const data = {
+				accepted: true,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+			socket.emit('AnswerGame', data);
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			location.href = notif.url;
+		}
+	}
+
 	async function getAllAchievements() {
 		const accessToken = await fetchAccessToken();
 		if (accessToken) {
@@ -717,9 +729,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		setInterval(friendRequest, 10000);
 		socket.on('InvitedNotif', async(data:any) => {
-			if (data.invitedBy === user.username) {
-				location.href = data.url;
-			}
+			// if (data.invitedBy === user.username) {
+			// 	location.href = data.url;
+			// }
 			if (data.invited.id === user.id) {
 				notif.display = true;
 				notif.url = data.url;
@@ -731,6 +743,17 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				}
 			}
 		});
+		socket.on('GameAnswer', async (data) => {
+            console.log('game answer data == ', data);
+		if (data.target.id == user.id) {
+			if (data.accepted = false) {
+				console.log("invitation refusee");
+			}
+			else {
+				location.href = data.url;
+			}
+		}
+	  });
 		loading = true;
 	});
 

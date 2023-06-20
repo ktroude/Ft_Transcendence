@@ -80,10 +80,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	let socket: Socket;
 	let anim:any = false;
-
+    let pending_invitation = false;
 	let all_achievements:any = {};
 
-
+	let notif:any = {url:'', display:false, invitedBy:''};
 	let loading:boolean = false;
 	let user: User;
     interface User {
@@ -93,6 +93,54 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         lastName: string;
         username: string;
     }
+
+	function createPopupDM(notif:any) {
+		const boxito = document.querySelector("body");
+		const toast = document.createElement("div");
+		toast.innerHTML = `<div class="popup">
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
+		boxito?.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
+		denyButton?.addEventListener("click", removePopup);
+	}
+
+	function removePopup(notif:any) {
+		const data = {
+				accepted: false,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+		socket.emit('AnswerGame', data);
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		boxito?.remove();
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			const data = {
+				accepted: true,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+			socket.emit('AnswerGame', data);
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			location.href = notif.url;
+		}
+	}
 
     async function redirectToGithub(username:any) {
       	const accessToken = await fetchAccessToken();
@@ -122,14 +170,14 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 												</div>
 										</div>`;
 					boxito?.appendChild(toast);
-					setTimeout(() => removePopup(toast), 3000);
+					setTimeout(() => removePopupo(toast), 3000);
 				}
 			}
 		}
 		window.open(`https://github.com/${username}`, '_blank');
 }
 
-	const removePopup = (toast:any) => {
+	const removePopupo = (toast:any) => {
     if(toast.timeoutId) clearTimeout(toast.timeoutId); 
     setTimeout(() => toast.remove(), 3000);
 	getAllAchievements();
@@ -151,11 +199,21 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
     else
     {
-      const socket = io(`http://${LOCALHOST}:3000`);
+      socket = io(`http://${LOCALHOST}:3000`);
       socket.on('connect', async function() {			
         socket.emit('userConnected', { pseudo: user.pseudo });
       });
-    
+	  socket.on('GameAnswer', async (data) => {
+            console.log('game answer data == ', data);
+		if (data.target.id == user.id) {
+			if (data.accepted = false) {
+				console.log("invitation refusee");
+			}
+			else {
+				location.href = data.url;
+			}
+		}
+	  });
       if (user.pseudo === 'yoshi' || user.pseudo === 'tac' || user.pseudo === 'mboy' || user.pseudo === 'palmi' || user.pseudo === "anissa")
       {
         const accessToken = await fetchAccessToken();
@@ -190,9 +248,27 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         }
       }
     }
+	socket.on('InvitedNotif', async(data) => {
+            // if (data.invitedBy === user.username) {
+            //     location.href = data.url;
+            // }
+			if (data.invited.id === user.id) {
+                notif.display = true;
+                notif.url = data.url;
+                notif.invitedBy = data.invitedBy;
+				if (pending_invitation == false)
+				{
+                    pending_invitation = true;
+					createPopupDM(notif);
+				}
+            }
+		});
 	await getAllAchievements();
 	loading = true;
 	});
+
+
+
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');

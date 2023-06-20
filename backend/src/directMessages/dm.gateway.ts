@@ -155,7 +155,6 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
         });
     }
 
-    getMessagesOfConnectedUser
     @SubscribeMessage('getMessagesOfConnectedUser')
     async handleGetMessagesOfConnectedUser(@ConnectedSocket() client:Socket, @MessageBody() data:any) {
         const user1 = this.clients.find(([, socket]) => socket === client)?.[0];
@@ -175,7 +174,7 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
             }
           });
         console.log("ROOZ === ", rooms)
-        if (rooms.length) {
+        if (rooms.length > 0) {
             this.server.emit('returnDirectMessage', {
                 user: user1,
                 room: rooms[0],
@@ -184,7 +183,7 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
             });
         }
         else {
-            const room = this.prisma.directMessageRoom.create({
+            const room = await this.prisma.directMessageRoom.create({
                 data: {
                     ownerOneId: user1.id,
                     ownerTwoId: user2.id,

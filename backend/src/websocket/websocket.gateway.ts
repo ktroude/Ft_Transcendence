@@ -50,6 +50,22 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
 		}
 		this.server.emit('InvitedNotif', toSend);
 	}
+
+  @SubscribeMessage('AnswerGame')
+  async handleAnswerGame(@ConnectedSocket() client:any, @MessageBody() data) {
+    const user = await this.prisma.user.findUnique({
+      where: {username: data.target},
+    });
+    console.log('answer game data == ', data);
+    console.log('user = ', user);
+    const toSend = {
+      accepted: data.accepted,
+      url:data.url,
+      target:user,
+    };
+    this.server.emit('GameAnswer', toSend);
+  }
+
   // ---------------------- DEPRECATED ----------------------
   
   async getClient() 

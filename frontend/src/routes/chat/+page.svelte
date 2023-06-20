@@ -361,7 +361,13 @@
 		denyButton?.addEventListener("click", removePopup);
 	}
 
-	function removePopup() {
+	function removePopup(notif:any) {
+		const data = {
+				accepted: false,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+		socket.emit('AnswerGame', data);
 		pending_invitation = false;
 		console.log("Denied the invitation");
 		const boxito = document.querySelector(".popup");
@@ -370,6 +376,12 @@
 
 	function acceptInvitation(notif:any) {
 		if (pending_invitation == true) {
+			const data = {
+				accepted: true,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+			socket.emit('AnswerGame', data);
 			pending_invitation = false;
 			console.log("Accepted the invitation");
 			location.href = notif.url;
@@ -845,9 +857,9 @@
 			}
 		});
 		socket.on('InvitedNotif', async(data) => {
-            if (data.invitedBy === currentUser.pseudo) {
-                location.href = data.url;
-            }
+            // if (data.invitedBy === currentUser.pseudo) {
+            //     location.href = data.url;
+            // }
 			if (data.invited.id === currentUser.id) {
                 notif.display = true;
                 notif.url = data.url;
@@ -859,6 +871,17 @@
 				}
             }
 		});
+		socket.on('GameAnswer', async (data) => {
+            console.log('game answer data == ', data);
+		if (data.target.id == user.id) {
+			if (data.accepted = false) {
+				console.log("invitation refusee");
+			}
+			else {
+				location.href = data.url;
+			}
+		}
+	  });
 		chatRooms = await fletchChatRoomsData();
 		currentUser = await fletchCurrentUserData();
 		if (currentUser.id < 0) {
