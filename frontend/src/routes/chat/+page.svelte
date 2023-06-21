@@ -566,23 +566,20 @@
 				Authorization: 'Bearer ' + access_token
 			}
 		});
-		if (!access_token || !socket) {
-			window.location.pathname = '/';
-		}
 		currentUser = await fetchData();
 		if (!currentUser) {
 			location.href = '/';
 			return ;
 		}
+		if (!access_token || !socket) {
+			window.location.pathname = '/';
+		}
+		socket.emit('userConnected', { pseudo: currentUser.pseudo });
 		const FA2 = await fetch2FA(currentUser.id)
 		if (FA2 === true) {
 			location.href = 'auth/2fa';
 			return ;
 		}
-		socket.on('connect', async function () {
-			console.log('Connected to server');
-			socket.emit('userConnected', { pseudo: currentUser.pseudo });
-		});
 		socket.on('roomCreated', async (newRoom: ChatRoom) => {
 			chatRooms = await fletchChatRoomsData();
 		});

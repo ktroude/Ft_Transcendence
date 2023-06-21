@@ -77,6 +77,50 @@
 	text-align: center;
 }
 
+.page404{
+	color: white;
+	padding: auto;
+	width:700px;
+	font-size: 30px;
+	/* height:40px; */
+	background-color: transparent;
+	line-height: 22px;
+	border: none;
+	display:flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	text-align: center;
+	position: absolute;
+	bottom: 40%;
+}
+
+.back_to_lobby{
+	color: white;
+	width:500px;
+	font-size: 30px;
+	/* height:40px; */
+	background-color: transparent;
+	cursor: pointer;
+	line-height: 22px;
+	border: none;
+	display:flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	text-align: center;
+	position: absolute;
+	bottom:20%;
+}
+
+.back_to_lobby:hover{
+	color: rgb(255, 175, 47);
+	animation: squeeze_text_edit 0.4s ease-in-out;
+	text-shadow: 3px 3px 20px rgb(255, 175, 47),
+	-2px 1px 50px rgb(255, 175, 47);
+}
 .verify_button:hover{
 	color: rgb(255, 175, 47);
 	animation: squeeze_text_edit 0.4s ease-in-out;

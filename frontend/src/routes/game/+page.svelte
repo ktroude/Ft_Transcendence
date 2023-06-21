@@ -171,6 +171,12 @@
 	
 	async function connect()
 	{
+	  const accessToken = await fetchAccessToken();
+	  if (!accessToken)
+	  {
+		location.href = '/';
+		return ;
+	  }
 	  if (waiting == false)
 	  {
 		waiting = true;

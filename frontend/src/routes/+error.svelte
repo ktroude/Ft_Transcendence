@@ -1,7 +1,7 @@
 <svelte:head>
-	<title>Home</title>
 	<link rel="preload" href="/img/bg1.jpg" as="image">
 	<link rel="preload" href="/homepage_style.css" as="style"/>
+	<link rel="stylesheet" href="/profile_style.css" />
 	<link rel="stylesheet" href="/homepage_style.css" />
 	<link rel="stylesheet" href="/navbar.css" />
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,10 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 </svelte:head>
 
+<script lang=ts>
+  import { page } from '$app/stores';
+</script>
 
-<h1 class="Ft-Transcendence">Ft-Transcendence</h1>
-<h2>
-    clique <a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-40c520b98b29c6f9322cc23e9f23942281b81e3160420de84e17bfcaa8295d71&redirect_uri=http%3A%2F%2F10.12.8.2%3A3000%2Ftoken&response_type=code">
-        ici </a>
-    pour te connecter breeeeeeeeeeeef
-</h2>
+<h1 class="Ft-Transcendence"> {$page.status}</h1>
+<h2 class="Ft-Transcendence"> Page not found</h2>
+<h3 class="page404"> You looking for something that doesn't exist anymore...</h3>
+
+<button class="back_to_lobby" on:click={() => location.href = '/homepage'}>Back to Homepage<span></span></button>
