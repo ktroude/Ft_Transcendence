@@ -413,9 +413,9 @@ let toast;
             <!------------------ LEFT BLOC ----------------------->
             <div class="left_bloc">
                 <div class="dm_list_bloc">
-                    <h2 class="connected_users_title">Messages privés:</h2>
+                    <h2 class="connected_users_title">Direct Messages</h2>
                         {#each roomList as chatRoom}
-                            <button class="user" on:click={() => handleClickRoomButton(chatRoom.id)}>
+                            <button class="pseudo-button-message" on:click={() => handleClickRoomButton(chatRoom.id)}>
                                 {chatRoom.name}
                             </button>
                         {/each}
@@ -437,7 +437,7 @@ let toast;
 										{/if}
 										{#if msg.senderPseudo != 'server'}
 											<button
-												class="pseudo-button-message"
+												class="pseudo-button"
 											>
 												{msg.senderPseudo}
 											</button>
@@ -477,28 +477,28 @@ let toast;
             <!----------------- RIGHT BLOC ---------------------->
             <div class="right_bloc">
                 <div class="connected_users">
-                    <h2 class="connected_users_title">Utilisateurs connectés:</h2>
+                    <h2 class="connected_title">Connected</h2>
                     <div class="connected_users_bloc">
-						<div class="connected_title">Connected</div>
-						<ul class="ul_friends">
+						<!-- <div class="connected_title">Connected</div> -->
+						<!-- <ul class="ul_friends"> -->
 							{#each connectedUsers as x }
-								<li class="friends_list">
+								<!-- <li class="friends_list"> -->
 									<div class="friend_line">
 										{#if x.connected == 2}
 											<div class="red_dot"></div>
 										{:else}
 											<div class="green_dot"></div>
 										{/if}
-										<button on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
+										<button class="pseudo-button-connected" on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
 									</div>
-								</li>
+								<!-- </li> -->
 							{/each}
-						</ul>
+						<!-- </ul> -->
 						</div>
                 </div>
                 <div class="selctedUser_button_settings">
-                    <buton on:click={handleCheckProfileButton} on:keydown>Voir le profil</buton>
-                    <button on:click={handleInviteGameButton}>Proposer une partie</button>
+                    <p> <buton class="button_show_profile" on:click={handleCheckProfileButton} on:keydown>Profil</buton>
+                    <p> <button  class="button_show_profile" on:click={handleInviteGameButton}>Game</button>
                 </div>
             </div>
         </div>
