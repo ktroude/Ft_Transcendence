@@ -46,6 +46,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
   import * as setting_game from "./GameConfig" 
   import { fetchAccessToken, fetchData, fetchFriend, fetchDataOfUser, fetch2FA } from '../../../API/api';
   import { LOCALHOST } from "../../../API/env";
+  import {io, Socket} from 'socket.io-client';
 
 	let currentUser;
 	let Colyseus;
@@ -272,7 +273,15 @@ function draw2(){
 }
 
 function play(){
-	room.onMessage("break", (message) => {break_r = message});
+	room.onMessage("break", (message) => {
+		if(break_r == true && message == false)
+		{
+			countdown(5);
+			break_r = message;
+		}
+		else
+			break_r = message
+	});
 	if (mainclient == true)
 		ballMove();
 	updatePos();
@@ -450,19 +459,6 @@ function updatePos(){
     })
   }
 }
-
-function fade(thisplace) {
-		document.body.classList.add('fade-out');
-		console.log("switching page....");
-		setTimeout(() => {
-		// window.location.href = href;
-		document.body.classList.remove('fade-out');
-		location.href = thisplace;
-		}, 400);
-	}
-
-	import {io, Socket} from 'socket.io-client';
-
 
 onMount(async() => {
 	const access = await fetchAccessToken();

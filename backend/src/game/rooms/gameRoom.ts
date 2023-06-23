@@ -81,7 +81,7 @@ async function handleVictoryPrisma(winner, looser, prisma) {
 async function leavePlayer(player, prisma)
 {
   await updateConnected(player, 1, prisma);
-  player.pseudo = '';
+  player.pseudo = 'null';
   player.username = '';
   player.id = '';
 }
@@ -188,13 +188,13 @@ export class gameRoomService extends Room {
     console.log("Leave la salle pong rom_id = ", this.roomId,client.id);
   }
   OnDispose(){
-    console.log('Room Pong is disposed', this.roomId);
+    console.log('Room Pong is disposed', this.roomId,);
   }
 
 
   async handlePlayerJoin(client: Client, playerInfo: { player_pseudo: string, player_username: string, player_id: string }) {
     // clearTimeout(this.reconnectTimeout);
-    console.log("Une personne a rejoint la salle pong", client.id);
+    console.log("Une personne a rejoint la salle pong", client.id, playerInfo);
   
     const { player_pseudo, player_username, player_id } = playerInfo;
   
