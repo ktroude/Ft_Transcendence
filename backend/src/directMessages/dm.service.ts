@@ -11,7 +11,7 @@ export class DirectMessageService {
         data: {
             content: content,
             senderId: user.id,
-            senderPseudo: user.pseudo,
+            senderPseudo: user.username,
             directMessageRoomId: roomId
         }
         });

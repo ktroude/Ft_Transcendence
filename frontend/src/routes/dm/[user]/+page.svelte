@@ -127,7 +127,6 @@ const fetchAccessToken = async () => {
 
     async function isExist() {
         try {
-
             const cookies = document.cookie.split(';');
             const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
 		    const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
@@ -426,6 +425,7 @@ let toast;
                 <div class="chat_messages_bloc" id="chat-messages">
     
                 </div>
+                {#if currentRoom}
                 <div class="message_input_container">
                     {#if messages && messages.length}
 								{#each messages as msg}
@@ -469,10 +469,11 @@ let toast;
                             id="sendMessageButton"
                             type="submit"
                             disabled>
-                            <img class="sent_icone" src="/img/edit_profile.png" alt="" /></button
+                            <img class="sent_icone" src="/img/edit_profile.png"  alt="" /></button
                         >
                     </form>
                 </div>
+                {/if}
             </div>
             <!----------------- RIGHT BLOC ---------------------->
             <div class="right_bloc">
