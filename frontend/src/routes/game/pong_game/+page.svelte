@@ -82,7 +82,10 @@ function ready_to_play()
 
 function countdown(counter)
 {
+	console.log("in countdown");
 	const context = canvas.getContext('2d');
+	if (anim)
+		cancelAnimationFrame(anim);
 	context.font = '80px Bebas Neue';
 	context.fillStyle = 'rgb(93, 215, 255)';
 	context.textAlign = 'center';
@@ -276,8 +279,10 @@ function play(){
 	room.onMessage("break", (message) => {
 		if(break_r == true && message == false)
 		{
+			console.log("in break coutdown");
 			countdown(5);
 			break_r = message;
+			return;
 		}
 		else
 			break_r = message
@@ -347,9 +352,6 @@ function endGame(){
 	connected = true;
     winner = message.winner;
     gameFinished = true;
-    if (winner == player.pseudo && mainclient == true)
-      print_win(winner);
-    else
       print_win(winner);
   });
 }
