@@ -70,7 +70,7 @@
 										 </div>
 										 {#if clickedFriend === friendName && showButtons == true}
 											 <button class="friend_button" on:click={() => {if (showButtons == true) handleMessageFriend(friendName)}}>💬</button>
-											 <button class="friend_button" on:click={() => {if (showButtons == true) handleInviteFriend(friendName)}}>🎮</button>
+											 <button class="friend_button" on:click={() => {if (showButtons == true) handleInviteGameButton(friendName)}}>🎮</button>
 											 <button class="friend_button" on:click={() => {if (showButtons == true) handleSearchProfile(friendName)}}>🔍</button>
 											 <button class="friend_button" on:click={() => {if (showButtons == true) handleDeleteFriend(friendName)}}>❌</button>
 										 {/if}
@@ -207,6 +207,8 @@
 	  }
 	}
 		let socket: Socket;
+		let notif:any = {url:'', display:false, invitedBy:''};
+    	let pending_invitation = false;
 		let previousFriend: string;
 		let showButtons = false;
 		let clickedFriend: string;
@@ -279,7 +281,7 @@
 				console.log('Error: Could not get users');
 		}
 	
-		async function acceptInvitation() {
+		async function acceptInvitat() {
 			console.log("Accepted the invitation");
 			location.href = `/game/${'roomid'}`;
 			/*function that sends to the other user that the invitation has been accepted*/
@@ -410,6 +412,88 @@
 		{
 			friends = await fetchFriend(user.pseudo);	
 		}
+
+
+		async function fetchRoomGameId() {
+		const cookies = document.cookie.split(';');
+		const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+		const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
+		if (accessToken) {
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			const response = await fetch(
+				`http://${LOCALHOST}:3000/users/getRoomId`,
+				{
+					headers
+				}
+			);
+			const data = await response.json();
+			return data;
+		}
+	}
+
+    async function handleInviteGameButton(selectedUser:string) {
+        const id = await fetchRoomGameId();
+        const url = `http://${LOCALHOST}:5173/game/pong_game?room_id=${id.response}`;
+		const data = {
+			invited: selectedUser,
+			invitedBy: user.username,
+			url: url,
+		}
+		socket.emit(`InvitedInGame`, data);
+    }
+
+	function createPopupDM(notif:any) {
+		const boxito = document.querySelector("body");
+		const toast = document.createElement("div");
+		toast.innerHTML = `<div class="popup">
+			<div class="popup_img">
+			</div>
+			<div class="popup_title_text_box">
+			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
+			<button class="popup_button" id="acceptButton">Accept</button>
+			<button class="popup_button" id="denyButton">Deny</button>
+			</div>
+		</div>`;
+		boxito?.appendChild(toast);
+		
+		const acceptButton = document.getElementById("acceptButton");
+		const denyButton = document.getElementById("denyButton");
+
+		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
+		denyButton?.addEventListener("click", () => removePopup(notif));
+	}
+
+	function removePopup(notif:any) {
+		const data = {
+				accepted: false,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+		socket.emit('AnswerGame', data);
+		pending_invitation = false;
+		console.log("Denied the invitation");
+		const boxito = document.querySelector(".popup");
+		if (boxito) {
+            boxito?.remove();
+            pending_invitation = false;
+        }
+	}
+
+	function acceptInvitation(notif:any) {
+		if (pending_invitation == true) {
+			const data = {
+				accepted: true,
+    			url: notif.url,
+      			target: notif.invitedBy,
+			}
+			socket.emit('AnswerGame', data);
+			pending_invitation = false;
+			console.log("Accepted the invitation");
+			location.href = notif.url;
+		}
+	}
+
 	
 		onMount(async () => {
 			user = await fetchData();
@@ -426,7 +510,7 @@
 			}
 			else
 			{
-				const socket = io(`http://${LOCALHOST}:3000`);
+				socket = io(`http://${LOCALHOST}:3000`);
 				socket.on('connect', function() {			
 					socket.emit('userConnected', { pseudo: user.pseudo });
 				});
@@ -438,6 +522,31 @@
 				setInterval(async () => {
   					await getConnectedUsers();
 					}, 5000);
+		socket.on('InvitedNotif', async(data) => {
+			console.log('data invitedNotif == ', data);
+			console.log('user == ', user)
+                    if (data.invited.id === user.id) {
+                        notif.display = true;
+                        notif.url = data.url;
+                        notif.invitedBy = data.invitedBy;
+                        if (pending_invitation == false)
+                        {
+                    pending_invitation = true;
+					createPopupDM(notif);
+				}
+            }
+		});
+        socket.on('GameAnswer', async (data) => {
+            console.log('game answer data == ', data);
+		if (data.target.id == user.id) {
+			if (data.accepted == false) {
+				console.log("invitation refusee");
+			}
+			else {
+				location.href = data.url;
+			}
+		}
+	  });
 			}
 			loading = true;
 		});

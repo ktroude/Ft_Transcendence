@@ -239,8 +239,7 @@ let toast;
 		const denyButton = document.getElementById("denyButton");
 
 		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
-		denyButton?.addEventListener("click", removePopup);
-	}
+		denyButton?.addEventListener("click", () => removePopup(notif));	}
 
 	function removePopup(notif:any) {
 		const data = {
@@ -252,7 +251,10 @@ let toast;
 		pending_invitation = false;
 		console.log("Denied the invitation");
 		const boxito = document.querySelector(".popup");
-		boxito?.remove();
+        if (boxito) {
+            boxito?.remove();
+            pending_invitation = false;
+        }
 	}
 
 	function acceptInvitation(notif:any) {
@@ -334,7 +336,7 @@ let toast;
         socket.on('GameAnswer', async (data) => {
             console.log('game answer data == ', data);
 		if (data.target.id == currentUser.id) {
-			if (data.accepted = false) {
+			if (data.accepted == false) {
 				console.log("invitation refusee");
 			}
 			else {
