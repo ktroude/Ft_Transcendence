@@ -15,10 +15,8 @@
   import { page } from '$app/stores';
 </script>
 
-
-
 <h1 class="Ft-Transcendence"> {$page.status}</h1>
 <h2 class="Ft-Transcendence"> Page not found</h2>
-<h3 class="glow"> You looking for something that doesn't exist anymore...</h3>
+<h3 class="page404"> You looking for something that doesn't exist anymore...</h3>
 
 <button class="back_to_lobby" on:click={() => location.href = '/homepage'}>Back to Homepage<span></span></button>
