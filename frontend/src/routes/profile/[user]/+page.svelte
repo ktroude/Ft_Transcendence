@@ -660,7 +660,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			realUserPseudo = user.pseudo;
 			user = await fetchDataOfUser($page.params.user);
 			if (!user)
-				return location.href = (`/homepage`);
+				return location.href = (`/error`);
 			is_blocked = await checkBlocked(realUserPseudo, user.username);
 			isFriend = await checkFrienship(user.id, realUserId);
 			await getImageURL();

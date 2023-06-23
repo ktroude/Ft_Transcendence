@@ -25,8 +25,11 @@ export class UserController {
     @UseGuards(JwtGuard)
     @Get(':user/getUser')
     async getUserInfo(@Param('user') user: string): Promise<User> {
-      const userId = parseInt(user, 10);
-        return await this.userService.findUserById(userId);
+        const userId = parseInt(user, 10);
+        if (userId > 2147483647)
+            return null;
+        else
+            return await this.userService.findUserById(userId);
     }
 
     @Get(':user/getUserbyPseudo')
