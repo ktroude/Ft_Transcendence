@@ -1,4 +1,5 @@
 	<svelte:head>
+		<title>Game</title>
 		<link rel="preload" href="/img/bg2.jpeg" as="image">
 		<link rel="preload" href="/game_style.css" as="style"/>
 		<link rel="stylesheet" href="/profile_style.css" />

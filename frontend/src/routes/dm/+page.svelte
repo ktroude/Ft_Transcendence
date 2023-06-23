@@ -336,6 +336,7 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 
     <svelte:head>
         <!-- <link rel="stylesheet" href="/style.css" /> -->
+        <title>Direct message</title>
         <link rel="preload" href="/img/bg1.jpg" as="image">
         <link rel="preload" href="/homepage_style.css" as="style"/>
         <link rel="stylesheet" href="/homepage_style.css" />

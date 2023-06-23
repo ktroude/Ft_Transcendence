@@ -13,7 +13,7 @@
 
 <h1 class="Ft-Transcendence">Ft-Transcendence</h1>
 <h2>
-    clique <a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-40c520b98b29c6f9322cc23e9f23942281b81e3160420de84e17bfcaa8295d71&redirect_uri=http%3A%2F%2F10.12.8.2%3A3000%2Ftoken&response_type=code">
+    clique <a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3c0128a2fdd31dcd10f5ffcafccc016da6b9a35d909368b56286b2c0331dd29c&redirect_uri=http%3A%2F%2F10.12.8.1%3A3000%2Ftoken&response_type=code">
         ici </a>
     pour te connecter breeeeeeeeeeeef
 </h2>

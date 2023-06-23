@@ -277,3 +277,22 @@
 	color: white;
 	text-align: left;
 }
+
+.glow {
+	font-size: 25px;
+	color: #ffffff;
+	text-align: center;
+	-webkit-animation: glow 1s ease-in-out infinite alternate;
+	-moz-animation: glow 1s ease-in-out infinite alternate;
+	animation: glow 1.5s ease-in-out infinite alternate;
+  }
+  @-webkit-keyframes glow {
+	from {
+	  text-shadow: 0 0 10px #eeeeee, 0 0 20px #000000, 0 0 20px #000000, 0 0 20px #000000, 
+				   0 0 20px #ffc233, 0 0 20px #ffd21d, 0 0 20px #fad460;
+	}
+	to {
+	  text-shadow: 0 0 20px #eeeeee, 0 0 30px #ff4da6, 0 0 20px #ffd04d, 0 0 20px #ffc830,
+				   0 0 20px #ffc117b2, 0 0 20px #ffa231, 0 0 20px #ffc812d6;
+	}
+  }
