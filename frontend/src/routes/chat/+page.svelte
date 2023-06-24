@@ -872,7 +872,7 @@
 		});
 		socket.on('GameAnswer', async (data) => {
             console.log('game answer data == ', data);
-		if (data.target.id == user.id) {
+		if (data.target.id == currentUser.id) {
 			if (data.accepted == false) {
 				console.log("invitation refusee");
 			}
@@ -1285,7 +1285,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 								{#if find(showOptionsPseudo, 'profile') === true}
 									<button class="button_show_profile" on:click={showProfile}>Voir le profil</button>
 									<button class="button_show_profile" on:click={handleDM}>DM</button>
-									<button class="button_show_profile" on:click={handleInviteGameButton}>Game</button>
+									<button class="button_show_profile" on:click={handleInviteGameButton}>Invite to play</button>
 								{/if}
 								{#if find(showOptionsPseudo, 'ban') === true}
 									<button

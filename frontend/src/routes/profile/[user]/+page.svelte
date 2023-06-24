@@ -674,12 +674,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		friends = await fetchFriend(user.pseudo);
 	}
 
-
-
-
-
-
-
 	let history: any[];
 	history = [];
 
@@ -700,8 +694,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			console.log('Error: Could not get history');
 	}
 
-
-
 	async function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
 		console.log("switching page....");
@@ -717,16 +709,20 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		
 		user = await fetchData(); // Catch the user
 		if (!user)
+		{
 			location.href = '/'; // If no user redirect
+			return ;
+		}
 		const FA2 = await fetch2FA(user.id);
 		if (FA2 == true)
+		{
 			location.href = 'auth/2fa';
+			return ;
+		}
 		else
 		{
 			socket = io(`http://${LOCALHOST}:3000`); // Connect to the server
-			socket.on('connect', async function() {			
-				socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
-			});
+			socket.emit('userConnected', { pseudo: user.pseudo }); // Send the user pseudo to the server
 			await loadpage();
 		}
 		setInterval(friendRequest, 10000);
@@ -741,10 +737,28 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					createPopupDM(notif);
 				}
 			}
+			else if (data.invited.id === user.id) {
+				notif.display = true;
+				notif.url = data.url;
+				notif.invitedBy = data.invitedBy;
+				if (pending_invitation == false)
+				{
+					pending_invitation = true;
+					createPopupDM(notif);
+				}
+			}
 		});
 		socket.on('GameAnswer', async (data) => {
             console.log('game answer data == ', data);
-		if (data.target.id == realUserId) {
+		if (data.target.id == user.id) {
+			if (data.accepted == false) {
+				console.log("invitation refusee");
+			}
+			else {
+				location.href = data.url;
+			}
+		}
+		else if (data.target.id == user.id) {
 			if (data.accepted == false) {
 				console.log("invitation refusee");
 			}
