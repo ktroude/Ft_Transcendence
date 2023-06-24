@@ -460,14 +460,10 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
                 </div>
                 <div class="selctedUser_button_settings">
                     {#if selectedUser?.id && selectedUser?.username}
-                    <p> <buton class="button_show_profile" on:click={handleCheckProfileButton} on:keydown>Profil</buton>
-                        <p> <button  class="button_show_profile" on:click={handleInviteGameButton}>Game</button>                    {/if}
+                    <p> <buton class="button_show_profile" on:click={handleCheckProfileButton} on:keydown>Profile</buton>
+                        <p> <button  class="button_show_profile" on:click={handleInviteGameButton}>Invite to play</button>                    {/if}
                 </div>
             </div>
         </div>
-    
-    
-    
-    
-        {/if}
-    </body>
+    {/if}
+</body>

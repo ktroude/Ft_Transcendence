@@ -367,7 +367,7 @@ let toast;
 
     <svelte:head>
         <!-- <link rel="stylesheet" href="/style.css" /> -->
-        <title>Direct message -> {$page.params.user}</title>
+        <title>Direct message</title>
         <link rel="preload" href="/img/bg1.jpg" as="image">
         <link rel="preload" href="/homepage_style.css" as="style"/>
         <link rel="stylesheet" href="/homepage_style.css" />
@@ -498,8 +498,8 @@ let toast;
 						</div>
                 </div>
                 <div class="selctedUser_button_settings">
-                    <p> <buton class="button_show_profile" on:click={handleCheckProfileButton} on:keydown>Profil</buton>
-                    <p> <button  class="button_show_profile" on:click={handleInviteGameButton}>Game</button>
+                    <p> <buton class="button_show_profile" on:click={handleCheckProfileButton} on:keydown>Profile</buton>
+                    <p> <button  class="button_show_profile" on:click={handleInviteGameButton}>Invite to play</button>
                 </div>
             </div>
         </div>

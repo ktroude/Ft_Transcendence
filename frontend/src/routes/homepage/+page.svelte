@@ -112,7 +112,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		const denyButton = document.getElementById("denyButton");
 
 		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
-		denyButton?.addEventListener("click", () => removePopup(notif));	}
+		denyButton?.addEventListener("click", () => removePopup(notif));
+		setTimeout(() => removePopupo(toast), 1000000000)
+		}
 
 	function removePopup(notif:any) {
 		const data = {

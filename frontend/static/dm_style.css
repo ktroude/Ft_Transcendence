@@ -266,7 +266,8 @@
 	color: yellow;
 	border: none;
 	margin: 10px;
-	font-size: 20px;
+	font-size: 40px;
+	height: 40px;
 }
 .button_show_profile:hover{
 	cursor: pointer;
