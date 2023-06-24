@@ -447,7 +447,7 @@
 		const boxito = document.querySelector("body");
 		const toast = document.createElement("div");
 		toast.innerHTML = `<div class="popup">
-			<div class="popup_img">
+			<div class="popup_img_2">
 			</div>
 			<div class="popup_title_text_box">
 			<h4 class="popup_title">Invited by: `+notif.invitedBy+`</h4>
