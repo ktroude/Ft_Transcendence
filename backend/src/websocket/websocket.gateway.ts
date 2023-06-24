@@ -10,7 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway()
 export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
-  constructor(private userService: UserService, private prisma: PrismaService) {}
+  constructor(private userService: UserService, private prisma: PrismaService) { }
   @WebSocketServer()
   server: Server;
   clients: Map<string, string> = new Map();
@@ -21,58 +21,60 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
       if (this.clients.has(pseudo)) { // If user already in map, we update his socket id
         this.clients.set(pseudo, client.id);
         return;
-	}
+      }
       this.clients.set(pseudo, client.id);
       this.userService.updateConnectedStatus(pseudo, 'online');
     });
   }
 
-	handleDisconnect(client: any) // When a client is disconnected, we remove it from the map
-	{
-		this.clients.forEach((value, key) => {
-			if (value === client.id)
-      {
+  handleDisconnect(client: any) // When a client is disconnected, we remove it from the map
+  {
+    this.clients.forEach((value, key) => {
+      if (value === client.id) {
         this.userService.updateConnectedStatus(key, 'offline');
-			  this.clients.delete(key);
+        this.clients.delete(key);
       }
-		});
-	}
-  
-	@SubscribeMessage('InvitedInGame')
-	async handleInvitedInGame(@ConnectedSocket() client:any, @MessageBody() data) {
-    const invited = await this.prisma.user.findUnique({
-      where: {username:data.invited},
     });
-		const toSend = {
-			invited: invited,
-			invitedBy: data.invitedBy,
-			url: data.url,
-		}
-		this.server.emit('InvitedNotif', toSend);
-	}
+  }
+
+  @SubscribeMessage('InvitedInGame')
+  async handleInvitedInGame(@ConnectedSocket() client: any, @MessageBody() data) {
+    const invited = await this.prisma.user.findUnique({
+      where: { username: data.invited },
+    });
+    const toSend = {
+      invited: invited,
+      invitedBy: data.invitedBy,
+      url: data.url,
+    }
+    this.server.emit('InvitedNotif', toSend);
+  }
 
   @SubscribeMessage('AnswerGame')
-  async handleAnswerGame(@ConnectedSocket() client:any, @MessageBody() data) {
-    console.log("Answer Game  DATA === ", data);
-    const user = await this.prisma.user.findUnique({
-      where: {username: data?.target},
-    });
-    console.log('answer game data == ', data);
-    const toSend = {
-      accepted: data.accepted,
-      url:data.url,
-      target:user,
-    };
-    this.server.emit('GameAnswer', toSend);
+  async handleAnswerGame(@ConnectedSocket() client: any, @MessageBody() data) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { username: data?.target },
+      });
+      console.log('answer game data == ', data);
+      const toSend = {
+        accepted: data.accepted,
+        url: data.url,
+        target: user,
+      };
+      this.server.emit('GameAnswer', toSend);
+    }
+    catch {
+      return null;
+    }
   }
 
   // ---------------------- DEPRECATED ----------------------
-  
-  async getClient() 
-  { 
+
+  async getClient() {
     const newmap = this.clients;
     const vector = [];
-  
+
     for (const [key, value] of newmap.entries()) {
       const user = await this.prisma.user.findUnique({
         where: {
@@ -85,11 +87,11 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
         }
       });
       if (user)
-      vector.push( {
-        id: user.id,
-        username: user.username,
-        connected: user.connected,
-      });
+        vector.push({
+          id: user.id,
+          username: user.username,
+          connected: user.connected,
+        });
     }
     return vector;
   }

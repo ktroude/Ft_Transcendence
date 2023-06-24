@@ -731,10 +731,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		setInterval(friendRequest, 10000);
 		socket.on('InvitedNotif', async(data:any) => {
-			// if (data.invitedBy === user.username) {
-			// 	location.href = data.url;
-			// }
-			if (data.invited.id === user.id) {
+			if (data.invited.id === realUserId) {
 				notif.display = true;
 				notif.url = data.url;
 				notif.invitedBy = data.invitedBy;
@@ -747,7 +744,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		});
 		socket.on('GameAnswer', async (data) => {
             console.log('game answer data == ', data);
-		if (data.target.id == user.id) {
+		if (data.target.id == realUserId) {
 			if (data.accepted == false) {
 				console.log("invitation refusee");
 			}

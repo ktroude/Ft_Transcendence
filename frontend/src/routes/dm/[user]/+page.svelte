@@ -485,11 +485,15 @@ let toast;
 							{#each connectedUsers as x }
 								<!-- <li class="friends_list"> -->
 									<div class="friend_line">
-										{#if x.connected == 2}
-											<div class="red_dot"></div>
-										{:else}
-											<div class="green_dot"></div>
-										{/if}
+                                        {#if x.connected == 0}
+                                        <div class="red_dot"></div>
+                                    {/if}
+                                    {#if x.connected == 1}
+                                        <div class="green_dot"></div>
+                                    {/if}
+                                    {#if x.connected == 2}
+                                        <div class="blue_dot"></div>
+                                    {/if}
 										<button class="pseudo-button-connected" on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
 									</div>
 								<!-- </li> -->
@@ -499,7 +503,9 @@ let toast;
                 </div>
                 <div class="selctedUser_button_settings">
                     <p> <buton class="button_show_profile" on:click={handleCheckProfileButton} on:keydown>Profile</buton>
+                        {#if selectedUser?.id !== currentUser?.id}
                     <p> <button  class="button_show_profile" on:click={handleInviteGameButton}>Invite to play</button>
+                        {/if}
                 </div>
             </div>
         </div>
@@ -508,3 +514,8 @@ let toast;
     
         {/if}
     </body>
+
+
+
+
+

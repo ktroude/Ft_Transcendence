@@ -442,14 +442,14 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 							{#each connectedUsers as x }
 								<!-- <li class="friends_list"> -->
 									<div class="friend_line">
-                                    {#if x.connected == 2}
-                                        <div class="blue_dot"></div>
+                                        {#if x.connected == 0}
+                                        <div class="red_dot"></div>
                                     {/if}
                                     {#if x.connected == 1}
                                         <div class="green_dot"></div>
                                     {/if}
-                                    {#if x.connected == 0}
-                                    <div class="red_dot"></div>
+                                    {#if x.connected == 2}
+                                        <div class="blue_dot"></div>
                                     {/if}
 										<button class="pseudo-button-connected" on:click={() => handleClickConnectedUserButton(x.id)}>{x.username}</button>
 									</div>
@@ -461,7 +461,10 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
                 <div class="selctedUser_button_settings">
                     {#if selectedUser?.id && selectedUser?.username}
                     <p> <buton class="button_show_profile" on:click={handleCheckProfileButton} on:keydown>Profile</buton>
-                        <p> <button  class="button_show_profile" on:click={handleInviteGameButton}>Invite to play</button>                    {/if}
+                        {#if selectedUser?.id !== currentUser?.id}
+                        <p> <button  class="button_show_profile" on:click={handleInviteGameButton}>Invite to play</button>
+                        {/if}
+                    {/if}
                 </div>
             </div>
         </div>
