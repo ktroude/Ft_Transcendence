@@ -301,7 +301,7 @@
 	background: rgba(0, 0, 0, 0.542);
 	border-radius: 5px;
 	width: 200px;
-	position:absolute;	animation: popup 20s ease-in-out;
+	position:absolute;	animation: popup 15s ease-in-out;
 }
 
 

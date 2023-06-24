@@ -4,6 +4,7 @@
 	<link rel="preload" href="/homepage_style.css" as="style"/>
 	<link rel="stylesheet" href="/homepage_style.css" />
 	<link rel="stylesheet" href="/navbar.css" />
+	<link rel="stylesheet" href="/dm_style.css" />
 	<link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
@@ -113,8 +114,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 		acceptButton?.addEventListener("click", () => acceptInvitation(notif));
 		denyButton?.addEventListener("click", () => removePopup(notif));
-		setTimeout(() => removePopupo(toast), 1000000000)
-		}
+		setTimeout(() => removePopup(toast), 14800);
+	}
 
 	function removePopup(notif:any) {
 		const data = {
@@ -123,8 +124,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       			target: notif.invitedBy,
 			}
 		socket.emit('AnswerGame', data);
-		pending_invitation = false;
-		console.log("Denied the invitation");
 		const boxito = document.querySelector(".popup");
 		if (boxito) {
             boxito?.remove();
