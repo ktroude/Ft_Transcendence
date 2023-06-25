@@ -59,6 +59,8 @@ async function handleVictoryPrisma(winner, looser, prisma) {
       data: {WinStreak: true}
     });
   }
+    if (winner.pseudo === 'null')
+      return;
   await prisma.user.update({
     where: {pseudo : winner.pseudo},
     data: {
@@ -67,6 +69,8 @@ async function handleVictoryPrisma(winner, looser, prisma) {
   });
 
   // push looser
+  if (looser.pseudo === 'null')
+      return ;
   await prisma.user.update({
     where: {pseudo : looser.pseudo},
     data: {
