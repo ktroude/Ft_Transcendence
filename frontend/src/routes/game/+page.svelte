@@ -139,6 +139,28 @@
 		import { navigate } from 'svelte-routing';
 		import { xlink_attr } from 'svelte/internal';
 		import { LOCALHOST } from "../../API/env";
+		let socket: Socket;
+		let notif:any = {url:'', display:false, invitedBy:''};
+		let pending_invitation = false;
+		let previousFriend: string;
+		let showButtons = false;
+		let clickedFriend: string;
+		let friends: any[] = [];
+		let friendNameAdd: string = '';
+		let searchProfile: string = '';
+		let connectedUsers:any[] = [];
+		let loading = false;
+		let friendUser: User;
+		let user: User;
+		interface User {
+			id: number;
+			pseudo: string;
+			firstName: string;
+			lastName: string;
+			picture: string;
+			username: string;
+			createdAt: Date;
+		}
 	
 		let Colyseus;
 		let client;
@@ -185,49 +207,22 @@
 		if(!client)
 			client = new Colyseus.Client(`ws://${LOCALHOST}:3001`);
 		room = await client.joinOrCreate("ranked");
-		console.log("joined successfully", room);
-		console.log("after join or create");
 		room.onMessage("connect", (message) => {
 			playerId = message.playerId;
-			console.log(`Connecté avec succès`);
 			// localStorage.setItem("playerId", playerId);
 		});
 		room.onMessage('waiting', (message) => { waiting = true; });
 		room.onMessage('seat', (message) => {
-			console.log("dans seat");
 			room_pong_id = message;
 			waiting = false;
 		  redirectToGame();
 		});
 	  }
 	  else{
-		console.log("dans l'waiting fausse", room);
 		waiting = false;
 		room.send('waiting',  { waiting : false});
 	  }
 	}
-		let socket: Socket;
-		let notif:any = {url:'', display:false, invitedBy:''};
-    	let pending_invitation = false;
-		let previousFriend: string;
-		let showButtons = false;
-		let clickedFriend: string;
-		let friends: any[] = [];
-		let friendNameAdd: string = '';
-		let searchProfile: string = '';
-		let connectedUsers:any[] = [];
-		let loading = false;
-		let friendUser: User;
-		let user: User;
-		interface User {
-			id: number;
-			pseudo: string;
-			firstName: string;
-			lastName: string;
-			picture: string;
-			username: string;
-			createdAt: Date;
-		}
 	
 		async function getConnectedUsers() {
 		const accessToken = await fetchAccessToken();
@@ -241,15 +236,11 @@
 			});
 			if (response.ok)
 				connectedUsers = await response.json();
-			else
-				console.log("FRONT NOT WORKIGN HOHO")
-		} else 
-			console.log('Error: Could not get users');
+		}
 	}
 	
 		function fade(thisplace:string) {
 			document.body.classList.add('fade-out');
-			console.log("switching page....");
 			setTimeout(() => {
 			// window.location.href = href;
 				location.href = thisplace;
@@ -276,20 +267,7 @@
 				} else {
 					return;
 				}
-			}
-			else 
-				console.log('Error: Could not get users');
-		}
-	
-		async function acceptInvitat() {
-			console.log("Accepted the invitation");
-			location.href = `/game/${'roomid'}`;
-			/*function that sends to the other user that the invitation has been accepted*/
-		}
-	
-		async function denyInvitation() {
-			console.log("Denied the invitation");
-			/*function that sends to the other user that the invitation has been denied*/
+			} 
 		}
 	
 		async function handleFriendClick(friendName: string) {
@@ -318,8 +296,6 @@
 						location.href = `/dm/${userExists.id}`;
 					}
 			}
-			else 
-				console.log('Error: Could not get users');
 		}
 	
 		async function handleProfileFriend(friendName: any) {
@@ -328,7 +304,7 @@
 			if (accessToken)
 				location.href = `/profile/${friendUser.id}`;
 			else
-				console.log('Error: Could not get profile');
+				location.href = '/';
 		}
 	
 		async function handleDeleteFriend(friendName: any) {
@@ -344,19 +320,9 @@
 				});
 				if (response.ok)
 					friends = friends.filter(friend => friend[0] !== friendName);
-				else
-					console.log('Error: Could not delete friend');
 			} 
 			else
-			{
-				console.log('Error: Could not delete friend');
 				location.href = '/';
-			}
-		}
-	
-		function handleInviteFriend(friendName: any) {
-			console.log(`Inviting ${friendName} to play`);
-			/*If accepted -> location.href = (`/game/${roomid}`); */
 		}
 	
 		const handleAddFriend = async () => {
@@ -375,20 +341,18 @@
 				if (response.ok) {
 					friends = await fetchFriend(user.pseudo);
 					friendNameAdd = '';
-				} else
-					console.log('Error: Could not add friend');
+				}
 			}
 		}
 	
 		let newUsername: string = '';
 	
 		async function handleUpdateUsername() {
-			if (!newUsername) {
-				console.log('New username not set');
+			if (!newUsername)
 				return;
-			}
 			const accessToken = await fetchAccessToken();
-				if (accessToken) {
+				if (accessToken) 
+				{
 					const response = await fetch(`http://${LOCALHOST}:3000/users/${user.pseudo}`, {
 						method: 'PUT',
 						headers: {
@@ -400,11 +364,7 @@
 					if (response.ok) {
 						user.username = newUsername;
 						newUsername = '';
-					} else {
-						console.log('Error: Could not update username');
 					}
-				} else {
-					console.log('Error: Could not update username');
 				}
 		}
 	
@@ -472,7 +432,6 @@
 			}
 		socket.emit('AnswerGame', data);
 		pending_invitation = false;
-		console.log("Denied the invitation");
 		const boxito = document.querySelector(".popup");
 		if (boxito) {
             boxito?.remove();
@@ -489,7 +448,6 @@
 			}
 			socket.emit('AnswerGame', data);
 			pending_invitation = false;
-			console.log("Accepted the invitation");
 			location.href = notif.url;
 		}
 	}
@@ -523,8 +481,6 @@
   					await getConnectedUsers();
 					}, 5000);
 		socket.on('InvitedNotif', async(data) => {
-			console.log('data invitedNotif == ', data);
-			console.log('user == ', user)
                     if (data.invited.id === user.id) {
                         notif.display = true;
                         notif.url = data.url;
@@ -537,10 +493,9 @@
             }
 		});
         socket.on('GameAnswer', async (data) => {
-            console.log('game answer data == ', data);
 		if (data.target.id == user.id) {
 			if (data.accepted == false) {
-				console.log("invitation refusee");
+				return ;
 			}
 			else {
 				location.href = data.url;
@@ -551,5 +506,5 @@
 			loading = true;
 		});
 	
-		export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, user, newUsername, handleUpdateUsername };
+		export { friends, friendNameAdd, handleAddFriend, handleFriendClick, handleMessageFriend, handleProfileFriend, handleDeleteFriend, handleInviteFriend, newUsername, handleUpdateUsername };
 	</script>

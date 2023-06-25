@@ -56,7 +56,6 @@ export class WebsocketGateway implements OnGatewayDisconnect, OnGatewayConnectio
       const user = await this.prisma.user.findUnique({
         where: { username: data?.target },
       });
-      console.log('answer game data == ', data);
       const toSend = {
         accepted: data.accepted,
         url: data.url,

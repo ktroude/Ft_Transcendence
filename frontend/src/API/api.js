@@ -10,7 +10,10 @@ import { LOCALHOST } from "./env";
         return null;
     const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
     if (!accessToken)
+    {
+        location.href = '/';
         return null;
+    }
     return accessToken;
  }
 
@@ -66,8 +69,7 @@ import { LOCALHOST } from "./env";
             if (!data)
                 return null;
             return data;
-        } else
-            console.log('Access token not found');
+        }
     }
     catch
     {
@@ -83,9 +85,7 @@ const fetchDataOfUserPseudo = async (user) => {
         const response = await fetch(`http://${LOCALHOST}:3000/users/${user}/getUserbyPseudo`, { headers });
         const data = await response.json();
         return data;
-    } else {
-        console.log('Access token not found');
-    }
+    } 
 }
 
 const fetchDataOfUsername = async (user) => {
@@ -96,8 +96,6 @@ const fetchDataOfUsername = async (user) => {
         const response = await fetch(`http://${LOCALHOST}:3000/users/${user}/search`, { headers });
         const data = await response.json();
         return data;
-    } else {
-        console.log('Access token not found');
     }
 }
 
@@ -110,7 +108,6 @@ const fetchDataOfUsername = async (user) => {
         const data = await response.json();
         return data;
     } else {
-        console.log('Access token not found');
         location.href = '/';
         return null;
     }
@@ -134,7 +131,7 @@ const fetchFriend = async (pseudo) =>
                 return data;
             }
             else
-                console.log('Error: Could not get friends');
+               return null;
         }
     }
 

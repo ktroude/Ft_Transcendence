@@ -18,7 +18,6 @@
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
         document.body.classList.remove('fade-out');
@@ -39,10 +38,7 @@
 		if (response.ok) {
             connectedUsers = await response.json();
         }
-		else
-			console.log("FRONT NOT WORKIGN HOHO")
-	} else 
-		console.log('Error: Could not get users');
+	}
 }
 
 const fetchAccessToken = async () => {
@@ -67,7 +63,6 @@ const fetchAccessToken = async () => {
         const data = await response.json();
         return data;
     } else {
-        console.log('Access token not found');
         location.href = '/';
         return null;
     }
@@ -79,7 +74,6 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
     } 
 
     async function handleClickRoomButton(roomId: number) {
-        console.log("roomId == ", roomId);
         socket.emit('getMessagesOfRoom', roomId);
     }
 
@@ -144,7 +138,6 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
       			target: notif.invitedBy,
 		}        
 		socket.emit('AnswerGame', data);
-		console.log("Denied the invitation");
 		const boxito = document.querySelector(".popup");
         if (boxito) {
             boxito?.remove();
@@ -153,7 +146,6 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 	}
 
 	function acceptInvitation(notif:any) {
-        console.log('accepted == true && notif == ', notif)
         if (pending_invitation == true) {
 			const data = {
 				accepted: true,
@@ -162,12 +154,14 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
 			}
 			socket.emit('AnswerGame', data);
 			pending_invitation = false;
-			console.log("Accepted the invitation");
 			location.href = notif.url;
 		}
 	}
 
     function sendMessage(event: Event, messageInput: HTMLInputElement, currentRoom:any) {
+        const accessToken = fetchAccessToken();
+        if (!accessToken)
+            location.href = '/';
 		event.preventDefault();
 		if (
 			messageInput &&
@@ -295,13 +289,11 @@ async function handleClickConnectedUserButton(userId:number):Promise<any> {
             }
 		});
         socket.on('GameAnswer', async (data) => {
-            console.log('game answer data == ', data);
 		    if (data.target.id == currentUser.id) {
 			if (data.accepted == false) {
-				console.log("invitation refusee");
+				return ;
 			}
 			else {
-                console.log('url == ', data.url);
 				location.href = data.url;
 			}
 		}

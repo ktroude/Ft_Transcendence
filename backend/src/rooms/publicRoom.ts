@@ -6,6 +6,5 @@ export class publicRoom extends Room<MyRoomState> {
     this.setState(new MyRoomState());
   }
   async onJoin(client: Client, options: any) {
-    console.log(client.sessionId, 'Joined');
   }
 }

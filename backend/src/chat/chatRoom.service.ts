@@ -123,11 +123,9 @@ export class ChatRoomService {
 	check_array(num:any, blocked:any[]) {
 		for (let i=0; i<blocked.length; i++) {
 			if (blocked[i] === num) {
-				console.log("check array ft return true")
 				return true;
 			}
 		}
-				console.log("check array ft return false")
 		return false;
 	}
 

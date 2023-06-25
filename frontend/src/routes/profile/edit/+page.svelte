@@ -133,13 +133,8 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           qrImage = '';
           FAstatus = false;
         }
-        else
-          console.log('Error: Could not update the 2fa');
       }
-      else {
-        console.log('Error: Could not update the 2fa');
-      }
-  }
+    }
 
 
     async function handleSubmit2fa()
@@ -156,7 +151,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             body: JSON.stringify({status : 'enable', codestring: code})
           });
           if (!response.ok) {
-      console.log('Error:', response.status);
       return null;
     }
 
@@ -169,11 +163,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             data = JSON.parse(responseData);
           }
           catch (error) {
-            console.log('Error parsing JSON:', error);
             return null;
           }
         } else {
-          console.log('Empty response');
           return null;
         }
         if (data === null)
@@ -181,8 +173,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         else
           qrImage = '';
       }
-      else
-        console.log('Error: Could not update the 2fa');
   }
 
 
@@ -206,8 +196,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           qrImage = data.image;
           FAstatus = true;
         }
-        else
-          console.log('Error: Could not update the 2fa');
       }
 
         async function getImageURL() {
@@ -223,11 +211,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
       async function handleUpdateUsername() // Update the username
       {
         if (!newUsername) {
-          console.log('New username not set');
           return;
         }
         if (newUsername.length > 13) {
-          console.log('New username too long');
           return;
         }
         const accessToken = await fetchAccessToken();
@@ -242,13 +228,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           body: JSON.stringify({ user: user, newPseudo: newUsername })
         });
         if (response.ok){
-          console.log('Username updated');
           displayUsername = newUsername;
           newUsername = '';
           user = await fetchData();
         }
-        else
-          console.log('Error: Could not update the username');
       }
         newUsername = '';
       }
@@ -259,13 +242,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
       // Check if a file was selected
       if (!file) {
-          console.log('Error: No file selected');
           return;
         }
         
         // Check if the uploaded file is an image
         if (!file.type.startsWith('image/')) {
-        console.log('Error: Only image files can be uploaded');
         return;
         }
     
@@ -289,8 +270,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           getImageURL();
           event.target.value = '';
         }
-        else
-          console.log('Error: Could not upload the image');
       }
     };
   }
@@ -319,7 +298,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
     document.body.classList.remove('fade-out');

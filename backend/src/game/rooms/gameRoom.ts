@@ -24,7 +24,6 @@ async function creatmatchprsima(winner, looser, prisma)
 
 async function updateConnected(player, condition, prisma)
 {
-  console.log("pseudo check=",player.pseudo, "username=", player.username)
   await prisma.user.update({
     where: {pseudo : player.pseudo},
     data: { connected: condition}
@@ -39,8 +38,6 @@ async function handleVictoryPrisma(winner, looser, prisma) {
     where: {id : winner.id_user},
     select : {wins : true, FirstWin: true, ImTheBoss: true, win_streak: true, WinStreak: true}
   });
-  console.log("firstwin", tmp.FirstWin)
-  console.log("nnrdebwin", tmp.wins)
   if (tmp.FirstWin == false)
   {
     await prisma.user.update({
@@ -108,7 +105,6 @@ export class gameRoomService extends Room {
     this.setState(new Game());
     this.player1.pseudo = 'null';
     this.player2.pseudo = 'null';
-    console.log("room pong crée ts =", this.roomId);
   }
   onJoin(client: Client, options?)
   {
@@ -119,7 +115,6 @@ export class gameRoomService extends Room {
     };
     this.handlePlayerJoin(client, playerInfo);
 
-    // console.log("une personne a la salle pong ", this.roomId,client.id);
     this.onMessage('player', (client, message) => {
       for (let i = 0; i < this.clients.length; i++) {
         if (this.clients[i].sessionId != client.sessionId)
@@ -157,7 +152,6 @@ export class gameRoomService extends Room {
           handleVictoryPrisma(this.player2, this.player1, this.prisma);
           this.broadcast('gameFinished', { winner: this.player2.username });
         }
-        console.log("envoie winner", this.player1.pseudo, this.player2.pseudo);
       }
     });
     // const isGameFinished: boolean = this.player1.score >= this.max_score || this.player2.score >= this.max_score;
@@ -172,8 +166,6 @@ export class gameRoomService extends Room {
     // this.reconnectTimeout = setTimeout(() => {
     //   // Supprimer le joueur de la salle après le délai d'attente
       
-    //   console.log("je retire les player de la room");
-    // }, 5000);    
     if(client.sessionId == this.player1.id)
       leavePlayer(this.player1, this.prisma);
     else
@@ -185,16 +177,13 @@ export class gameRoomService extends Room {
     }
     // updateConnected(this.player1, 1, this.prisma);
     // Le client a quitté la room involontairement (rafraîchissement de la page)
-    console.log("Leave la salle pong rom_id = ", this.roomId,client.id);
   }
   OnDispose(){
-    console.log('Room Pong is disposed', this.roomId,);
   }
 
 
   async handlePlayerJoin(client: Client, playerInfo: { player_pseudo: string, player_username: string, player_id: string }) {
     // clearTimeout(this.reconnectTimeout);
-    console.log("Une personne a rejoint la salle pong", client.id, playerInfo);
   
     const { player_pseudo, player_username, player_id } = playerInfo;
   
@@ -232,7 +221,6 @@ export class gameRoomService extends Room {
           handleVictoryPrisma(this.player2, this.player1, this.prisma);
           this.broadcast('gameFinished', { winner: this.player2.username });
         }
-        console.log("reload but already finish");
         return
       }
       this.broadcast('Player_init', {

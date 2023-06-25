@@ -73,10 +73,7 @@ export class UserService {
             });
             const isVerified = authenticator.check(code, findUser.FA2secret)
             if (!isVerified)
-            {
-                console.log('Invalid code');
                 return null;
-            }
             const updatedUser = await this.prisma.user.update({ // update user
             where: { id: user }, // where id = user
             data: { FA2: true } // set FA2 to true

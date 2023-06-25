@@ -366,9 +366,7 @@
     			url: notif.url,
       			target: notif.invitedBy,
 			};
-		console.log('neg answer where data ==', data);
 		socket.emit('AnswerGame', data);
-		console.log("Denied the invitation");
 		const boxito = document.querySelector(".popup");
 		if (boxito) {
             boxito?.remove();
@@ -385,7 +383,6 @@
 			}
 			socket.emit('AnswerGame', data);
 			pending_invitation = false;
-			console.log("Accepted the invitation");
 			location.href = notif.url;
 		}
 	}
@@ -703,7 +700,6 @@
 			if (currentUser?.id == data?.user?.id) {
 				currentRoom = data.room;
 				animation = data.animation;
-    console.log("data.room 3 == ", data.room);
 				socket.emit('getMessage', data.room);
 				socket.emit('getUser', data.room);
 				await fletchMembres();
@@ -840,7 +836,6 @@
 			chatRooms = await fletchChatRoomsData();
 		});
 		socket.on('blocked', async (data) => {
-			console.log("return .on'blocked' == ", data);
 			if (currentUser.id === data.user.id) {
 				blocked = data.block;
 			if (currentRoom?.id)
@@ -871,10 +866,9 @@
             }
 		});
 		socket.on('GameAnswer', async (data) => {
-            console.log('game answer data == ', data);
 		if (data.target.id == currentUser.id) {
 			if (data.accepted == false) {
-				console.log("invitation refusee");
+				return;
 			}
 			else {
 				location.href = data.url;

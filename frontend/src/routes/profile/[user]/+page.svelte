@@ -291,15 +291,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 },
                 body: JSON.stringify({ friend: friendName })
             });
-            if (response.ok)
-			{
-				;
-			}
-			else
-                console.log('Error: Could not delete friend');
-        } 
-		else
-            console.log('Error: Could not delete friend');
+        }
 		isFriend = await checkFrienship(user.id, realUserId)
 	}
 
@@ -318,18 +310,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             if (response.ok) {
                 friends = await fetchFriend(user.pseudo);
                 friendNameAdd = '';
-            } else
-                console.log('Error: Could not add friend');
-        
+            }
 		}
 		isFriend = await checkFrienship(user.id, realUserId);
     }
-
-	async function denyInvitation() {
-		console.log("Denied the invitation");
-		/*function that sends to the other user that the invitation has been denied*/
-		invited = 0;
-	}
 
     async function handleFriendClick(friendName: string) {
 		friends = await fetchFriend(user.pseudo);
@@ -363,8 +347,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 					location.href = `/dm/${userExists.id}`;
 				}
 		}
-		else 
-			console.log('Error: Could not get users');
 	}
 
     async function handleProfileFriend(friendName:any) {
@@ -372,16 +354,12 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         if (accessToken)
 		{
 			friendUser = await fetchDataOfUsername(friendName);
-			if (!friendUser)
-				console.log('Error: Could not get profile');
-			else
+			if (friendUser)
 			{
 				location.href = `/profile/${friendUser.id}`;
 				await loadpage();
 			}
 		}
-		else
-            console.log('Error: Could not get profile');
     }
 
     async function handleDeleteFriend(friendName:any) {
@@ -397,16 +375,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             });
             if (response.ok)
 				friends = friends.filter((friend: any[]) => friend[0] !== friendName);
-            else
-                console.log('Error: Could not delete friend');
         } 
-		else
-            console.log('Error: Could not delete friend');
-    }
-
-    function handleInviteFriend(friendName:any) {
-        console.log(`Inviting ${friendName} to play`);
-		/*If accepted -> location.href = (`/game/${roomid}`); */
     }
 
 	async function handleEnter(event:any)
@@ -432,8 +401,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             if (response.ok) {
                 friends = await fetchFriend(user.pseudo);
                 friendNameAdd = '';
-            } else
-                console.log('Error: Could not add friend');
+            }
         }
     }
 
@@ -455,8 +423,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
     const accessToken = await fetchAccessToken();
     if (accessToken)
       location.href = `/dm/${user.id}`;
-    else
-      console.log('Error: Could not send message');
   }
 
 	async function block(realUser:any, blockerUser:any) { // block user
@@ -473,10 +439,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
             });
 			if (response.ok)
 				is_blocked = true;
-			else
-				console.log('Error: Could not block user');
-        } else
-			console.log('Error: Could not block user');
+        }
 		is_blocked = await checkBlocked(realUser, blockerUser);
     }
 	
@@ -497,8 +460,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			else
 				return false;
 			}
-		else
-			console.log('Error: Could not check if user is blocked');
 	}
 
 
@@ -519,8 +480,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			else
 				return false
 		}
-		else
-			console.log('Error: Could not check if user is friend');
 	}
 
 	async function fetchRoomGameId() {
@@ -597,7 +556,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			}
 			socket.emit('AnswerGame', data);
 			pending_invitation = false;
-			console.log("Accepted the invitation");
 			location.href = notif.url;
 		}
 	}
@@ -616,8 +574,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			if (data)
 				all_achievements = new Map(data);
 			}
-		else 
-			console.log('Error: Could not get achievements');
 	}
 
 	async function unblock(realUser:any, blockerUser:any) { // unblock user
@@ -632,8 +588,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 body: JSON.stringify({block: blockerUser})
             });
 			is_blocked = false;
-        } else
-			console.log('Error: Could not unblock user');
+        }
     }
 
 	let realUser: string; 
@@ -690,13 +645,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				});
 				return await response.json(); // Parse response body as JSON
 		}
-		else 
-			console.log('Error: Could not get history');
 	}
 
 	async function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
 		document.body.classList.remove('fade-out');
@@ -749,10 +701,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			}
 		});
 		socket.on('GameAnswer', async (data) => {
-            console.log('game answer data == ', data);
 		if (data.target.id == user.id) {
 			if (data.accepted == false) {
-				console.log("invitation refusee");
+				return ;
 			}
 			else {
 				location.href = data.url;
@@ -760,7 +711,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		}
 		else if (data.target.id == user.id) {
 			if (data.accepted == false) {
-				console.log("invitation refusee");
+				return ;
 			}
 			else {
 				location.href = data.url;

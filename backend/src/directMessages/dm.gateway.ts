@@ -111,7 +111,6 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
     @SubscribeMessage('getDirectMessageRoom')
     async handleGetDirectMessageRoom(@ConnectedSocket() client:Socket) {
     const user = this.clients.find(([user, socket]) => socket === client)?.[0];
-    console.log('user id ==', user.id);
     const rooms = await this.prisma.directMessageRoom.findMany({
         where: { 
           OR: [
@@ -143,7 +142,6 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
 			SU_id = room.ownerTwo.id;
 		else
 			SU_id = room.ownerOne.id;
-		console.log(room.ownerTwo.id, 'num')
         const selectedUser = await this.prisma.user.findUnique({
 			where: {id: SU_id}
 		});
@@ -173,7 +171,6 @@ async handleSendMessage(@ConnectedSocket() client: Socket , @MessageBody() data:
                 id:true,
             }
           });
-        console.log("ROOZ === ", rooms)
         if (rooms.length > 0) {
             this.server.emit('returnDirectMessage', {
                 user: user1,

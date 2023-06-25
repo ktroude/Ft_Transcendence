@@ -18,7 +18,6 @@ export class DirectMessageService {
     }
 
     async otherUser(user:any, room:any) {
-		console.log(room);
         if (user.id === room.ownerOne.id) {
             return room.ownerTwoId;
         }

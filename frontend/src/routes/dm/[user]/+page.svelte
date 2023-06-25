@@ -37,10 +37,7 @@
 		});
 		if (response.ok)
 			connectedUsers = await response.json();
-		else
-			console.log("FRONT NOT WORKIGN HOHO")
-	} else 
-		console.log('Error: Could not get users');
+	}
 }
 
 const fetchAccessToken = async () => {
@@ -65,7 +62,6 @@ const fetchAccessToken = async () => {
         const data = await response.json();
         return data;
     } else {
-        console.log('Access token not found');
         location.href = ('/');
         return null;
     }
@@ -77,7 +73,6 @@ const fetchAccessToken = async () => {
 
     
     async function handleClickRoomButton(roomId: number) {
-        console.log("roomId == ", roomId);
         socket.emit('getMessagesOfRoom', roomId);
     }
 
@@ -248,7 +243,6 @@ let toast;
 			}
 		socket.emit('AnswerGame', data);
 		pending_invitation = false;
-		console.log("Denied the invitation");
 		const boxito = document.querySelector(".popup");
         if (boxito) {
             boxito?.remove();
@@ -265,7 +259,6 @@ let toast;
 			}
 			socket.emit('AnswerGame', data);
 			pending_invitation = false;
-			console.log("Accepted the invitation");
 			location.href = notif.url;
 		}
 	}
@@ -313,7 +306,6 @@ let toast;
             }
         });
         socket.on('returnDirectMessage', async(data) => {
-            console.log("data de returnDirectMessage == ", data);
             if (currentUser.id === data.user.id) {
                 messages = data.messages;
                 currentRoom = data.room;
@@ -333,10 +325,9 @@ let toast;
             }
 		});
         socket.on('GameAnswer', async (data) => {
-            console.log('game answer data == ', data);
 		if (data.target.id == currentUser.id) {
 			if (data.accepted == false) {
-				console.log("invitation refusee");
+                return ;
 			}
 			else {
 				location.href = data.url;
@@ -353,7 +344,6 @@ let toast;
 
     function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
         document.body.classList.remove('fade-out');

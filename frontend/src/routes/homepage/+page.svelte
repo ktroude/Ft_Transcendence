@@ -140,7 +140,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			}
 			socket.emit('AnswerGame', data);
 			pending_invitation = false;
-			console.log("Accepted the invitation");
 			location.href = notif.url;
 		}
 	}
@@ -156,7 +155,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			body: JSON.stringify({achievement: 'ImCurious' })
             });
 		if (!response.ok)
-            console.log("Error update achievements <ImCurious>")
+            return ;
 		else if (anim == false){
 			for (const [key, value] of Array.from(all_achievements) as Iterable<any>) {
 				if (key == "ImCurious" && value == false)
@@ -207,10 +206,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         socket.emit('userConnected', { pseudo: user.pseudo });
       });
 	  socket.on('GameAnswer', async (data) => {
-            console.log('game answer data == ', data);
 		if (data.target.id == user.id) {
 			if (data.accepted == false) {
-				console.log("invitation refusee");
+				return ;
 			}
 			else {
 				location.href = data.url;
@@ -231,7 +229,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
               body: JSON.stringify({achievement: 'TheDarkSide' })
             });
           if (!response.ok)
-            console.log("Error update achievements <TheDarkSide>")
+            return ;
 		  else
 		  {
 			anim = true;
@@ -275,7 +273,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	function fade(thisplace:string) {
 		document.body.classList.add('fade-out');
-		console.log("switching page....");
 		setTimeout(() => {
 		// window.location.href = href;
 		document.body.classList.remove('fade-out');
@@ -298,7 +295,5 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			if (data)
 				all_achievements = new Map(data);
 			}
-		else 
-			console.log('Error: Could not get achievements');
 	}
 </script>

@@ -68,21 +68,13 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let room_id;
 	let started = 0;
 
-
-  async function test() //debug
-{
-  console.log("room_id", room_id);
-}
-
 function ready_to_play()
 {
-	console.log(room);
-	// room.send("rdtoplay", true);
+	return ;
 }
 
 function countdown(counter)
 {
-	console.log("in countdown");
 	const context = canvas.getContext('2d');
 	if (anim)
 		cancelAnimationFrame(anim);
@@ -179,7 +171,6 @@ async function connect(){
 	});
 	endGame();
 	// room.send('player_name', {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
-	console.log('Joined succefuly', room);
 }
     
 const MAX_SPEED = 8;
@@ -279,7 +270,6 @@ function play(){
 	room.onMessage("break", (message) => {
 		if(break_r == true && message == false)
 		{
-			console.log("in break coutdown");
 			countdown(5);
 			break_r = message;
 			return;
@@ -375,7 +365,6 @@ function ballMove()
 	// room.onMessage("break", (message) => {break_r = message});
 	if(break_r == true)
 	{
-		console.log("break");
 		ball.x = canvas.width / 2;
 		ball.y = canvas.height / 2;
 		ball.velocity_y = 2;

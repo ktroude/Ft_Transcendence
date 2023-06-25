@@ -43,7 +43,6 @@ export class BlockService {
 				}
 		}});
 		if (!deleteFriend) {
-			console.log("Cannot unblock, friend is not blocked");
 			return ;
 		}
 		const deleted = await this.prisma.block.delete({
