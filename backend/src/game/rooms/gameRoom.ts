@@ -7,6 +7,15 @@ import { Injectable } from '@nestjs/common';
 import { async } from 'rxjs';
 
 
+async function mybroadcast(room, event, data) {
+  for (const client of room.clients) {
+    const player = client.sessionId === room.player1.id ? room.player1 : room.player2;
+    if (player.rdtoplay) {
+      await client.send(event, data);
+    }
+  }
+}
+
 async function creatmatchprsima(winner, looser, prisma)
 {
   return await prisma.match.create({
@@ -81,6 +90,7 @@ async function handleVictoryPrisma(winner, looser, prisma) {
 
 async function leavePlayer(player, prisma)
 {
+  player.rdtoplay = false;
   await updateConnected(player, 1, prisma);
   player.pseudo = 'null';
   player.username = '';
@@ -103,6 +113,7 @@ export class gameRoomService extends Room {
   p2_color: string = 'green';
   winner: User;
   break: boolean = false;
+  rdtoplay: boolean = false;
   // reconnectTimeout: NodeJS.Timeout;
 
   onCreate() {
@@ -120,20 +131,31 @@ export class gameRoomService extends Room {
     this.handlePlayerJoin(client, playerInfo);
 
     this.onMessage('player', (client, message) => {
-      for (let i = 0; i < this.clients.length; i++) {
-        if (this.clients[i].sessionId != client.sessionId)
-          this.clients[i].send('player', { player_y: message.player_y });
+      if (this.rdtoplay == true)
+      {
+        for (let i = 0; i < this.clients.length; i++) {
+          if (this.clients[i].sessionId != client.sessionId)
+            this.clients[i].send('player', { player_y: message.player_y });
+        }
       }
     });
     this.onMessage('player2', (client, message) => {
-      for (let i = 0; i < this.clients.length; i++) {
-        if (this.clients[i].sessionId != client.sessionId) {
-          this.clients[i].send('player2', { player2_y: message.player2_y });
+      if (this.rdtoplay == true)
+      {
+        for (let i = 0; i < this.clients.length; i++) {
+          if (this.clients[i].sessionId != client.sessionId) {
+            this.clients[i].send('player2', { player2_y: message.player2_y });
+          }
         }
       }
     });
     this.onMessage('rdtoplay', (client, message) => {
-
+      this.rdtoplay = true
+      if (client.sessionId === this.player1.id) {
+        this.player1.rdtoplay = true;
+      } else if (client.sessionId === this.player2.id) {
+        this.player2.rdtoplay = true;
+      }
     })
     this.onMessage('updateScore', async(client, message) =>
     {
@@ -159,17 +181,19 @@ export class gameRoomService extends Room {
       }
     });
     // const isGameFinished: boolean = this.player1.score >= this.max_score || this.player2.score >= this.max_score;
-    this.onMessage('ballPos', (client, message) => {
-      this.broadcast('ballPos', {
-        ball_x: message.ball_x,
-        ball_y: message.ball_y,
-      });
+    this.onMessage('ballPos', async(client, message) => {
+      await mybroadcast(this, 'ballPos', { ball_x: message.ball_x, ball_y: message.ball_y,});
+      // if (this.rdtoplay == true)
+      // {
+      //   console.log("send ballpos");
+      //   this.broadcast('ballPos', {
+      //     ball_x: message.ball_x,
+      //     ball_y: message.ball_y,
+      //   });
+      // }
     });
   }
-  onLeave(client: Client, consented: boolean) {
-    // this.reconnectTimeout = setTimeout(() => {
-    //   // Supprimer le joueur de la salle après le délai d'attente
-      
+  async onLeave(client: Client, consented: boolean) {
     if(client.sessionId == this.player1.id)
       leavePlayer(this.player1, this.prisma);
     else
@@ -177,10 +201,9 @@ export class gameRoomService extends Room {
     if(this.player1.score < this.max_score || this.player2.score < this.max_score)
     {
       this.break = true;
-      this.broadcast('break',true);
+      await mybroadcast(this, 'break', true);
+      // this.broadcast('break',true);
     }
-    // updateConnected(this.player1, 1, this.prisma);
-    // Le client a quitté la room involontairement (rafraîchissement de la page)
   }
   OnDispose(){
   }
@@ -243,7 +266,9 @@ export class gameRoomService extends Room {
       });
       updateConnected(this.player2, 2, this.prisma);
       updateConnected(this.player1, 2, this.prisma);
-      this.broadcast('break', false);
+      await mybroadcast(this, 'break', false);
+      // if (this.rdtoplay == true)
+      //   this.broadcast('break', false);
     }
   }
 }

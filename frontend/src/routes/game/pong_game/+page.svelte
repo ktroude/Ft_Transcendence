@@ -267,6 +267,7 @@ function draw2(){
 }
 
 function play(){
+	room.send("rdtoplay", 1);
 	room.onMessage("break", (message) => {
 		if(break_r == true && message == false)
 		{
