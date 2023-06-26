@@ -615,7 +615,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			realUserPseudo = user.pseudo;
 			user = await fetchDataOfUser($page.params.user);
 			if (!user)
-				return location.href = (`/error`);
+				return location.href = (`/`);
 			is_blocked = await checkBlocked(realUserPseudo, user.username);
 			isFriend = await checkFrienship(user.id, realUserId);
 			await getImageURL();

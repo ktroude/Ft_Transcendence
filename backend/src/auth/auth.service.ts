@@ -62,18 +62,41 @@ export class AuthService {
     // prisma.findUnique() renvoie (null) si il existe pas dans la db
     if (!user) {
       // sinon on le creer
-      const new_user = await this.prisma.user.create({
-        data: {
-          firstname: user_data.first_name,
-          lastname: user_data.last_name,
-          pseudo: user_data.login,
+      const checkNickname = await this.prisma.user.findUnique({
+        where: {
           username: user_data.login,
-          picture: await fetch(user_data.image.link)
-              .then(res => res.buffer())
-              .then(buffer => Buffer.from(buffer).toString('base64')),
-        },
+        }
       });
+      if (checkNickname)
+      {
+        const new_user = await this.prisma.user.create({
+          data: {
+            firstname: user_data.first_name,
+            lastname: user_data.last_name,
+            pseudo: user_data.login,
+            username: user_data.login + pseudoRandomBytes(4).toString('hex'),
+            picture: await fetch(user_data.image.link)
+                .then(res => res.buffer())
+                .then(buffer => Buffer.from(buffer).toString('base64')),
+          },
+        });
+        return new_user;
+      }
+      else
+      {
+        const new_user = await this.prisma.user.create({
+          data: {
+            firstname: user_data.first_name,
+            lastname: user_data.last_name,
+            pseudo: user_data.login,
+            username: user_data.login,
+            picture: await fetch(user_data.image.link)
+                .then(res => res.buffer())
+                .then(buffer => Buffer.from(buffer).toString('base64')),
+          },
+        });
       return new_user;
+      }
     }
     return user;
   }

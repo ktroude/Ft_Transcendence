@@ -232,6 +232,10 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
           newUsername = '';
           user = await fetchData();
         }
+        else
+        {
+          ;
+        }
       }
         newUsername = '';
       }
