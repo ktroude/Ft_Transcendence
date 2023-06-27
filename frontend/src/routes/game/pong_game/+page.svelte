@@ -20,7 +20,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			</div>
 		{/if} 
 	</div>
-	<div class="canvas-container">		
+	<div class="canvas-container">
 		<canvas id="canvas" width={setting_game.canvas_width} height={setting_game.canvas_height}>
 		</canvas>
 		{#if connected == false}
@@ -34,6 +34,23 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			<button class="lobby_button" on:click={() => location.href = "/game"}>LOBBY</button>
 		{/if}
 	</div>
+	<div>
+		<!-- Ajout du composant ColorDropdown -->
+		<!-- <ColorDropdown on:selectedColor={handleColorSelected} /> -->
+
+		<h1>Choisissez une couleur :</h1>
+		
+		<label for="couleur">Couleur :</label>
+		<select id="couleur" on:change={handleChange}>
+  		<option value="Défault">Sélectionnez une couleur</option>
+  		<option value="Rouge">Rouge</option>
+  		<option value="Vert">Vert</option>
+  		<option value="Bleu">Bleu</option>
+  		<option value="Jaune">Jaune</option>
+		</select>
+
+		<p>Vous avez sélectionné la couleur : {selectedColor}</p>
+	</div>
 </body>
 <!-- {/if} -->
 
@@ -41,6 +58,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 // @ts-nocheck
 
   import { Ball } from './ball';
+//   import {ColorDropdown, selectedColor} from './ColorDropdown.svelte';
   import { Player } from './player';
   import { onMount } from 'svelte';
   import * as setting_game from "./GameConfig" 
@@ -68,6 +86,31 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	let room_id;
 	let started = 0;
 
+	let selectedColor = '';
+	let colorValuePlayer = '';
+
+function handleChange(event) {
+  selectedColor = event.target.value;
+  
+  switch (selectedColor) {
+	case 'Rouge':
+		colorValuePlayer = 'rgb(255, 0, 0)';
+        break;
+	case 'Jaune':
+        colorValuePlayer = 'rgb(255, 255, 0)';
+        break;
+    case 'Bleu':
+		colorValuePlayer = 'rgb(0, 0, 255)';
+        break;
+    case 'Vert':
+        colorValuePlayer = 'rgb(0, 255, 0)';
+        break;
+    default:
+		colorValuePlayer = 'rgb(93, 215, 255)';
+        break;
+	}
+}
+
 function ready_to_play()
 {
 	return ;
@@ -91,7 +134,7 @@ function countdown(counter)
 		clearInterval(countdownInterval);
 		play()
 		}
-	}, 500);
+	}, 1000);
 }
 
 function getRoomIdFromUrl(){
@@ -109,7 +152,7 @@ function init_player(num) {
 }
 
 function init_ball(){
-  let ball = new Ball(setting_game.canvas_width / 2, setting_game.canvas_height / 2, 2, 2);
+  let ball = new Ball(setting_game.canvas_width / 2, setting_game.canvas_height / 2, 5, 5);
   return ball;
 }
 
@@ -170,10 +213,10 @@ async function connect(){
 		clientId = message.client;
 	});
 	endGame();
-	// room.send('player_name', {player_pseudo : currentUser.pseudo, player_username : currentUser.username, player_id : currentUser.id});
 }
     
 const MAX_SPEED = 8;
+const MIN_SPEED = 7;
 
 let anim;
 
@@ -211,7 +254,7 @@ function draw(){
 	context.stroke();
 
 	// Set the color of the bars
-	context.fillStyle = 'rgb(93, 215, 255)';
+	context.fillStyle = colorValuePlayer;
 	context.fillRect(0, player.y, setting_game.paddle_width, setting_game.paddle_height);
 	context.fillRect(
 		canvas.width - setting_game.paddle_width,
@@ -244,7 +287,7 @@ function draw2(){
 	if (touched_player_1 == true){
 		context.fillStyle = 'white';
 		context.fillRect(0, player.y, setting_game.paddle_width, setting_game.paddle_height);
-		context.fillStyle = 'rgb(93, 215, 255)';
+		context.fillStyle = colorValuePlayer;
 		context.fillRect(
 			canvas.width - setting_game.paddle_width,
 			player2.y,
@@ -253,7 +296,7 @@ function draw2(){
 			);
 	}
 	else{
-		context.fillStyle = 'rgb(93, 215, 255)';
+		context.fillStyle = colorValuePlayer;
 		context.fillRect(0, player.y, setting_game.paddle_width, setting_game.paddle_height);
 		context.fillStyle = 'white';
 		context.fillRect(
@@ -283,6 +326,7 @@ function play(){
 	updatePos();
 	Updatescore();
 	Updateball();
+	// console.log("I am vitesse: ",ball.velocity_x, ball.velocity_y);
 	if (touched > 0)
 		draw2();
 	else
@@ -318,7 +362,8 @@ function collide(playerCurrent) {
 		// envoie les scores.
 		room.send("updateScore", {player_score: player.score , player2_score : player2.score});
 		ball.velocity_x = (Math.random() * 3 + 2) * (Math.random() < .5 ? -1 : 1);
-			ball.velocity_y = Math.random();
+		ball.velocity_y = Math.random();
+		console.log(ball.velocity_x, ball.velocity_y);
 		// if(Math.abs(ball.velocity_x) < MAX_SPEED)
 		//   ball.velocity_x *= 1.2;
 	}

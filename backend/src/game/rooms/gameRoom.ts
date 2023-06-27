@@ -204,8 +204,12 @@ export class gameRoomService extends Room {
       await mybroadcast(this, 'break', true);
       // this.broadcast('break',true);
     }
+    
+    if(this.player1.score >= this.max_score || this.player2.score >= this.max_score)
+      this.disconnect();
   }
   OnDispose(){
+    console.log("salle détruite", this.roomId);
   }
 
 
