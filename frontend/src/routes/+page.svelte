@@ -10,10 +10,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 </svelte:head>
 
+<script>
+    function redirectToAuth() {
+      window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3c0128a2fdd31dcd10f5ffcafccc016da6b9a35d909368b56286b2c0331dd29c&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Ftoken&response_type=code";
+    }
+</script>
 
 <h1 class="Ft-Transcendence">Ft-Transcendence</h1>
-<h2>
+<!-- <h2>
     clique <a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3c0128a2fdd31dcd10f5ffcafccc016da6b9a35d909368b56286b2c0331dd29c&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Ftoken&response_type=code">
         ici </a>
     pour te connecter breeeeeeeeeeeef
+</h2> -->
+
+<h2>
+    Pour te connecter...
 </h2>
+
+<button class="btn" type="button" on:click={redirectToAuth}>
+    <strong>Clique ici</strong>
+    <div id="container-stars">
+      <div id="stars"></div>
+    </div>
+  
+    <div id="glow">
+      <div class="circle"></div>
+      <div class="circle"></div>
+    </div>
+</button>
+  
