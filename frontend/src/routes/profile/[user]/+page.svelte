@@ -129,9 +129,11 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 				<div class="history_title_bloc">
 					<h1 class="profile_h1"><span><img class="profile_icone" src="/img/time_icone.png" alt=""></span>History</h1>
 				</div>
-				{#if history.length == 0}
-					<h5 class="history_line">Feels empty...</h5>
+				<div class="match_div">
+					{#if history.length == 0}
+						<h5 class="history_line">Feels empty...</h5>
 					{/if}
+				</div>
 				{#each Array.from(history) as hist}
 					{#if hist.winner == user?.pseudo || hist.loser == user?.pseudo }
 						<h5 class="history_line">{hist.winner} - {hist.loser} <span style="color:greenyellow">[{hist.scoreUser} - {hist.scoreOpponent}]</span></h5>

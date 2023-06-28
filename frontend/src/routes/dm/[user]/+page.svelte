@@ -293,7 +293,7 @@ let toast;
             }
         });
         socket.on('newDirectMessage', async(data) => {
-            if (currentRoom.id === data.message.directMessageRoomId && data.blocked === false) {
+            if (currentRoom?.id === data?.message?.directMessageRoomId && data?.blocked === false) {
                 	messages = [...messages, data.message];
             }
             else if (data.blocked === true && data.user.id === currentUser.id) {
@@ -412,32 +412,32 @@ let toast;
             </div>
             <!------------------ MIDDLE BLOC -------------------->
             <div class="middle_bloc">
-                <div class="chat_messages_bloc" id="chat-messages">
-    
-                </div>
+                
                 {#if currentRoom}
                 <div class="message_input_container">
-                    {#if messages && messages.length}
+                    <div class="container_inside_container_inside">
+                        {#if messages && messages.length}
 								{#each messages as msg}
-									<p class="message_text">
-										{#if msg.senderPseudo == 'server'}
+                                <p class="message_text">
+                                    {#if msg.senderPseudo == 'server'}
 											<button class="server_message">
-												{msg.senderPseudo}
+                                                {msg.senderPseudo}
 											</button>
-										{/if}
-										{#if msg.senderPseudo != 'server'}
+                                            {/if}
+                                            {#if msg.senderPseudo != 'server'}
 											<button
-												class="pseudo-button"
+                                            class="pseudo-button"
 											>
-												{msg.senderPseudo}
-											</button>
+                                            {msg.senderPseudo}
+                                        </button>
 										{/if}
 										<span class="message">
-											: {msg.content}
+                                            : {msg.content}
 										</span>
 									</p>
-								{/each}
-							{/if}
+                                    {/each}
+                                    {/if}
+                                </div>
                     <form class="send_message_form">
                         <input
                             on:input={handleMessageInput}

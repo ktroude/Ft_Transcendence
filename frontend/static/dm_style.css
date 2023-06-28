@@ -66,12 +66,22 @@
 	padding: 30px;
 }
 .chat_messages_bloc{
-	height:85vh;
+	height:80vh;
 	overflow: scroll;
 	margin: 5px;
 	word-wrap: break-word;
 }
+.container_inside_container_inside{
+	height: 95%;
+	width: 100%;
+	overflow: scroll;
+	word-wrap: break-word;
+}
 .message_input_container{
+	height:90vh;
+	margin: 5px;
+	overflow: none;
+	word-wrap: break-word;
 	animation: appear_input 0.5s ease-in-out;
 }
 .send_message_form{

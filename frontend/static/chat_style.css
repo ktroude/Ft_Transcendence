@@ -321,6 +321,7 @@
 	flex-direction: column;
 	text-align: left;
 	padding: 30px;
+	overflow: scroll;
 }
 .chat-messages{
 	height:85vh;
