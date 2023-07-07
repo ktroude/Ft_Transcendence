@@ -135,6 +135,19 @@
 	}
 }
 
+.select_color_box{
+	margin-top: 10vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: auto;
+	width: 100vw;
+}
+
+.select_color_box h1{
+	width: 20%;
+}
+
 #player2_score{
 	display: inline-block;
 	transform: translateY(0px);

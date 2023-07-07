@@ -34,7 +34,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 			<button class="lobby_button" on:click={() => location.href = "/game"}>LOBBY</button>
 		{/if}
 	</div>
-	<div>
+	<div class='select_color_box'>
 		<!-- Ajout du composant ColorDropdown -->
 		<!-- <ColorDropdown on:selectedColor={handleColorSelected} /> -->
 

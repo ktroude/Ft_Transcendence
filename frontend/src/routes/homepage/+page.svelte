@@ -60,7 +60,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         <p>Un projet de
           <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('ktroude')} on:keydown>Ktroude</span>,
           <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Krokmouuu')} on:keydown>Bleroy</span>,
-          <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('Lmaujean')} on:keydown>Lmaujean</span>,
           <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('PKLB')} on:keydown>Ple-berr</span> et
           <span class="footer_name homepage_redirect_pointer" on:click={() => redirectToGithub('venum78160')} on:keydown>vl-hotel</span>
         </p>

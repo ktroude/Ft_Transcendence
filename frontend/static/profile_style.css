@@ -176,7 +176,7 @@ img {
 }
 .history_bloc{
 	position: absolute;
-
+	overflow: scroll;
 	margin:0;
 	padding: 20px;
 	background-color: rgba(0, 0, 0, 0.267);
@@ -227,12 +227,12 @@ img {
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
-	justify-content: center;
 	font-family: 'Bebas Neue', cursive;
 	box-shadow: 10px 10px 50px black;
 	color: greenyellow;
 	transform: translateX(0px);
 	animation: div_slide_right 0.2s ease-in-out;
+	overflow: scroll;
 }
 
 .achievements_bloc_switched{
@@ -296,6 +296,7 @@ img {
 	width: 30px;
 }
 .profile_h1{
+	position: relative;
 	margin-top: 10px;
 	font-size: 30px;
 	display: flex;
