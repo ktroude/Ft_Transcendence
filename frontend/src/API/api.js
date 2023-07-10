@@ -2,6 +2,8 @@ import { goto } from "$app/navigation";
 import { LOCALHOST } from "./env";
 
  const fetchAccessToken = async () => {
+    try
+    {
     const cookies = document.cookie.split(';');
     if (cookies.length === 0)
         return null;
@@ -15,6 +17,11 @@ import { LOCALHOST } from "./env";
         return null;
     }
     return accessToken;
+    }
+    catch{  
+        location.href = '/';
+    }
+
  }
 
  const fetch2FAstatus = async (user) => { // USED ONLY FOR ACTIVATION IN PROFILE USER
@@ -100,6 +107,8 @@ const fetchDataOfUsername = async (user) => {
 }
 
  const fetchData = async () => {
+    try 
+    {
     const accessToken = await fetchAccessToken();
     if (accessToken) {
         const headers = new Headers();
@@ -107,9 +116,11 @@ const fetchDataOfUsername = async (user) => {
         const response = await fetch(`http://${LOCALHOST}:3000/users/userInfo`, { headers });
         const data = await response.json();
         return data;
-    } else {
-        location.href = '/';
+    } else 
         return null;
+    }
+    catch {
+        location.href = '/';
     }
 }
 

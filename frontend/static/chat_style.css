@@ -354,6 +354,21 @@
 	text-shadow: 3px 3px 10px rgba(255, 0, 0, 0.353),
 	-2px 1px 10px rgba(255, 0, 0, 0.357);
 }
+.pseudo-button-message_admin{
+	background-color: transparent;
+	color: yellowgreen;
+	border: none;
+	font-size: 20px;
+	animation: wiggle_text 0.3s ease-in-out;
+}
+.pseudo-button-message_admin:hover{
+	cursor: pointer;
+	background-color: transparent;
+	color: yellowgreen;
+	text-shadow: 3px 3px 10px rgba(255, 0, 0, 0.353),
+	-2px 1px 10px rgba(255, 0, 0, 0.357);
+}
+
 @keyframes wiggle_text {
 	0% {
 		transform: rotate(5deg);

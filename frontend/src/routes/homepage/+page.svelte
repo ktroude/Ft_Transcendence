@@ -73,8 +73,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-    import { fetchAccessToken, fetchData, fetchDataOfUser, fetchFriend, fetchDataOfUsername, fetch2FA} from '../../API/api';
-	import { redirect } from '@sveltejs/kit';
+    import { fetchData, fetch2FA} from '../../API/api';
 	import {io, Socket} from 'socket.io-client';
 	import { LOCALHOST } from "../../API/env";
 
@@ -144,12 +143,16 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	}
 
     async function redirectToGithub(username:any) {
-      	const accessToken = await fetchAccessToken();
+		const cookies = document?.cookie?.split(';');
+		const accessTokenCookie = cookies?.find((cookie) =>
+		cookie?.trim()?.startsWith('access_token=')
+		);
+		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
       	const response = await fetch(`http://${LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
 			method: 'PUT',
 			headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${accessToken}`
+			'Authorization': `Bearer ${access_token}`
 			},
 			body: JSON.stringify({achievement: 'ImCurious' })
             });
@@ -216,14 +219,18 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 	  });
       if (user.pseudo === 'yoshi' || user.pseudo === 'tac' || user.pseudo === 'mboy' || user.pseudo === 'palmi' || user.pseudo === "anissa")
       {
-        const accessToken = await fetchAccessToken();
-        if (accessToken)
+		const cookies = document?.cookie?.split(';');
+		const accessTokenCookie = cookies?.find((cookie) =>
+		cookie?.trim()?.startsWith('access_token=')
+		);
+		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
+		if (access_token)
         {
           const response = await fetch(`http://${LOCALHOST}:3000/users/achievements/${user.id}/updateAchievements`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
+                'Authorization': `Bearer ${access_token}`
               },
               body: JSON.stringify({achievement: 'TheDarkSide' })
             });
@@ -281,13 +288,17 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 
 	async function getAllAchievements() {
-		const accessToken = await fetchAccessToken();
-		if (accessToken) {
+		const cookies = document?.cookie?.split(';');
+		const accessTokenCookie = cookies?.find((cookie) =>
+		cookie?.trim()?.startsWith('access_token=')
+		);
+		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
+		if (access_token) {
 			const url = `http://${LOCALHOST}:3000/users/achievements/${user.id}/getAchievements`;
 			const response = await fetch(url, {
 			method: 'GET',
 			headers: {
-				'Authorization': `Bearer ${accessToken}`,
+				'Authorization': `Bearer ${access_token}`,
 			},
 			});
 			const data = await response.json();

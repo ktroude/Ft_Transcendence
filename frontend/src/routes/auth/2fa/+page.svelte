@@ -1,7 +1,7 @@
 <svelte:head>
 	<!-- <link rel="stylesheet" href="/style_profile.css" /> -->
 	<title>Authentication</title>
-	<link rel="preload" href="/img/bg1.jpg" as="image">
+	<!-- <link rel="preload" href="/img/bg1.jpg" as="image"> -->
 	<link rel="preload" href="/homepage_style.css" as="style"/>
 	<link rel="stylesheet" href="/edit_style.css" />
 	<link rel="stylesheet" href="/profile_style.css" />

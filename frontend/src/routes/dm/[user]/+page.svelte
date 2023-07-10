@@ -26,13 +26,17 @@
 
 
     async function getConnectedUsers() {
-	const accessToken = await fetchAccessToken();
-	if (accessToken) {
+		const cookies = document?.cookie?.split(';');
+		const accessTokenCookie = cookies?.find((cookie) =>
+		cookie?.trim()?.startsWith('access_token=')
+		);
+		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
+	if (access_token) {
 		const response = await fetch(`http://${LOCALHOST}:3000/websocket/getClient`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${accessToken}`
+			'Authorization': `Bearer ${access_token}`
 		},
 		});
 		if (response.ok)
@@ -40,24 +44,15 @@
 	}
 }
 
-const fetchAccessToken = async () => {
-    const cookies = document.cookie.split(';');
-    if (cookies.length === 0)
-        return null;
-    const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('access_token='));
-    if (!accessTokenCookie)
-        return null;
-    const accessToken = accessTokenCookie ? accessTokenCookie.split('=')[1] : null;
-    if (!accessToken)
-        return null;
-    return accessToken;
- }
-
  const fetchData = async () => {
-    const accessToken = await fetchAccessToken();
-    if (accessToken) {
+    const cookies = document?.cookie?.split(';');
+		const accessTokenCookie = cookies?.find((cookie) =>
+		cookie?.trim()?.startsWith('access_token=')
+		);
+		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
+    if (access_token) {
         const headers = new Headers();
-        headers.append('Authorization', `Bearer ${accessToken}`);
+        headers.append('Authorization', `Bearer ${access_token}`);
         const response = await fetch(`http://${LOCALHOST}:3000/users/userInfo`, { headers });
         const data = await response.json();
         return data;
@@ -269,11 +264,11 @@ let toast;
 /****************************************************/
 
 	onMount(async() => {
-		const cookies = document?.cookie?.split(';');
+        const cookies = document?.cookie?.split(';');
 		const accessTokenCookie = cookies?.find((cookie) =>
-			cookie?.trim()?.startsWith('access_token=')
-            );
-            const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
+		cookie?.trim()?.startsWith('access_token=')
+		);
+		const access_token = accessTokenCookie ? accessTokenCookie?.split('=')[1] : null;
             if (!access_token) {
                 window.location.pathname = '/';
             }

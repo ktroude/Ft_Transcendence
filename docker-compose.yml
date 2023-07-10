@@ -20,6 +20,7 @@ services:
       context: ./
       dockerfile: ./backend/Dockerfile
     ports:
+      - 5555:5555
       - 3000:3000
       - 3001:3001
     depends_on:

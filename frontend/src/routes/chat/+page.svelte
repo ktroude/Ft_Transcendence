@@ -866,7 +866,7 @@
             }
 		});
 		socket.on('GameAnswer', async (data) => {
-		if (data.target.id == currentUser.id) {
+		if (data?.target?.id == currentUser.id) {
 			if (data.accepted == false) {
 				return;
 			}
