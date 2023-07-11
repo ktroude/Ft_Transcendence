@@ -363,7 +363,7 @@ function collide(playerCurrent) {
 		room.send("updateScore", {player_score: player.score , player2_score : player2.score});
 		ball.velocity_x = (Math.random() * 3 + 2) * (Math.random() < .5 ? -1 : 1);
 		ball.velocity_y = Math.random();
-		console.log(ball.velocity_x, ball.velocity_y);
+		//console.log(ball.velocity_x, ball.velocity_y);
 		// if(Math.abs(ball.velocity_x) < MAX_SPEED)
 		//   ball.velocity_x *= 1.2;
 	}

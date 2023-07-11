@@ -54,6 +54,7 @@ export class AuthService {
   // si il existe on le renvoie sinon on le creer et le renvoie.
   async check_db(user_data: any): Promise<User> {
     // check si il existe dans la db
+    user_data.login = user_data.login.toUpperCase();
     const user = await this.prisma.user.findUnique({
       where: {
         pseudo: user_data.login,

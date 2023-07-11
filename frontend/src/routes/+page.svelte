@@ -12,7 +12,7 @@
 
 <script>
     function redirectToAuth() {
-      window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ad63634a67eaff34218824a7796fa6e5c5337b11f88c026df3956ba7a8f38dc6&redirect_uri=http%3A%2F%2F10.12.8.2%3A3000%2Ftoken&response_type=code";
+      window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3c0128a2fdd31dcd10f5ffcafccc016da6b9a35d909368b56286b2c0331dd29c&redirect_uri=http%3A%2F%2F10.12.1.2%3A3000%2Ftoken&response_type=code";
     }
 </script>
 

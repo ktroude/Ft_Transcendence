@@ -216,6 +216,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
         if (newUsername.length > 13) {
           return;
         }
+        newUsername = newUsername.toUpperCase();
         const accessToken = await fetchAccessToken();
         if (accessToken)
         {

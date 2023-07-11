@@ -3,7 +3,7 @@
 
   function handleChange(event) {
     selectedColor = event.target.value;
-    console.log('Couleur sélectionnée :', selectedColor);
+    //console.log('Couleur sélectionnée :', selectedColor);
     // Vous pouvez exécuter d'autres actions en fonction de la sélection
   }
 </script>
