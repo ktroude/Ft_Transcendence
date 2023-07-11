@@ -429,7 +429,6 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 
 	async function block(realUser:any, blockerUser:any) { // block user
 		const accessToken = await fetchAccessToken();
-		console.log("test");
 		if (accessToken) 
 		{
 			const response = await fetch(`http://${LOCALHOST}:3000/users/${realUser}/block`, {
@@ -441,12 +440,9 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                 body: JSON.stringify({block: blockerUser})
             });
 			if (response.ok)
-			{
-				console.log("test2");
 				is_blocked = true;
-			}
         }
-		is_blocked = await checkBlocked(realUser, blockerUser);
+		// is_blocked = await checkBlocked(realUser, blockerUser);
     }
 	
 	async function checkBlocked(realUser:any, blockerUser:any) { // check if user is blocked

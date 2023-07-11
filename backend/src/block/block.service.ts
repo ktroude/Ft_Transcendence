@@ -63,8 +63,6 @@ export class BlockService {
         });
         if (!user)
             return null;
-        if (user.username === pseudoBlock)
-            return null;
 		const userBlock = await this.prisma.user.findUnique({
 			where: {
 				pseudo: pseudoBlock,
@@ -111,8 +109,6 @@ export class BlockService {
             }
         });
         if (!user)
-            return null;
-        if (user.username === pseudoBlock)
             return null;
         const userBlock = await this.prisma.user.findUnique({
             where: {

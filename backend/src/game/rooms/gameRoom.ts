@@ -209,7 +209,7 @@ export class gameRoomService extends Room {
       this.disconnect();
   }
   OnDispose(){
-    console.log("salle détruite", this.roomId);
+    // console.log("salle détruite", this.roomId);
   }
 
 

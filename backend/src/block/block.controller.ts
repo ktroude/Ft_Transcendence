@@ -16,7 +16,6 @@ export class BlockController {
     @Put(':pseudo/block') // Block a user
     async blockUser(@Param('pseudo') pseudo: string,@Body() body:{block: string}): Promise<User>
     {
-        console.log(pseudo + "uhoh"+ body.block);
         return this.blockService.blockUser(pseudo, body.block);
     }
 	

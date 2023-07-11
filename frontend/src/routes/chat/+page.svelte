@@ -163,7 +163,7 @@
 	}
 
 	function handleInvitUserInput() {
-		socket.emit('addUser', { pseudo: userPseudoInput, room: currentRoom });
+		socket.emit('addUser', { username: userPseudoInput.toUpperCase(), room: currentRoom });
 		userPseudoInput = '';
 	}
 
@@ -482,12 +482,11 @@
 	function leaveRoom() {
 		if (currentRoom?.id) {
 			socket.emit('leaveRoom', currentRoom);
-			messages = [];
-			muted = [];
-			banned = [];
-			membres = [];
 		}
 		// currentRoom = null;
+		membres = [];
+		banned = [];
+		muted = [];
 		currentRoom.id = -1;
 	}
 
@@ -685,15 +684,15 @@
 				banned = [];
 				muted = [];
 			} else if (currentRoom.id === data.room.id) {
-				delete membres[data.user];
+				await fletchMembres();
 			}
 			if (currentUser.id === data.user.id && data.room.private == true) {
-				delete chatRooms[data.room];
+				await fletchMembres();
 			}
 		});
 		socket.on('roomLeaved', async (data) => {
 			if (currentRoom?.id === data) {
-				membres = await fletchMembres();
+				await fletchMembres();
 			}
 		});
 		socket.on('sucess', async (data) => {
@@ -729,8 +728,9 @@
 						senderPseudo: 'server'
 					}
 				];
-				if (currentRoom.id === data.room.id) {
 					currentUser.status = 1;
+				if (currentRoom.id === data.room.id) {
+					await fletchMembres();
 				}
 				scrollToBottom();
 			}
@@ -744,8 +744,9 @@
 						senderPseudo: 'server'
 					}
 				];
+				currentUser.status = 0;
 				if (currentRoom.id === data.room.id) {
-					currentUser.status = 0;
+					await fletchMembres();
 				}
 				scrollToBottom();
 			}
@@ -783,15 +784,13 @@
 
 
 		socket.on('UserAdded', async (data) => {
-
-
 			if (data.room.id === currentRoom?.id) {
 
 				if (data?.ban === true && data?.user.id === currentUser.id) {
 					animation = data.animation;
 					messages = [
 						...messages,
-						{ senderPseudo: 'server', content: "Cet utilisateur EST BAN, pas de ca chez moi" }
+						{ senderPseudo: 'server', content: "Cet utilisateur EST BAN, pas de ca chez moi, la racaille c'est dehors" }
 					];
 					scrollToBottom();
 					return
@@ -818,10 +817,11 @@
 			
 			if (data.sucess === true) {
 				membres = [... membres, data.userToAdd];
+				chatRooms = await fletchChatRoomsData();
 			}
-			await fletchMembres();
-			chatRooms = await fletchChatRoomsData();
 		}
+		await fletchMembres();
+		chatRooms = await fletchChatRoomsData();
 		});
 
 
@@ -1133,7 +1133,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		<!----------------------------------------------->
 			<div class="message_container">
 				{#if currentRoom}
-					{#if currentRoom?.id}
+					{#if currentRoom?.id >= 0}
 						<div class="chat-messages" id="chat-messages">
 							{#if messages && messages.length}
 								{#each messages as msg}
@@ -1159,7 +1159,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 							{/if}
 						</div>
 					{/if}
-					{#if currentRoom.name.length}
+					{#if currentRoom.name.length && currentRoom.id > 0}
 						<div class="message_input_container">
 							<form class="send_message_form">
 								<input
@@ -1192,7 +1192,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
 		<!----------------------------------------------->
 		<!----------------- RIGHT BLOC ----------------->
 		<!----------------------------------------------->
-			{#if currentRoom?.id}
+			{#if currentRoom?.id >= 0}
 				<div class="right_bloc">
 					<div class="user_list">
 						{#if currentRoom?.id}
