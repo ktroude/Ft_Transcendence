@@ -336,7 +336,7 @@
 						'Content-Type': 'application/json',
 						'Authorization': `Bearer ${accessToken}`
 					},
-					body: JSON.stringify({friend: friendNameAdd})
+					body: JSON.stringify({friend: friendNameAdd.toUpperCase()})
 				});
 				if (response.ok) {
 					friends = await fetchFriend(user.pseudo);

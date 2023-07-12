@@ -398,7 +398,7 @@ background-position: center; background-size: cover ; overflow: hidden; width: 1
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
                 },
-                body: JSON.stringify({friend: friendNameAdd})
+                body: JSON.stringify({friend: friendNameAdd.toUpperCase()})
             });
             if (response.ok) {
                 friends = await fetchFriend(user.pseudo);
